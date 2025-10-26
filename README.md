@@ -53,12 +53,13 @@ MonKi empowers children to build healthy spending habits through interactive, st
 
   ## Tech Stack
 
-  | Category   | Technology                |
-  | ---------- | ------------------------- |
-  | Platform   | iOS 17+                   |
-  | Language   | Swift 5.9                 |
-  | Frameworks | SwiftUI, UIKit, Core Data |
-  | Tools      | Xcode 15+                 |
+  | Category   | Technology                              |
+  | ---------- | --------------------------------------- |
+  | Platform   | iOS 16.1+                               |
+  | Device     | iPhone 14 Pro                           |
+  | Language   | Swift                                   |
+  | Frameworks | SwiftUI, UIKit, Core Data, AVFoundation |
+  | Tools      | Xcode 15+                               |
 
   ***
 
@@ -86,6 +87,7 @@ MonKi empowers children to build healthy spending habits through interactive, st
 
   - Xcode 15 or later
   - macOS with development tools installed
+  - iOS 16.1 , Simulator iPhone 14 Pro
 
   ### Installation
 
@@ -114,7 +116,20 @@ MonKi empowers children to build healthy spending habits through interactive, st
   ```
   MonKi/
   ├─ MonKiApp.swift            # App entry point (SwiftUI @main)
-  ├─ ContentView.swift         # Root view for the app
+  ├─ Common/
+     ├─ Components/            # UI Components
+        ├─ Button
+        └─ ...
+     ├─ IOHelper               # IO Helper (Singleton)
+     ├─ Fonts/
+     ├─ Icons/
+     ├─ Extension/
+     ├─ Const.swift            # Const Declaration
+     └─ UserDefaults.swift
+  ├─ ContentView.swift         # Root view for the app (Will be deleted)
+  ├─ Pages/                    # Main Pages will be here
+  ├─ LocalDB/
+     └─ LocalDBManager.swift   # DB Wrapper for coreData
   ├─ Assets.xcassets/          # App icons and colors
   ├─ MonKi.xcdatamodeld/       # Core Data model
   ├─ MonKi.xcodeproj/          # Xcode project
@@ -137,7 +152,7 @@ MonKi empowers children to build healthy spending habits through interactive, st
   MonKi/
   ├─ App/                     # App entry & app-wide setup
   │  └─ MonKiApp.swift
-  ├─ Features/
+  ├─ Pages/
   │  ├─ Dashboard/
   │  │  ├─ DashboardView.swift
   │  │  └─ DashboardViewModel.swift
@@ -145,8 +160,6 @@ MonKi empowers children to build healthy spending habits through interactive, st
   │  │  ├─ ReflectionView.swift
   │  │  └─ ReflectionViewModel.swift
   │  └─ Shared/               # Shared helpers, extensions
-  ├─ Models/                  # Data models and Core Data helpers
-  ├─ Resources/               # Images, local JSON fixtures
   └─ Tests/
   ```
 
@@ -156,9 +169,7 @@ MonKi empowers children to build healthy spending habits through interactive, st
 
   ## Roadmap
 
-  - Add more analytics and charts
-  - Add parental review workflows and notifications
-  - Improve onboarding and tutorial content
+  - TBA
 
   ***
 
@@ -176,13 +187,8 @@ MonKi empowers children to build healthy spending habits through interactive, st
 
   ## License
 
-  This project is provided under the MIT License. See `LICENSE` for details (add a LICENSE file if missing).
-
-  ***
-
-  ## Contact
-
-  Project maintained by yinsxie — open an issue or reach out via GitHub.
+  - TBA
+  <!-- This project is provided under the MIT License. See `LICENSE` for details (add a LICENSE file if missing). -->
 
   ***
 
