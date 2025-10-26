@@ -24,6 +24,7 @@ MonKi empowers children to build healthy spending habits through interactive, st
   - [Contributing](#contributing)
   - [License](#license)
   - [Contact](#contact)
+  - [Notes for Devs](#notes-for-devs)
   - [Acknowledgements](#acknowledgements)
 
   ***
@@ -189,6 +190,17 @@ MonKi empowers children to build healthy spending habits through interactive, st
 
   - TBA
   <!-- This project is provided under the MIT License. See `LICENSE` for details (add a LICENSE file if missing). -->
+
+  ***
+
+  ## Notes for Devs
+
+- As for the current deadline, only have 1 dev branch
+- make branch `feat-[feature]`
+- CI Workflow will run :
+  - SwiftLint
+  - Swift Test
+- CI workflow will run after PR and after pushing to Main
 
   ***
 
