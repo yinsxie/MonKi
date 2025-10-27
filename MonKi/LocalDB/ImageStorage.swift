@@ -16,7 +16,7 @@ struct ImageStorage {
         
         let id = UUID().uuidString
         
-        let fileURL = getDocumentsDirectory().appendingPathComponent("\(id).jpg")
+        let fileURL = getDocumentsDirectory().appendingPathComponent("\(id).png")
         
         do {
             try data.write(to: fileURL)
