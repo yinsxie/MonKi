@@ -56,8 +56,8 @@ MonKi empowers children to build healthy spending habits through interactive, st
 
   | Category   | Technology                              |
   | ---------- | --------------------------------------- |
-  | Platform   | iOS 16.1+                               |
-  | Device     | iPhone 14 Pro                           |
+  | Platform   | iOS 17.0+                               |
+  | Device     | iPhone 15                               |
   | Language   | Swift                                   |
   | Frameworks | SwiftUI, UIKit, Core Data, AVFoundation |
   | Tools      | Xcode 15+                               |
