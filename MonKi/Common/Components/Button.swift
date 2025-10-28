@@ -98,8 +98,7 @@ struct CustomButton: View {
             
         ))
         .frame(width: width, height: 60)
-        .padding(.horizontal, 2.5)
-        .padding(.top, 2.5)
+        .contentShape(Rectangle())
     }
 }
 
