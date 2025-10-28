@@ -10,7 +10,7 @@ import Combine
 
 final class ParentHomeViewModel: ObservableObject {
     
-    @Published var gridCards: [ReviewCard] = []
+    @Published var logsForParent: [MsLog] = []
     
     private let logRepository: LogRepositoryProtocol
     
@@ -33,16 +33,6 @@ final class ParentHomeViewModel: ObservableObject {
         }
         print("Filtered down to \(logsForParent.count) logs for parent view.")
         
-        self.gridCards = logsForParent.map { log in
-            
-            let state = log.state ?? ""
-            let needsReview = (state == ChildrenLogState.needToTalk.stringValue)
-            
-            return ReviewCard(
-                id: log.id ?? UUID(),
-                imageName: log.imagePath ?? "icecream_placeholder",
-                needsReview: needsReview
-            )
-        }
+        self.logsForParent = logsForParent
     }
 }
