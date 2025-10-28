@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import CoreData // Needed to reference MsLog
+import CoreData 
 
 final class ParentReviewDetailViewModel: ObservableObject {
     
