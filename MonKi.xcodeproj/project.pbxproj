@@ -30,11 +30,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		EBCEDA8A2EAF09BD0019A9F5 /* Common */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Common;
-			sourceTree = "<group>";
-		};
 		EBD024FB2EAB5DA4004E1875 /* MonKi */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MonKi;
@@ -80,7 +75,6 @@
 		EBD024F02EAB5DA4004E1875 = {
 			isa = PBXGroup;
 			children = (
-				EBCEDA8A2EAF09BD0019A9F5 /* Common */,
 				EBD024FB2EAB5DA4004E1875 /* MonKi */,
 				EBD0250E2EAB5DA5004E1875 /* MonKiTests */,
 				EBD025182EAB5DA5004E1875 /* MonKiUITests */,
@@ -115,7 +109,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				EBCEDA8A2EAF09BD0019A9F5 /* Common */,
 				EBD024FB2EAB5DA4004E1875 /* MonKi */,
 			);
 			name = MonKi;
@@ -431,7 +424,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2CXYFC5LAK;
+				DEVELOPMENT_TEAM = 3N5KK4M42R;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -464,7 +457,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2CXYFC5LAK;
+				DEVELOPMENT_TEAM = 3N5KK4M42R;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
