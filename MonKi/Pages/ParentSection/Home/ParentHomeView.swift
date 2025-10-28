@@ -73,7 +73,7 @@ struct ParentHomeView: View {
                                     .frame(height: 70)
                                     Spacer()
                                 }
-                                .padding(.horizontal, 20)
+                                .padding(.horizontal, 24)
                                 .padding(.top, 20)
                                 
                                 // 5. Header Text
@@ -123,7 +123,7 @@ struct ParentHomeView: View {
                                         type: .normal
                                     )
                                 }
-                                .padding(.horizontal, 10)
+                                .padding(.horizontal, 16)
                                 .padding(.top, 60)
                                 
                                 // 7. Card Grid or Empty State

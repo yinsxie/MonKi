@@ -38,7 +38,7 @@ struct ParentReviewDetailView: View {
                         alignment: .top)
                 
                 // 2. Main Content
-                VStack(alignment: .leading, spacing: 30) {
+                VStack(alignment: .leading, spacing: 24) {
                     
                     closeButton
                     
@@ -61,7 +61,6 @@ struct ParentReviewDetailView: View {
                         .cornerRadius(16)
                         .frame(maxWidth: .infinity, alignment: .center)
                     
-                    // Dynamic Tags
                     VStack(alignment: .leading, spacing: 16) {
                         if viewModel.log.isHappy == true {
                             happyTag
