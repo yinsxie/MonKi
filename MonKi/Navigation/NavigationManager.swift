@@ -22,6 +22,12 @@ final class NavigationManager: ObservableObject {
         _ = navigationPath.popLast()
     }
     
+    func pop(times n: Int) {
+        guard n > 0 else { return }
+        let countToRemove = min(n, navigationPath.count)
+        navigationPath.removeLast(countToRemove)
+    }
+    
     func replaceTop(with route: MainRoute) {
         guard !navigationPath.isEmpty else {
             navigationPath.append(route)
