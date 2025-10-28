@@ -14,7 +14,10 @@ struct CustomButton: View {
     }
     
     let text: String?
-    let colorSet: ButtonColorSet
+    let backgroundColor: Color
+    let foregroundColor: Color
+    let textColor: Color
+    let font: Font
     let image: String?
     let action: () -> Void
     let cornerRadius: CGFloat
@@ -23,7 +26,10 @@ struct CustomButton: View {
     
     init(
         text: String? = nil,
-        colorSet: ButtonColorSet,
+        backgroundColor: Color,
+        foregroundColor: Color,
+        textColor: Color,
+        font: Font = .headlineEmphasized,
         image: String? = nil,
         action: @escaping () -> Void,
         cornerRadius: CGFloat = 12,
@@ -31,7 +37,10 @@ struct CustomButton: View {
         type: ButtonType = .normal
     ) {
         self.text = text
-        self.colorSet = colorSet
+        self.backgroundColor = backgroundColor
+        self.foregroundColor = foregroundColor
+        self.textColor = textColor
+        self.font = font
         self.image = image
         self.action = action
         self.cornerRadius = cornerRadius
@@ -39,28 +48,51 @@ struct CustomButton: View {
         self.type = type
     }
     
+    init(
+        text: String? = nil,
+        colorSet: ButtonColorSet,
+        font: Font = .headlineEmphasized,
+        image: String? = nil,
+        action: @escaping () -> Void,
+        cornerRadius: CGFloat = 12,
+        width: CGFloat = .infinity,
+        type: ButtonType = .normal
+    ) {
+        self.init(
+            text: text,
+            backgroundColor: colorSet.backgroundColor,
+            foregroundColor: colorSet.foregroundColor,
+            textColor: colorSet.textColor,
+            font: font,
+            image: image,
+            action: action,
+            cornerRadius: cornerRadius,
+            width: width,
+            type: type
+        )
+    }
+    
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
                 if let image = image {
                     Image(systemName: image)
-                        .imageScale(.large)
-                        .foregroundStyle(colorSet.textColor)
+                        .font(font)
+                        .foregroundStyle(textColor)
                 }
                 
                 if let text = text, !text.isEmpty {
                     Text(text)
-                        .foregroundStyle(colorSet.textColor)
-                        .font(.headline)
-                        .fontWeight(.bold)
+                        .foregroundStyle(textColor)
+                        .font(font)
                 }
             }
             .frame(maxWidth: .infinity)
             
         }
         .buttonStyle(CustomButtonStyle(
-            backgroundColor: colorSet.backgroundColor,
-            foregroundColor: colorSet.foregroundColor,
+            backgroundColor: backgroundColor,
+            foregroundColor: foregroundColor,
             cornerRadius: cornerRadius,
             shape: type == .normal ? .rectangle : .borderedRectangle
             
@@ -100,6 +132,30 @@ struct CustomButtonComponent_Previews: PreviewProvider {
                 action: {},
                 width: 70,
                 type: .bordered,
+            )
+            
+            // Custom Button (color)
+            
+            
+            // --- NEW: Custom Font Button ---
+            CustomButton(
+                colorSet: .primary,
+                font: .system(size: 36, weight: .black, design: .rounded),
+                image: "arrow.left",
+                action: {},
+                width: 72,
+                type: .normal
+            )
+            
+            // --- NEW: Custom Color & Font Button ---
+            CustomButton(
+                backgroundColor: ColorPalette.yellow600,
+                foregroundColor: ColorPalette.yellow400,
+                textColor: ColorPalette.yellow50,
+                image: "star.fill",
+                action: {},
+                width: 70,
+                type: .normal
             )
         }
         .padding()
