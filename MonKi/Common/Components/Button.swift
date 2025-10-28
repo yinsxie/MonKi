@@ -98,8 +98,7 @@ struct CustomButton: View {
             
         ))
         .frame(width: width, height: 60)
-        .padding(.horizontal, 2.5)
-        .padding(.top, 2.5)
+        .contentShape(Rectangle())
     }
 }
 
@@ -133,9 +132,6 @@ struct CustomButtonComponent_Previews: PreviewProvider {
                 width: 70,
                 type: .bordered,
             )
-            
-            // Custom Button (color)
-            
             
             // --- NEW: Custom Font Button ---
             CustomButton(

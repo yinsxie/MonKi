@@ -23,6 +23,7 @@ final class CoreDataManager: ObservableObject {
             if let error = error {
                 fatalError("Core Data Failed \(error.localizedDescription)")
             }
+            self.seedInitialData(context: self.viewContext)
         }
     }
     
@@ -32,4 +33,73 @@ final class CoreDataManager: ObservableObject {
                 try? ctx.save()
             }
         }
+    
+    // Seeder for parent home view
+    private func seedInitialData(context: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<MsLog> = MsLog.fetchRequest()
+        
+        do {
+            let count = try context.count(for: fetchRequest)
+            guard count == 0 else {
+                print("Database already seeded. Skipping.")
+                return
+            }
+        } catch {
+            print("Failed to fetch log count: \(error.localizedDescription)")
+            return
+        }
+
+        print("Seeding initial data...")
+        
+        // Log 1: Needs Review (state = "created")
+        let log1 = MsLog(context: context)
+        log1.id = UUID()
+        log1.imagePath = "icecream_placeholder"
+        log1.isHappy = true
+        log1.isBeneficial = true
+        log1.beneficialTags = "snack,sweet" // Your IOHelper combines tags
+        log1.state = ChildrenLogState.created.stringValue
+        log1.createdAt = Date()
+        log1.updatedAt = Date()
+
+        // Log 2: Needs Review (state = "needToTalk")
+        let log2 = MsLog(context: context)
+        log2.id = UUID()
+        log2.imagePath = "icecream_placeholder"
+        log2.isHappy = false
+        log2.isBeneficial = false
+        log2.beneficialTags = "toy,expensive"
+        log2.state = ChildrenLogState.needToTalk.stringValue
+        log2.createdAt = Date()
+        log2.updatedAt = Date()
+        
+        // Log 3: Already Approved (state = "approved")
+        let log3 = MsLog(context: context)
+        log3.id = UUID()
+        log3.imagePath = "icecream_placeholder"
+        log3.isHappy = true
+        log3.isBeneficial = true
+        log3.beneficialTags = "book,education"
+        log3.state = ChildrenLogState.approved.stringValue
+        log3.createdAt = Date()
+        log3.updatedAt = Date()
+        
+        let log4 = MsLog(context: context)
+        log4.id = UUID()
+        log4.imagePath = "icecream_placeholder"
+        log4.isHappy = true
+        log4.isBeneficial = true
+        log4.beneficialTags = "snack,sweet"
+        log4.state = ChildrenLogState.created.stringValue
+        log4.createdAt = Date()
+        log4.updatedAt = Date()
+
+        // 3. Save the new data to the database
+        do {
+            try context.save()
+            print("Initial data seeded successfully.")
+        } catch {
+            print("Failed to save seed data: \(error.localizedDescription)")
+        }
+    }
 }
