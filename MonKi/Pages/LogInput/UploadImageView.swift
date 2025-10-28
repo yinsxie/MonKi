@@ -70,22 +70,13 @@ struct UploadPage: View {
             .padding(.horizontal)
             
             // MARK: - Pick Button
-            Button {
+            
+            CanvasToolButton(toolType: .undo) {
                 viewModel.showPhotoPicker = true
-            } label: {
-                RoundedRectangle(cornerRadius: 60)
-                    .frame(width: 70, height: 70)
-                    .foregroundColor(.blue)
-                    .overlay(
-                        Image(systemName: "camera.fill")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                    )
-            }
-            .padding(.top, 16)
-            .padding(.bottom, 10)
-            .disabled(viewModel.backgroundRemover.isProcessing)
-            .opacity(viewModel.backgroundRemover.isProcessing ? 0.5 : 1)
+            }.padding(.top, 16)
+                .padding(.bottom, 10)
+                .disabled(viewModel.backgroundRemover.isProcessing)
+                .opacity(viewModel.backgroundRemover.isProcessing ? 0.5 : 1)
             
             Spacer()
         }

@@ -63,7 +63,8 @@ struct CustomButton: View {
         action: @escaping () -> Void,
         cornerRadius: CGFloat = 12,
         width: CGFloat = .infinity,
-        type: ButtonType = .normal
+        type: ButtonType = .normal,
+        isDisabled: Bool = false
     ) {
         self.init(
             text: text,
@@ -76,7 +77,8 @@ struct CustomButton: View {
             action: action,
             cornerRadius: cornerRadius,
             width: width,
-            type: type
+            type: type,
+            isDisabled: isDisabled
         )
     }
     
