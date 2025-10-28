@@ -25,6 +25,10 @@ final class CanvasViewModel: ObservableObject {
     @Published var isEraserEnabled: Bool = false
     @Published var onGoingAction: CanvasActionType?
     
+    // Line widths (points)
+    @Published var lineWidth: CGFloat = 7.5
+    @Published var eraserWidth: CGFloat = 15
+    
     func toggleColoredPencil(to pencil: ColoredPencilAsset) {
         isEraserEnabled = false
         selectedPencil = pencil
