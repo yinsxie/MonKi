@@ -1,0 +1,128 @@
+//
+//  LogRepository.swift
+//  MonKi
+//
+//  Created by William on 27/10/25.
+//
+
+import CoreData
+
+protocol LogRepositoryProtocol {
+    
+    func createLog(imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String])
+    func fetchLogs() -> [MsLog]
+    func childRelogged(withId id: UUID, isHappy: Bool, isBeneficial: Bool, tags: [String])
+    
+    func logApprovedByParent(withId id: UUID)
+    func logNeedToTalkWithParents(withId id: UUID)
+    func logRejectedByParent(withId id: UUID)
+    func logDone(withId id: UUID)
+    func logArchieved(withId id: UUID)
+}
+
+final class LogRepository: LogRepositoryProtocol {
+    
+    private let context: NSManagedObjectContext
+    
+    init(context: NSManagedObjectContext = CoreDataManager.shared.viewContext) {
+        self.context = context
+    }
+    
+    func createLog(imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String]) {
+        let log = MsLog(context: context)
+        
+        log.id = UUID()
+        log.beneficialTags = IOHelper.combineTag(tags)
+        log.isBeneficial = isBeneficial
+        log.isHappy = isHappy
+        log.state = ChildrenLogState.created.stringValue
+        log.imagePath = imagePath
+        log.createdAt = Date()
+        log.updatedAt = Date()
+        
+        do {
+            try context.save()
+        } catch {
+            print("Failed to save log: \(error.localizedDescription)")
+        }
+    }
+    
+    func fetchLogs() -> [MsLog] {
+        let fetchRequest: NSFetchRequest<MsLog> = MsLog.fetchRequest()
+        
+        do {
+            return try context.fetch(fetchRequest)
+        } catch {
+            return []
+        }
+    }
+    
+    func childRelogged(withId id: UUID, isHappy: Bool, isBeneficial: Bool, tags: [String]) {
+        guard let log = fetchLogById(id: id) else {
+            return
+        }
+        
+        log.isHappy = isHappy
+        log.isBeneficial = isBeneficial
+        log.beneficialTags = IOHelper.combineTag(tags)
+        log.updatedAt = Date()
+        
+        do {
+            try context.save()
+        } catch {
+            print("Failed to update log state: \(error.localizedDescription)")
+        }
+    }
+    
+    func logApprovedByParent(withId id: UUID) {
+        updateLogState(withId: id, newState: .approved)
+    }
+    
+    func logNeedToTalkWithParents(withId id: UUID) {
+        updateLogState(withId: id, newState: .needToTalk)
+    }
+    
+    func logRejectedByParent(withId id: UUID) {
+        updateLogState(withId: id, newState: .rejected)
+    }
+    
+    func logDone(withId id: UUID) {
+        updateLogState(withId: id, newState: .done)
+    }
+    
+    func logArchieved(withId id: UUID) {
+        updateLogState(withId: id, newState: .archived)
+    }
+}
+
+private extension LogRepository {
+    func updateLogState(withId id: UUID, newState: ChildrenLogState) {
+        
+        guard let log = fetchLogById(id: id) else {
+            return
+        }
+        
+        log.state = newState.stringValue
+        log.updatedAt = Date()
+        
+        do {
+            try context.save()
+        } catch {
+            print("Failed to update log state: \(error.localizedDescription)")
+        }
+    }
+    
+    func fetchLogById(id: UUID) -> MsLog? {
+        let fetchRequest: NSFetchRequest<MsLog> = MsLog.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            return results.first
+        } catch {
+            print("Failed to fetch log by id: \(error.localizedDescription)")
+            return nil
+        }
+        
+    }
+}
