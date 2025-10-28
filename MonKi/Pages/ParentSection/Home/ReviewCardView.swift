@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ReviewCardView: View {
     let log: MsLog
-    @Binding var path: NavigationPath
+    @EnvironmentObject var navigationManager: NavigationManager
     
     private var needsReview: Bool {
         log.state == ChildrenLogState.needToTalk.stringValue
@@ -34,7 +34,7 @@ struct ReviewCardView: View {
                         colorSet: .primary,
                         font: .headlineEmphasized,
                         action: {
-                            path.append(log)
+                            navigationManager.goTo(.parentHome(.reviewDetail(log: log)))
                         },
                         cornerRadius: 24,
                         width: 89,

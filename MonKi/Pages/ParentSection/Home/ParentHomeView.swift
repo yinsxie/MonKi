@@ -5,19 +5,13 @@
 //  Created by Aretha Natalova Wahyudi on 27/10/25.
 //
 
-//
-//  ParentHomeView.swift
-//  MonKi
-//
-//  Created by Aretha Natalova Wahyudi on 27/10/25.
-//
-
 import SwiftUI
 
 struct ParentHomeView: View {
     
+    @EnvironmentObject var navigationManager: NavigationManager
     @StateObject private var viewModel = ParentHomeViewModel()
-    @State private var navigationPath = NavigationPath()
+//    @State private var navigationPath = NavigationPath()
     
     // Grid layout: 2 columns
     let columns: [GridItem] = [
@@ -25,13 +19,15 @@ struct ParentHomeView: View {
         GridItem(.flexible(), spacing: 16)
     ]
     
-    // Actions for the placeholder buttons
-    func didTapHomeButton() { print("Home Tapped") }
+    func didTapHomeButton() {
+        print("Home Tapped")
+        navigationManager.popToRoot()
+    }
     func didTapPrevButton() { print("Previous Tapped") }
     func didTapNextButton() { print("Next Tapped") }
     
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+//        NavigationStack(path: $navigationPath) {
             GeometryReader { geometry in
                 
                 // 1. ZStack for the static light gray background
@@ -145,7 +141,7 @@ struct ParentHomeView: View {
                                 } else {
                                     LazyVGrid(columns: columns, spacing: 16) {
                                         ForEach(viewModel.logsForParent) { log in
-                                            ReviewCardView(log: log, path: $navigationPath)
+                                            ReviewCardView(log: log)
                                                 .frame(height: 241)
                                         }
                                     }
@@ -158,12 +154,9 @@ struct ParentHomeView: View {
                     }
                     // Prevents the scroll view from going under the status bar
                     .ignoresSafeArea(edges: .bottom)
-                    .navigationDestination(for: MsLog.self) { log in
-                        ParentReviewDetailView(log: log)
-                    }
                 }
             }
-        }
+//        }
         .onAppear {
             viewModel.loadLogs()
         }

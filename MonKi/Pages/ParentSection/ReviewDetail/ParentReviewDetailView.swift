@@ -11,9 +11,7 @@ struct ParentReviewDetailView: View {
     
     let log: MsLog
     @StateObject private var viewModel: ParentReviewDetailViewModel
-    
-    // Environment property to dismiss this view
-    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var navigationManager: NavigationManager
     
     init(log: MsLog) {
         self.log = log
@@ -93,7 +91,7 @@ struct ParentReviewDetailView: View {
             font: .title3Regular,
             image: "xmark",
             action: {
-                dismiss()
+                navigationManager.popLast()
             },
             cornerRadius: 24,
             width: 64,
@@ -178,7 +176,7 @@ struct ParentReviewDetailView: View {
                         font: .calloutEmphasized,
                         action: {
                             viewModel.rejectLog()
-                            dismiss()
+                            navigationManager.popLast()
                         },
                         cornerRadius: 24,
                         width: 135,
@@ -191,7 +189,7 @@ struct ParentReviewDetailView: View {
                         font: .calloutEmphasized,
                         action: {
                             viewModel.approveLog()
-                            dismiss()
+                            navigationManager.replaceTop(with: .parentHome(.reviewSuccess))
                         },
                         cornerRadius: 24,
                         width: 135,

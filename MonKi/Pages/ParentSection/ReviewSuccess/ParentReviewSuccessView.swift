@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ParentReviewSuccessView: View {
     
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     enum SendState {
         case sending
         case sent
@@ -24,7 +26,7 @@ struct ParentReviewSuccessView: View {
                 Image("ReviewSuccessWaterBackground")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: .infinity)
+                    .frame(maxWidth: .infinity)
                     .foregroundColor(Color.blue)
                 
                 if sendState == .sent {
@@ -68,6 +70,7 @@ struct ParentReviewSuccessView: View {
                         colorSet: .normal,
                         font: .calloutEmphasized,
                         action: {
+                            navigationManager.popLast()
                         },
                         cornerRadius: 24,
                         width: 180,

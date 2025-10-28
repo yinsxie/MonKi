@@ -29,7 +29,8 @@ struct HomeView: View {
                 }
                 
                 Button {
-                    
+                    navigationManager.goTo(.parentHome(.home)
+                    )
                 } label: {
                     Text("Nav to parent home")
                 }

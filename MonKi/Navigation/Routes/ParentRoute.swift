@@ -9,7 +9,8 @@ import SwiftUI
 
 enum ParentRoute: Hashable {
     case home
-    case reviewDetail
+    case reviewDetail(log: MsLog)
+    case reviewSuccess
 }
 
 extension ParentRoute {
@@ -18,9 +19,14 @@ extension ParentRoute {
     func delegateView() -> some View {
         switch self {
         case .home:
-            Text("Parent Home")
-        case .reviewDetail:
-            Text("Review Detail")
+            ParentHomeView()
+                .navigationBarBackButtonHidden(true)
+        case .reviewDetail(let log):
+            ParentReviewDetailView(log: log)
+                .navigationBarBackButtonHidden(true)
+        case .reviewSuccess:
+            ParentReviewSuccessView()
+                .navigationBarBackButtonHidden(true)
         }
     }
 }
