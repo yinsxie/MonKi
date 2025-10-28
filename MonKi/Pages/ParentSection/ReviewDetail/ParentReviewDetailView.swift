@@ -175,8 +175,7 @@ struct ParentReviewDetailView: View {
                         colorSet: .normal,
                         font: .calloutEmphasized,
                         action: {
-                            viewModel.rejectLog()
-                            navigationManager.popLast()
+                            navigationManager.replaceTop(with: .parentHome(.reflectionGuide(log: log)))
                         },
                         cornerRadius: 24,
                         width: 135,
@@ -205,10 +204,3 @@ struct ParentReviewDetailView: View {
         }
     }
 }
-
-//// MARK: - Preview
-//struct ParentReviewDetailView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ParentReviewDetailView(logId: UUID())
-//    }
-//}

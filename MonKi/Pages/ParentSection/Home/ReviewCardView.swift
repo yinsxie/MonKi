@@ -76,24 +76,3 @@ struct ReviewCardView: View {
         }
     }
 }
-
-//struct ReviewCardView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        Group {
-//            ReviewCardView(
-//                card: ReviewCard(id: UUID(), imageName: "icecream_placeholder", needsReview: true),
-//                path: .constant(NavigationPath())
-//            )
-//            .previewDisplayName("Needs Review Card")
-//            
-//            ReviewCardView(
-//                card: ReviewCard(id: UUID(), imageName: "icecream_placeholder", needsReview: false),
-//                path: .constant(NavigationPath())
-//            )
-//            .previewDisplayName("Standard Card")
-//        }
-//        .frame(width: 172, height: 241)
-//        .previewLayout(.sizeThatFits)
-//        .padding()
-//    }
-//}
