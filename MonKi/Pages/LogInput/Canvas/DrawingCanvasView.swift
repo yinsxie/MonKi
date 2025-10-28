@@ -15,7 +15,7 @@ class FingerCanvasView: UIView {
     private var currentLine: Line?
 
     private var currentColor: UIColor = .black
-    private var currentWidth: CGFloat = 100
+    private var currentWidth: CGFloat = 10
     private var isEraser: Bool = false
 
     override init(frame: CGRect) {
@@ -90,8 +90,11 @@ class FingerCanvasView: UIView {
             path.move(to: first)
             for point in line.points.dropFirst() { path.addLine(to: point) }
 
-            ctx?.setLineWidth(line.lineWidth)
-            ctx?.setLineCap(.round)
+            // Apply stroke attributes to the path so stroke width actually takes effect
+            path.lineWidth = line.lineWidth
+            path.lineCapStyle = .round
+
+            // Use clear blend mode to erase when needed
             ctx?.setBlendMode(line.color == .clear ? .clear : .normal)
             line.color.setStroke()
             path.stroke()
@@ -119,7 +122,6 @@ struct DrawingCanvasView: UIViewRepresentable {
     
     func makeUIView(context: Context) -> FingerCanvasView {
         let view = FingerCanvasView()
-        view.setLineWidth(50)
         return view
     }
 
@@ -132,6 +134,10 @@ struct DrawingCanvasView: UIViewRepresentable {
             uiView.setColor(pencilColor)
         }
         uiView.enableEraser(viewModel.isEraserEnabled)
+        
+        // Apply width based on current tool (pencil vs eraser)
+        let width = viewModel.isEraserEnabled ? viewModel.eraserWidth : viewModel.lineWidth
+        uiView.setLineWidth(width)
         
         if let action = viewModel.onGoingAction {
             switch action {
