@@ -30,10 +30,9 @@ struct ParentHomeView: View {
                 Group {
                     Circle()
                         .fill(ColorPalette.yellow300)
-                    //  .frame(width: 1200, height: 1200)
                         .offset(y: geometry.size.height / 3 )
                         .scaleEffect(3.0)
-
+                    
                 }
                 .ignoresSafeArea(.all, edges: .bottom)
                 
@@ -43,7 +42,10 @@ struct ParentHomeView: View {
                     HStack {
                         // Home Button (Icon-only)
                         CustomButton(
-                            colorSet: .normal,
+                            backgroundColor: ColorPalette.yellow600,
+                            foregroundColor: ColorPalette.yellow400,
+                            textColor: ColorPalette.yellow50,
+                            font: .system(size: 20, weight: .black, design: .rounded),
                             image: "house.fill",
                             action: didTapHomeButton,
                             cornerRadius: 24,
@@ -78,14 +80,16 @@ struct ParentHomeView: View {
                         
                         // Left Arrow Button
                         CustomButton(
-                            colorSet: .normal,
+                            backgroundColor: ColorPalette.yellow600,
+                            foregroundColor: ColorPalette.yellow400,
+                            textColor: ColorPalette.neutral50,
+                            font: .system(size: 36, weight: .black, design: .rounded),
                             image: "arrow.left",
                             action: didTapPrevButton,
                             cornerRadius: 24,
                             width: 72,
                             type: .normal
                         )
-                        .frame(height: 70)
                         
                         // Gray Placeholder Card
                         RoundedRectangle(cornerRadius: 16)
@@ -94,14 +98,16 @@ struct ParentHomeView: View {
                         
                         // Right Arrow Button
                         CustomButton(
-                            colorSet: .normal,
+                            backgroundColor: ColorPalette.yellow600,
+                            foregroundColor: ColorPalette.yellow400,
+                            textColor: ColorPalette.neutral50,
+                            font: .system(size: 36, weight: .black, design: .rounded),
                             image: "arrow.right",
                             action: didTapNextButton,
                             cornerRadius: 24,
                             width: 72,
                             type: .normal
                         )
-                        .frame(height: 70)
                         
                     }
                     .padding(.horizontal, 20)
@@ -121,12 +127,11 @@ struct ParentHomeView: View {
                     }
                     .padding(.horizontal, 32)
                     .padding(.bottom, 60)
-                    .padding(.top, 30) // Add top padding to move it slightly down from the card
-                    // This Vstack is now visible because the main content Vstack is now working
+                    .padding(.top, 30)
                     
                     Spacer()
                     
-                } // End of Content VStack
+                }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }

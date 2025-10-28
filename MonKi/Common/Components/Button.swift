@@ -134,9 +134,6 @@ struct CustomButtonComponent_Previews: PreviewProvider {
                 type: .bordered,
             )
             
-            // Custom Button (color)
-            
-            
             // --- NEW: Custom Font Button ---
             CustomButton(
                 colorSet: .primary,
