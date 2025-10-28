@@ -8,8 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State private var isSplashShown: Bool = true
+    @StateObject var navigationManager = NavigationManager()
+    
     var body: some View {
-        Text("Hello, MonKi!")
+        VStack {
+            if isSplashShown {
+                SplashScreenView()
+            } else {
+                HomeView()
+                    .environmentObject(navigationManager)
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                withAnimation {
+                    isSplashShown = false
+                }
+            }
+        }
     }
 }
 
