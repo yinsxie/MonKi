@@ -33,13 +33,14 @@ struct CanvasToolView: View {
     @ObservedObject var viewModel: CanvasViewModel
     
     var body: some View {
-        HStack {
-            CanvasDeleteToolButton(toolType: .delete, isEnabled: $viewModel.isEraserEnabled) {
-                viewModel.toggleEraser()
-            }
+        HStack(spacing: 20) {
             
             CanvasToolButton(toolType: .undo) {
                 viewModel.handleAction(forAction: .undo)
+            }
+            
+            CanvasDeleteToolButton(toolType: .delete, isEnabled: $viewModel.isEraserEnabled) {
+                viewModel.toggleEraser()
             }
             
             CanvasToolButton(toolType: .redo) {
