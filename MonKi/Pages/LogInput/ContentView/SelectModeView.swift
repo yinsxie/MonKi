@@ -14,15 +14,16 @@ struct SelectModePage: View {
     
     var body: some View {
         VStack {
+            Spacer()
+            
             // MARK: - Bagian Atas: Teks
             Text("Yuk, tunjukkin impianmu!")
                 .font(Font.title2Emphasized)
                 .multilineTextAlignment(.center)
-            
-            Spacer()
+                .padding(.bottom, 40)
             
             // MARK: - Bagian Tengah: Card
-            HStack(spacing: 16) {
+            HStack(spacing: 8) {
                 ChildInputCard(
                     text: "Draw",
                     isSelected: selectedMode == "Draw"
@@ -37,8 +38,10 @@ struct SelectModePage: View {
                     selectedMode = "Gallery"
                 }
             }
+            .frame(height: 400, alignment: .top)
+            .frame(maxWidth: .infinity)
             .animation(.easeInOut, value: selectedMode)
-            .padding(.horizontal, 32)
+            .padding(.horizontal)
             
             Spacer()
             

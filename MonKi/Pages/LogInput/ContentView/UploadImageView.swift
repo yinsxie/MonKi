@@ -18,7 +18,7 @@ struct UploadPage: View {
             Text("Selected Photo")
                 .font(Font.title2Emphasized)
                 .multilineTextAlignment(.center)
-                .padding(.bottom, 24)
+                .padding(.bottom, 32)
             
             // MARK: - Preview Area
             ZStack {
@@ -64,7 +64,7 @@ struct UploadPage: View {
                         .padding()
                 }
             }
-            .frame(height: 300)
+            .frame(height: 300, alignment: .top)
             .frame(maxWidth: .infinity)
             .padding(.horizontal)
             
@@ -72,8 +72,8 @@ struct UploadPage: View {
             
             CanvasToolButton(toolType: .undo) {
                 viewModel.showPhotoPicker = true
-            }.padding(.top, 16)
-                .padding(.bottom, 10)
+            }.padding(.top, 24)
+                .padding(.bottom, 8)
                 .disabled(viewModel.backgroundRemover.isProcessing)
                 .opacity(viewModel.backgroundRemover.isProcessing ? 0.5 : 1)
             
