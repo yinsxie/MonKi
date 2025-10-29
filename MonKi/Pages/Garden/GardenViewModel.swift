@@ -41,6 +41,11 @@ final class GardenViewModel: ObservableObject {
             return
         }
     }
+    
+    func pushReplaceToCollectibleView(context: NavigationManager) {
+        context.replaceTopAnimate(with: .childGarden(.collectible))
+    }
+    
 }
 
 private extension GardenViewModel {

@@ -1,29 +1,29 @@
 //
-//  GardenWateringAsset.swift
+//  GardenHarvestingAsset.swift
 //  MonKi
 //
 //  Created by William on 29/10/25.
 //
 
-enum GardenWateringAsset: CaseIterable {
+enum GardenHarvestingAsset {
     case frame1
     case frame2
 
     var imageName: String {
         switch self {
         case .frame1: return "WateringHarvestingF1"
-        case .frame2: return "WateringF2"
+        case .frame2: return "HarvestingF2"
         }
     }
 }
 
-enum GardenWateringHelperAsset: CaseIterable {
-    case wateringCan
+enum GardenHarvestingHelperAsset: CaseIterable {
+    case hand
     
     var imageName: String {
         switch self {
-        case .wateringCan:
-            return "WateringF1WateringCan"
+        case .hand:
+            return "HarvestingF1HarvestHand"
         }
     }
 }

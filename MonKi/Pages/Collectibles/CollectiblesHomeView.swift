@@ -8,7 +8,21 @@
 import SwiftUI
 
 struct CollectiblesHomeView: View {
+    
+    @EnvironmentObject var navigationManager: NavigationManager
+    
     var body: some View {
-        Text("CollectiblesHomeView")
+        VStack {
+            Text("CollectiblesHomeView")
+            
+            Button {
+                navigationManager.popLast()
+            } label: {
+                Text("Go back")
+            }
+            
+        }
+        
+        
     }
 }
