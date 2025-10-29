@@ -20,4 +20,13 @@ final class ReflectionGuideViewModel: ObservableObject {
         self.logRepository = logRepository
     }
     
+<<<<<<< HEAD
+=======
+    func needToTalkLog() {
+        guard let logId = log.id else { return }
+        print("Need to talk with parent for log: \(logId)")
+        logRepository.logNeedToTalkWithParents(withId: logId)
+    }
+    
+>>>>>>> dev
 }

@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 /// List of Identifier for determined userDefault keys
 ///
 /// > Important: Conform to other teammates when adding new keys to avoid duplication. Be sure to double-check existing keys first.
@@ -18,7 +17,7 @@ enum UserDefaultsIdentifier {
     case maxFieldCount
     case isNewUser
     
-    var value : String {
+    var value: String {
         switch self {
         case .parentalGateQuestion:
             return "parental_gate_question"
@@ -34,10 +33,9 @@ enum UserDefaultsIdentifier {
     }
 }
 
-enum UserDefaultsError : Error {
+enum UserDefaultsError: Error {
     case maxFieldLessThanCurrentFilledField
 }
-
 
 /// Singleton for managing UserDefaults operations
 ///
