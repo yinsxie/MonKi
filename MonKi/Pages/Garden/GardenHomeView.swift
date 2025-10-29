@@ -19,6 +19,17 @@ struct GardenHomeView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
             
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
+                fieldCardViewBuilder(type: .empty)
+                
+                fieldCardViewBuilder(type: .approved)
+                
+                fieldCardViewBuilder(type: .created)
+                
+                fieldCardViewBuilder(type: .done)
+            }
+            .offset(y: 40)
+            
             VStack {
                 HStack {
                     homeButton
@@ -27,16 +38,7 @@ struct GardenHomeView: View {
                 }
                 .padding(.top, 70)
                 
-                Spacer(minLength: 180)
-               
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 60) {
-                    ForEach(0..<4) { _ in
-                        FieldCardView(type: .empty, gardenViewModel: viewModel, context: navigationManager)
-                    }
-                }
-                
                 Spacer()
-                
                 //MARK: Uncomment to enable left and right
 //                footerButtonView
             }
@@ -44,6 +46,16 @@ struct GardenHomeView: View {
             .padding(.bottom, 57)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    @ViewBuilder
+    func fieldCardViewBuilder(type: FieldState) -> some View {
+        FieldCardView(type: type) {
+            // OnEmptyTapped
+            viewModel.navigateTo(route: .childLog(.logInput), context: navigationManager)
+        } onCTAButtonTapped: {
+            viewModel.handleCTAButtonTapped(for: type, context: navigationManager)
+        }
     }
     
     var footerButtonView: some View {

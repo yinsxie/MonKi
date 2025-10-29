@@ -10,6 +10,8 @@ import SwiftUI
 enum ChildGardenRoute: Hashable {
     case home
     case collectible
+    case watering
+    case harvesting
 }
 
 extension ChildGardenRoute {
@@ -20,6 +22,10 @@ extension ChildGardenRoute {
             GardenHomeView()
         case .collectible:
             CollectiblesHomeView()
+        case .watering:
+            GardenWateringView()
+        case .harvesting:
+            GardenHarvestingView()
         }
     }
 }

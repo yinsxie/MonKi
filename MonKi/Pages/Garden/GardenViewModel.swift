@@ -17,13 +17,37 @@ final class GardenViewModel: ObservableObject {
         context.goTo(route)
     }
     
-    func onFieldTapped(forFieldType: FieldState, context: NavigationManager){
+    func onFieldTapped(forFieldType: FieldState, context: NavigationManager) {
         switch forFieldType {
         case .empty:
             context.goTo(.childLog(.logInput))
         default:
-            print("belum")
+            return
         }
             
+    }
+    
+    func handleCTAButtonTapped(for type: FieldState, context: NavigationManager) {
+        switch type {
+        case .approved:
+           onApproveFieldTapped(context: context)
+        case .done:
+            onDoneFieldTapped(context: context)
+        default:
+            return
+        }
+    }
+}
+
+private extension GardenViewModel {
+    
+    func onApproveFieldTapped(context: NavigationManager) {
+        context.goTo(.childGarden(.watering))
+        // TODO: Update State to Done
+    }
+    
+    func onDoneFieldTapped(context: NavigationManager) {
+        context.goTo(.childGarden(.watering))
+        // TODO: Update State to Archieved (removing it from the field basically)
     }
 }
