@@ -25,6 +25,11 @@ internal class ChildLogViewModel: ObservableObject {
     // MARK: - Background Remover
     @Published var backgroundRemover = BackgroundRemoverViewModel()
     
+    // MARK: - Page
+    var currentPage: ChildLogPageEnum {
+        return ChildLogPageEnum(rawValue: currentIndex) ?? .selectMode
+    }
+    
     // MARK: - Permission
     func requestGalleryPermission(completion: @escaping (Bool) -> Void) {
         PhotoPermissionService.shared.requestPermission { [weak self] granted in
@@ -74,8 +79,8 @@ internal class ChildLogViewModel: ObservableObject {
     
     // MARK: - Navigation Actions
     func handleNextAction(defaultAction: @escaping () -> Void) {
-        switch currentIndex {
-        case 0:
+        switch currentPage {
+        case .selectMode:
             if selectedMode == "Gallery" {
                 requestGalleryPermission { [weak self] granted in
                     guard let self else { return }
@@ -86,59 +91,67 @@ internal class ChildLogViewModel: ObservableObject {
                     }
                 }
             } else if selectedMode == "Draw" {
-                withAnimation { currentIndex = 1 }
+                withAnimation { currentIndex = ChildLogPageEnum.mainInput.rawValue }
             }
             
-        case 1:
+        case .mainInput:
             if selectedMode == "Draw" ||
                 (selectedMode == "Gallery" &&
                  selectedItem != nil &&
                  !backgroundRemover.isProcessing) {
-                withAnimation { currentIndex = 2 }
+                withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
             }
             
-        default:
+        case .finalImage:
             defaultAction()
         }
     }
     
     func handleNoImageSelected() {
-        if selectedMode == "Gallery", currentIndex == 1 {
+        if selectedMode == "Gallery", currentPage == .mainInput {
             withAnimation {
-                currentIndex = 0
+                currentIndex = ChildLogPageEnum.selectMode.rawValue
                 selectedItem = nil
             }
         }
     }
-
+    
     func handleBackAction() {
-        if currentIndex == 2 {
+        switch currentPage {
+        case .finalImage:
             withAnimation {
-                currentIndex = 1
+                currentIndex = ChildLogPageEnum.mainInput.rawValue
                 if selectedMode == "Gallery" {
                     backgroundRemover.partialReset()
                 }
             }
-        } else if currentIndex == 1 {
+        case .mainInput:
             withAnimation {
-                currentIndex = 0
+                currentIndex = ChildLogPageEnum.selectMode.rawValue
                 selectedItem = nil
                 backgroundRemover.reset()
             }
+        case .selectMode:
+            break
         }
     }
     
     func shouldDisableNext() -> Bool {
         let isModeInvalid = selectedMode?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
         let isProcessing = backgroundRemover.isProcessing
-        let isUploadInvalid = selectedMode == "Gallery" && currentIndex == 1 && selectedItem == nil
-
-        if currentIndex == 0 {
+        let isUploadInvalid = selectedMode == "Gallery" && currentPage == .mainInput && selectedItem == nil
+        
+        switch currentPage {
+        case .selectMode:
             return isModeInvalid
-        } else if currentIndex == 1 {
+        case .mainInput:
             return isProcessing || isUploadInvalid
-        } else {
+        case .finalImage:
             return false
         }
+    }
+    
+    var shouldHideProgressBar: Bool {
+        return selectedMode == "Draw" && currentPage == .mainInput
     }
 }

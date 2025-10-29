@@ -15,9 +15,7 @@ struct FinalImagePage: View {
             // MARK: - Background: FinalImage
             Image("FinalImage")
                 .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity)
-                .layoutPriority(1)
+                .scaledToFit()
             
             // MARK: - Foreground: Gambar Hasil + Shadow
             VStack {
@@ -39,9 +37,8 @@ struct FinalImagePage: View {
             }
             .zIndex(1)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical)
-        .navigationBarTitleDisplayMode(.inline)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
     }
 }
 

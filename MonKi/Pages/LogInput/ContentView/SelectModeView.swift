@@ -13,21 +13,11 @@ struct SelectModePage: View {
     let viewModel: ChildLogViewModel
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack {
             // MARK: - Bagian Atas: Teks
-            VStack(spacing: 12) {
-                Text("Headilne")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                
-                Text("Lorem ipsum dolor sit amet")
-                    .font(.body)
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-            }
-            .padding(.top, 24)
+            Text("Yuk, tunjukkin impianmu!")
+                .font(Font.title2Emphasized)
+                .multilineTextAlignment(.center)
             
             Spacer()
             
@@ -54,8 +44,10 @@ struct SelectModePage: View {
             .padding(.horizontal, 32)
             
             Spacer()
+            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemBackground))
+        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
+        .padding(.vertical, 140)
     }
 }

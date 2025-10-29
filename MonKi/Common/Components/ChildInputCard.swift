@@ -43,8 +43,7 @@ struct ChildInputCard: View {
                     .frame(height: UIScreen.main.bounds.height * 0.15)
                 
                 Text(text)
-                    .font(.title3)
-                    .fontWeight(.bold)
+                    .font(Font.title3Emphasized)
                     .foregroundStyle(colorSet.textColor)
             }
             .frame(maxWidth: .infinity)
