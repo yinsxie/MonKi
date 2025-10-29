@@ -14,7 +14,8 @@ struct ChildLogNavigationContainer: View {
     var body: some View {
         ChildLogNavigationView(
             currentIndex: $viewModel.currentIndex,
-            pageCount: 3,
+            pageCount: ChildLogPageEnum.allCases.count,
+            isProgressBarHidden: viewModel.shouldHideProgressBar,
             onClose: { print("Navigation closed") },
             customNextAction: { defaultAction in
                 viewModel.handleNextAction(defaultAction: defaultAction)
@@ -24,29 +25,7 @@ struct ChildLogNavigationContainer: View {
             },
             isNextDisabled: viewModel.shouldDisableNext(),
             content: {
-                Group {
-                    switch viewModel.currentIndex {
-                    case 0:
-                        SelectModePage(
-                            selectedMode: $viewModel.selectedMode,
-                            isGalleryPermissionGranted: $viewModel.isGalleryPermissionGranted,
-                            viewModel: viewModel
-                        )
-                        
-                    case 1:
-                        if viewModel.selectedMode == "Draw" {
-                            DrawPage()
-                        } else {
-                            UploadPage(viewModel: viewModel)
-                        }
-                        
-                    case 2:
-                        FinalImagePage(processedImage: viewModel.backgroundRemover.resultImage)
-                        
-                    default:
-                        EmptyView()
-                    }
-                }
+                ChildLogRouter(viewModel: viewModel)
             }
         )
         // MARK: - Photo Picker
@@ -61,7 +40,7 @@ struct ChildLogNavigationContainer: View {
                 if newItem != nil {
                     await MainActor.run {
                         withAnimation {
-                            viewModel.currentIndex = 1
+                            viewModel.currentIndex = ChildLogPageEnum.mainInput.rawValue
                         }
                     }
                 }
@@ -85,7 +64,7 @@ struct ChildLogNavigationContainer: View {
                 message: Text(alert.message),
                 dismissButton: .default(Text("OK")) {
                     withAnimation {
-                        viewModel.currentIndex = 1
+                        viewModel.currentIndex = ChildLogPageEnum.mainInput.rawValue
                         viewModel.selectedItem = nil
                         viewModel.backgroundRemover.partialReset()
                     }

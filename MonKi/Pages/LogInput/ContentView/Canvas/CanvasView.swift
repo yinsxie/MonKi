@@ -23,20 +23,21 @@ struct CanvasView: View {
             
             Image(ImageAsset.canvasViewCloth.imageName)
                 .resizable()
-                .scaledToFill()
-                .frame(width: UIScreen.main.bounds.width * 1.4,
-                       height: UIScreen.main.bounds.height * 0.7,
-                       alignment: .topLeading)
+                .scaledToFit()
+            //                .frame(height: UIScreen.main.bounds.height * 0.75,
+            //                                       alignment: .topLeading)
+                .frame(maxWidth: .infinity)
+                .clipped()
                 .offset(x: -150, y: -200)
                 .id("clothBackground")
                 .ignoresSafeArea()
             
             Image(ImageAsset.canvasViewButton.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 357.26, height: 278.08)
-                    .offset(x: 50, y: -320)
-                    .ignoresSafeArea()
+                .resizable()
+                .scaledToFit()
+                .frame(width: 357.26, height: 278.08)
+                .offset(x: 50, y: -320)
+                .ignoresSafeArea()
             
             VStack {
                 Spacer()
@@ -46,7 +47,7 @@ struct CanvasView: View {
                         .frame(width: 384.68, height: 363.87)
                         .scaledToFit()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .offset(x: 70, y: 0)
+                    //                        .offset(x: 60, y: 0)
                     
                     DrawingCanvasView(viewModel: viewModel)
                         .frame(width: 300, height: 300)
@@ -63,7 +64,10 @@ struct CanvasView: View {
                 
                 Spacer()
             }
+            .ignoresSafeArea()
+            .padding(.vertical, 100)
         }
+        .ignoresSafeArea()
     }
 }
 

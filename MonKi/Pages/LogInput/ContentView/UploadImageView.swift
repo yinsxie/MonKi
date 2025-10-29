@@ -13,13 +13,12 @@ struct UploadPage: View {
     
     var body: some View {
         VStack {
-            Text("Selected Photo")
-                .font(.title3)
-                .fontWeight(.bold)
-                .multilineTextAlignment(.center)
-                .padding(.top, 24)
-            
             Spacer()
+            
+            Text("Selected Photo")
+                .font(Font.title2Emphasized)
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 24)
             
             // MARK: - Preview Area
             ZStack {
@@ -80,6 +79,9 @@ struct UploadPage: View {
             
             Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
+        .padding(.vertical, 140)
     }
 }
 

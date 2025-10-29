@@ -11,6 +11,7 @@ struct ChildLogNavigationView<Content: View>: View {
     @Binding var currentIndex: Int
     @State private var isMovingForward: Bool = true
     let pageCount: Int
+    let isProgressBarHidden: Bool
     let onClose: () -> Void
     let customNextAction: ((@escaping () -> Void) -> Void)?
     let customBackAction: (() -> Void)?
@@ -20,6 +21,7 @@ struct ChildLogNavigationView<Content: View>: View {
     init(
         currentIndex: Binding<Int>,
         pageCount: Int,
+        isProgressBarHidden: Bool = false,
         onClose: @escaping () -> Void,
         customNextAction: ((@escaping () -> Void) -> Void)? = nil,
         customBackAction: (() -> Void)? = nil,
@@ -28,6 +30,7 @@ struct ChildLogNavigationView<Content: View>: View {
     ) {
         self._currentIndex = currentIndex
         self.pageCount = pageCount
+        self.isProgressBarHidden = isProgressBarHidden
         self.onClose = onClose
         self.customNextAction = customNextAction
         self.customBackAction = customBackAction
@@ -36,20 +39,7 @@ struct ChildLogNavigationView<Content: View>: View {
     }
     
     var body: some View {
-        VStack(spacing: 24) {
-            
-            // MARK: - Progress Bar
-            ProgressBar(
-                count: Double(currentIndex + 1) / Double(pageCount),
-                color: ColorPalette.orange500,
-                action: onClose
-            )
-            .padding(.horizontal)
-            .padding(.top)
-            
-            Spacer()
-            
-            // MARK: Dynamic page content
+        ZStack {
             ZStack {
                 content()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -59,14 +49,25 @@ struct ChildLogNavigationView<Content: View>: View {
                     ))
                     .id(currentIndex)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .animation(.easeInOut(duration: 0.3), value: currentIndex)
-            
-            Spacer()
-            
-            // MARK: Navigation buttons
-            HStack(spacing: 12) {
+            .edgesIgnoringSafeArea(.all)
+
+            VStack(spacing: 0) {
+                
+                // MARK: - Progress Bar
+                ProgressBar(
+                    count: Double(currentIndex + 1) / Double(pageCount),
+                    color: ColorPalette.orange500,
+                    action: onClose,
+                    isHidden: isProgressBarHidden
+                )
+                .padding(.horizontal)
+                .padding(.top)
+                
+                Spacer()
+                
+                // MARK: Navigation buttons
                 GeometryReader { geometry in
                     let totalWidth = geometry.size.width
                     
@@ -117,11 +118,12 @@ struct ChildLogNavigationView<Content: View>: View {
                         )
                     }
                     .frame(width: totalWidth)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 }
                 .frame(height: 60)
+                .padding(.horizontal)
+                .padding(.bottom)
             }
-            .padding(.horizontal)
-            .padding(.bottom)
         }
     }
 }
