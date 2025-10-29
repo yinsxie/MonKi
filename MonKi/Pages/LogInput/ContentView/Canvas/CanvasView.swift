@@ -8,13 +8,8 @@
 import SwiftUI
 
 struct CanvasView: View {
-    
-    @StateObject var viewModel: CanvasViewModel
-    
-    init(viewModel: CanvasViewModel = CanvasViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-    }
-    
+    @EnvironmentObject var viewModel: CanvasViewModel
+
     var body: some View {
         ZStack {
             Image(ImageAsset.canvasBackground.imageName)
@@ -49,7 +44,7 @@ struct CanvasView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     //                        .offset(x: 60, y: 0)
                     
-                    DrawingCanvasView(viewModel: viewModel)
+                    DrawingCanvasView(viewModel: _viewModel)
                         .frame(width: 300, height: 300)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                 }
@@ -73,4 +68,5 @@ struct CanvasView: View {
 
 #Preview {
     CanvasView()
+        .environmentObject(CanvasViewModel()) // Provide VM for preview
 }

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+import CoreData
 
 @MainActor
 internal class ChildLogViewModel: ObservableObject {
@@ -22,12 +23,28 @@ internal class ChildLogViewModel: ObservableObject {
     @Published var imageLoadError: String?
     @Published var showPhotoPicker = false
     
-    // MARK: - Background Remover
+    // MARK: - Image Processors & Final Image
     @Published var backgroundRemover = BackgroundRemoverViewModel()
+    @Published var canvasViewModel = CanvasViewModel()
+    @Published var finalProcessedImage: UIImage?
     
-    // MARK: - Page
+    // MARK: - Core Data Log
+    private let context: NSManagedObjectContext
+    
+    // MARK: - Computed Properties
     var currentPage: ChildLogPageEnum {
         return ChildLogPageEnum(rawValue: currentIndex) ?? .selectMode
+    }
+    
+    // MARK: - Initialization
+    init(context: NSManagedObjectContext = CoreDataManager.shared.viewContext) {
+        self.context = context
+        self.canvasViewModel.onDrawingProcessed = { [weak self] image in
+            guard let self else { return }
+            Task { @MainActor in
+                self.handleDrawingProcessed(image: image)
+            }
+        }
     }
     
     // MARK: - Permission
@@ -38,24 +55,32 @@ internal class ChildLogViewModel: ObservableObject {
                 self.isGalleryPermissionGranted = granted
                 if !granted {
                     self.showingPermissionAlert = true
+                    if self.selectedMode == "Gallery" { self.selectedMode = nil }
                 } else {
-                    self.selectedMode = "Gallery"
+                    if self.selectedMode == "Gallery" {
+                        completion(granted)
+                    } else {
+                        self.selectedMode = "Gallery"
+                        completion(granted)
+                    }
                 }
-                completion(granted)
+                if !granted { completion(granted) }
             }
         }
     }
     
-    // MARK: - Image Selection
-    func handleImageSelection(_ item: PhotosPickerItem?, skipProcessing: Bool = false) async {
+    // MARK: - Image Selection (Gallery Mode)
+    func handleImageSelection(_ item: PhotosPickerItem?) async {
         imageLoadError = nil
+        previewImage = nil
+        backgroundRemover.reset()
+        finalProcessedImage = nil
         
         guard let item else {
-            previewImage = nil
-            backgroundRemover.reset()
-            handleNoImageSelected()
+            selectedItem = nil
             return
         }
+        self.selectedItem = item
         
         do {
             guard let data = try await item.loadTransferable(type: Data.self),
@@ -66,28 +91,32 @@ internal class ChildLogViewModel: ObservableObject {
             previewImage = uiImage
             backgroundRemover.originalImage = uiImage
             
-            if !skipProcessing {
-                await backgroundRemover.processSelectedImage(item)
+            await backgroundRemover.processSelectedImage(item)
+            self.finalProcessedImage = backgroundRemover.resultImage
+            if self.finalProcessedImage == nil {
+                imageLoadError = "Failed to process the image background. Please try another photo."
             }
+            
         } catch {
             previewImage = nil
-            imageLoadError = "Failed to load image. Please try another photo."
+            imageLoadError = "Failed to load the selected image. Please try another photo."
             backgroundRemover.reset()
-            handleNoImageSelected()
+            finalProcessedImage = nil
+            selectedItem = nil // Clear selection on load failure
         }
     }
     
-    // MARK: - Navigation Actions
+    // MARK: - Navigation Logic
     func handleNextAction(defaultAction: @escaping () -> Void) {
         switch currentPage {
         case .selectMode:
+            guard selectedMode != nil else { return }
+            
             if selectedMode == "Gallery" {
-                requestGalleryPermission { [weak self] granted in
-                    guard let self else { return }
-                    if granted {
-                        Task { @MainActor in
-                            self.showPhotoPicker = true
-                        }
+                if isGalleryPermissionGranted { showPhotoPicker = true }
+                else {
+                    requestGalleryPermission { [weak self] granted in
+                        if granted { Task { @MainActor in self?.showPhotoPicker = true } }
                     }
                 }
             } else if selectedMode == "Draw" {
@@ -95,11 +124,14 @@ internal class ChildLogViewModel: ObservableObject {
             }
             
         case .mainInput:
-            if selectedMode == "Draw" ||
-                (selectedMode == "Gallery" &&
-                 selectedItem != nil &&
-                 !backgroundRemover.isProcessing) {
-                withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
+            if selectedMode == "Draw" {
+                canvasViewModel.saveDrawing()
+            } else { // Gallery Mode
+                if selectedItem != nil && !backgroundRemover.isProcessing && finalProcessedImage != nil {
+                    withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
+                } else if selectedItem == nil { imageLoadError = "Please select a photo first." }
+                else if backgroundRemover.isProcessing { /* Do nothing while processing */ }
+                else { imageLoadError = "Image processing failed. Try again." }
             }
             
         case .finalImage:
@@ -116,14 +148,28 @@ internal class ChildLogViewModel: ObservableObject {
         }
     }
     
+    func handleDrawingProcessed(image: UIImage?) {
+        print(">>> handleDrawingProcessed called with image: \(image == nil ? "nil" : "VALID")")
+        guard let processed = image else {
+            print(">>> ERROR: handleDrawingProcessed guard failed!")
+            canvasViewModel.isProcessing = false
+            // TODO: Show an alert to the user?
+            return
+        }
+        print(">>> Guard passed, setting final image...")
+        self.finalProcessedImage = processed
+        print(">>> Navigating to final page...")
+        withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
+        print(">>> Current index set to: \(currentIndex)")
+    }
+    
     func handleBackAction() {
         switch currentPage {
         case .finalImage:
             withAnimation {
                 currentIndex = ChildLogPageEnum.mainInput.rawValue
-                if selectedMode == "Gallery" {
-                    backgroundRemover.partialReset()
-                }
+                finalProcessedImage = nil
+                if selectedMode == "Gallery" { backgroundRemover.partialReset() }
             }
         case .mainInput:
             withAnimation {
@@ -137,17 +183,24 @@ internal class ChildLogViewModel: ObservableObject {
     }
     
     func shouldDisableNext() -> Bool {
-        let isModeInvalid = selectedMode?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true
-        let isProcessing = backgroundRemover.isProcessing
-        let isUploadInvalid = selectedMode == "Gallery" && currentPage == .mainInput && selectedItem == nil
+        let isModeInvalid = selectedMode == nil || selectedMode!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let isProcessingBG = backgroundRemover.isProcessing
+        let isProcessingCanvas = canvasViewModel.isProcessing
+        let isGalleryInputInvalid = selectedMode == "Gallery" && currentPage == .mainInput && (selectedItem == nil || finalProcessedImage == nil)
+        let isDrawingInputInvalid = selectedMode == "Draw" && currentPage == .mainInput && isProcessingCanvas
+        let isFinalImageInvalid = currentPage == .finalImage && finalProcessedImage == nil
         
         switch currentPage {
         case .selectMode:
             return isModeInvalid
         case .mainInput:
-            return isProcessing || isUploadInvalid
+            if selectedMode == "Gallery" {
+                return isProcessingBG || isGalleryInputInvalid
+            } else { // Draw Mode
+                return isDrawingInputInvalid
+            }
         case .finalImage:
-            return false
+            return isFinalImageInvalid // Disable Done if no final image
         }
     }
     

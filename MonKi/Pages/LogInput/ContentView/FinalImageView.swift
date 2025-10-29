@@ -41,8 +41,3 @@ struct FinalImagePage: View {
         .clipped()
     }
 }
-
-// MARK: - Preview
-#Preview {
-    FinalImagePage(processedImage: nil)
-}

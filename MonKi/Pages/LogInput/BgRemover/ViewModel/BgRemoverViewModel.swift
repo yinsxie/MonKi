@@ -8,7 +8,7 @@
 import SwiftUI
 import PhotosUI
 
-internal final class BackgroundRemoverViewModel: ObservableObject {
+final class BackgroundRemoverViewModel: ObservableObject {
     @Published var originalImage: UIImage?
     @Published var resultImage: UIImage?
     @Published var alert: AlertType?

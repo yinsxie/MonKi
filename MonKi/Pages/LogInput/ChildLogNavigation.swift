@@ -11,11 +11,11 @@ struct ChildLogNavigationView<Content: View>: View {
     @Binding var currentIndex: Int
     @State private var isMovingForward: Bool = true
     let pageCount: Int
-    let isProgressBarHidden: Bool
     let onClose: () -> Void
     let customNextAction: ((@escaping () -> Void) -> Void)?
     let customBackAction: (() -> Void)?
     let isNextDisabled: Bool
+    let isProgressBarHidden: Bool
     let content: () -> Content
     
     init(
@@ -30,11 +30,11 @@ struct ChildLogNavigationView<Content: View>: View {
     ) {
         self._currentIndex = currentIndex
         self.pageCount = pageCount
-        self.isProgressBarHidden = isProgressBarHidden
         self.onClose = onClose
         self.customNextAction = customNextAction
         self.customBackAction = customBackAction
         self.isNextDisabled = isNextDisabled
+        self.isProgressBarHidden = isProgressBarHidden
         self.content = content
     }
     
@@ -49,6 +49,7 @@ struct ChildLogNavigationView<Content: View>: View {
                     ))
                     .id(currentIndex)
             }
+            .clipped()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .animation(.easeInOut(duration: 0.3), value: currentIndex)
             .edgesIgnoringSafeArea(.all)
@@ -95,21 +96,7 @@ struct ChildLogNavigationView<Content: View>: View {
                             action: {
                                 withAnimation {
                                     isMovingForward = true
-                                    if let customAction = customNextAction {
-                                        customAction {
-                                            if currentIndex < pageCount - 1 {
-                                                currentIndex += 1
-                                            } else {
-                                                onClose()
-                                            }
-                                        }
-                                    } else {
-                                        if currentIndex < pageCount - 1 {
-                                            currentIndex += 1
-                                        } else {
-                                            onClose()
-                                        }
-                                    }
+                                    customNextAction?(onClose)
                                 }
                             },
                             width: currentIndex == 0 ? totalWidth : totalWidth * 0.67, // 2/3

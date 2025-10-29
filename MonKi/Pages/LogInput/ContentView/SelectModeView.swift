@@ -10,7 +10,7 @@ import SwiftUI
 struct SelectModePage: View {
     @Binding var selectedMode: String?
     @Binding var isGalleryPermissionGranted: Bool
-    let viewModel: ChildLogViewModel
+    @ObservedObject var viewModel: ChildLogViewModel
     
     var body: some View {
         VStack {
@@ -35,9 +35,6 @@ struct SelectModePage: View {
                     isSelected: selectedMode == "Gallery"
                 ) {
                     selectedMode = "Gallery"
-                    if !isGalleryPermissionGranted {
-                        viewModel.requestGalleryPermission { _ in }
-                    }
                 }
             }
             .animation(.easeInOut, value: selectedMode)

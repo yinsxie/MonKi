@@ -13,7 +13,26 @@ import UIKit
 struct BackgroundRemoverImageComposer {
     private let context = CIContext(options: [.useSoftwareRenderer: true])
     private let outlineThickness: CGFloat = 20.0  // ← Statis
-
+    
+    func processDrawing(_ image: UIImage) async throws -> UIImage {
+        guard let cgImage = image.cgImage else {
+            throw ProcessingError.invalidImage
+        }
+        
+        let originalCI = CIImage(cgImage: cgImage)
+        let whiteDrawing = CIImage(color: .white)
+            .cropped(to: originalCI.extent)
+            .applyingFilter("CIBlendWithAlphaMask", parameters: [
+                kCIInputMaskImageKey: originalCI
+            ])
+        
+        let outlineMask = try applyOutline(to: whiteDrawing)
+        let foreground = originalCI
+        let compositeImage = try composite(foreground: foreground, outline: outlineMask)
+        
+        return try render(compositeImage, extent: originalCI.extent)
+    }
+    
     func compose(
         original cgImage: CGImage,
         mask: CVPixelBuffer,
