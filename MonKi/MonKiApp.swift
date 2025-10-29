@@ -12,7 +12,7 @@ struct MonKiApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ParentHomeView()
+            ContentView()
         }
     }
 }

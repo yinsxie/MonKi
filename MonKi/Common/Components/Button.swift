@@ -19,6 +19,7 @@ struct CustomButton: View {
     let textColor: Color
     let font: Font
     let image: String?
+    let imageRight: String?
     let action: () -> Void
     let cornerRadius: CGFloat
     let width: CGFloat
@@ -31,6 +32,7 @@ struct CustomButton: View {
         textColor: Color,
         font: Font = .headlineEmphasized,
         image: String? = nil,
+        imageRight: String? = nil,
         action: @escaping () -> Void,
         cornerRadius: CGFloat = 12,
         width: CGFloat = .infinity,
@@ -42,6 +44,7 @@ struct CustomButton: View {
         self.textColor = textColor
         self.font = font
         self.image = image
+        self.imageRight = imageRight
         self.action = action
         self.cornerRadius = cornerRadius
         self.width = width
@@ -53,6 +56,7 @@ struct CustomButton: View {
         colorSet: ButtonColorSet,
         font: Font = .headlineEmphasized,
         image: String? = nil,
+        imageRight: String? = nil,
         action: @escaping () -> Void,
         cornerRadius: CGFloat = 12,
         width: CGFloat = .infinity,
@@ -65,6 +69,7 @@ struct CustomButton: View {
             textColor: colorSet.textColor,
             font: font,
             image: image,
+            imageRight: imageRight,
             action: action,
             cornerRadius: cornerRadius,
             width: width,
@@ -85,6 +90,12 @@ struct CustomButton: View {
                     Text(text)
                         .foregroundStyle(textColor)
                         .font(font)
+                }
+                
+                if let imageRight = imageRight {
+                    Image(systemName: imageRight)
+                        .font(font)
+                        .foregroundStyle(textColor)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -120,6 +131,15 @@ struct CustomButtonComponent_Previews: PreviewProvider {
                 text: "Previous Button",
                 colorSet: .normal,
                 image: "arrow.left",
+                action: {},
+                type: .bordered,
+            )
+            
+            // Right Image Button
+            CustomButton(
+                text: "Next Button",
+                colorSet: .normal,
+                imageRight: "arrow.right",
                 action: {},
                 type: .bordered,
             )

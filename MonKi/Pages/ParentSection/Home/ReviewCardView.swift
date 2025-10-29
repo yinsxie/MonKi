@@ -8,15 +8,14 @@
 import Foundation
 import SwiftUI
 
-struct ReviewCard: Identifiable {
-    let id: UUID
-    let imageName: String
-    let needsReview: Bool
-}
-
 struct ReviewCardView: View {
-    let card: ReviewCard
-
+    let log: MsLog
+    @EnvironmentObject var navigationManager: NavigationManager
+    
+    private var needsReview: Bool {
+        log.state == ChildrenLogState.needToTalk.stringValue
+    }
+    
     var body: some View {
         ZStack(alignment: .center) {
             RoundedRectangle(cornerRadius: 24)
@@ -24,7 +23,7 @@ struct ReviewCardView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 8, y: 2)
             
             VStack(spacing: 10) {
-                Image(card.imageName)
+                Image(log.imagePath ?? "icecream_placeholder")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 100, height: 100)
@@ -34,12 +33,23 @@ struct ReviewCardView: View {
                         text: "Review",
                         colorSet: .primary,
                         font: .headlineEmphasized,
-                        action: {},
+                        action: {
+                            navigationManager.goTo(.parentHome(.reviewDetail(log: log)))
+                        },
                         cornerRadius: 24,
                         width: 89,
                         type: .normal
                     )
-                    if card.needsReview {
+                    //                    CustomButton(
+                    //                        text: "Review",
+                    //                        colorSet: .primary,
+                    //                        font: .headlineEmphasized,
+                    //                        action: {},
+                    //                        cornerRadius: 24,
+                    //                        width: 89,
+                    //                        type: .normal
+                    //                    )
+                    if needsReview {
                         Circle()
                             .fill(ColorPalette.orange500)
                             .frame(width: 12, height: 12)
@@ -48,7 +58,7 @@ struct ReviewCardView: View {
                 .padding(.top, 12)
             }
             
-            if card.needsReview {
+            if needsReview {
                 HStack(spacing: 4) {
                     Image(systemName: "exclamationmark.circle")
                     Text("Perlu Ngobrol")
@@ -64,20 +74,5 @@ struct ReviewCardView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
         }
-    }
-}
-
-struct ReviewCardView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            ReviewCardView(card: ReviewCard(id: UUID(), imageName: "icecream_placeholder", needsReview: true))
-                .previewDisplayName("Needs Review Card")
-
-            ReviewCardView(card: ReviewCard(id: UUID(), imageName: "icecream_placeholder", needsReview: false))
-                .previewDisplayName("Standard Card")
-        }
-        .frame(width: 172, height: 241)
-        .previewLayout(.sizeThatFits)
-        .padding()
     }
 }
