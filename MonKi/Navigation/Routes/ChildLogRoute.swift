@@ -24,7 +24,6 @@ extension ChildLogRoute {
                 ],
                 onClose: { print("Onboarding closed") }
             )
-            .navigationBarBackButtonHidden(true)
         }
     }
 }

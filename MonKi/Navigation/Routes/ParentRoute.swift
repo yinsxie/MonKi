@@ -21,16 +21,12 @@ extension ParentRoute {
         switch self {
         case .home:
             ParentHomeView()
-                .navigationBarBackButtonHidden(true)
         case .reviewDetail(let log):
             ParentReviewDetailView(log: log)
-                .navigationBarBackButtonHidden(true)
         case .reviewSuccess:
             ParentReviewSuccessView()
-                .navigationBarBackButtonHidden(true)
         case .reflectionGuide(let log):
             ReflectionGuideView(log: log)
-                .navigationBarBackButtonHidden(true)
         }
     }
 }

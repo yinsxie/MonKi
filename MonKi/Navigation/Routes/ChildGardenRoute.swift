@@ -8,15 +8,18 @@
 import SwiftUI
 
 enum ChildGardenRoute: Hashable {
-   case garden
+    case home
+    case collectible
 }
 
 extension ChildGardenRoute {
     @ViewBuilder
     func delegateView() -> some View {
         switch self {
-        case .garden:
-            Text("Garden")
+        case .home:
+            GardenHomeView()
+        case .collectible:
+            CollectiblesHomeView()
         }
     }
 }

@@ -15,10 +15,12 @@ final class NavigationManager: ObservableObject {
     }
     
     func popToRoot() {
+        if navigationPath.isEmpty { return }
         navigationPath.removeAll()
     }
     
     func popLast() {
+        if navigationPath.isEmpty { return }
         _ = navigationPath.popLast()
     }
     

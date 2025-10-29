@@ -17,11 +17,11 @@ struct CanvasView: View {
     
     var body: some View {
         ZStack {
-            Image(ImageAsset.canvasBackground.imageName)
+            Image(CanvasImageAsset.canvasBackground.imageName)
                 .resizable()
                 .ignoresSafeArea()
             
-            Image(ImageAsset.canvasViewCloth.imageName)
+            Image(CanvasImageAsset.canvasViewCloth.imageName)
                 .resizable()
                 .scaledToFill()
                 .frame(width: UIScreen.main.bounds.width * 1.4,
@@ -31,7 +31,7 @@ struct CanvasView: View {
                 .id("clothBackground")
                 .ignoresSafeArea()
             
-            Image(ImageAsset.canvasViewButton.imageName)
+            Image(CanvasImageAsset.canvasViewButton.imageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 357.26, height: 278.08)
@@ -41,7 +41,7 @@ struct CanvasView: View {
             VStack {
                 Spacer()
                 ZStack {
-                    Image(ImageAsset.canvasViewPaperNote.imageName)
+                    Image(CanvasImageAsset.canvasViewPaperNote.imageName)
                         .resizable()
                         .frame(width: 384.68, height: 363.87)
                         .scaledToFit()
