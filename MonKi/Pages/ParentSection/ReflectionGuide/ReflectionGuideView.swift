@@ -83,7 +83,7 @@ struct ReflectionGuideView: View {
                         font: .calloutEmphasized,
                         imageRight: "arrow.right",
                         action: {
-                            navigationManager.popLast()
+                            navigationManager.goTo(.parentHome(.reflectionGuideStory(log: log)))
                         },
                         cornerRadius: 24,
                         width: 187,
