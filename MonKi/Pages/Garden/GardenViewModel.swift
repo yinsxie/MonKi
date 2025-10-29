@@ -17,6 +17,10 @@ final class GardenViewModel: ObservableObject {
         context.goTo(route)
     }
     
+    func navigateBack(context: NavigationManager) {
+        context.popLast()
+    }
+    
     func onFieldTapped(forFieldType: FieldState, context: NavigationManager) {
         switch forFieldType {
         case .empty:
@@ -47,7 +51,7 @@ private extension GardenViewModel {
     }
     
     func onDoneFieldTapped(context: NavigationManager) {
-        context.goTo(.childGarden(.watering))
+        context.goTo(.childGarden(.harvesting))
         // TODO: Update State to Archieved (removing it from the field basically)
     }
 }

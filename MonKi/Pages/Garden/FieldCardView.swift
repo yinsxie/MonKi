@@ -78,7 +78,7 @@ struct FieldCardView: View {
             }
             
             if let CTATitle = type.CTAButtonTitle, let CTAButtonImage = type.CTAButtonImage {
-                FieldCustomButton(
+                CustomCTAButton(
                     text: CTATitle,
                     imageRight: CTAButtonImage, action: onCTAButtonTapped ?? {})
                 .offset(y: 130)

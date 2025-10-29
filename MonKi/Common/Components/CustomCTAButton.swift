@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FieldCustomButton: View {
+struct CustomCTAButton: View {
     enum ButtonType {
         case normal
         case bordered
@@ -18,7 +18,9 @@ struct FieldCustomButton: View {
     let foregroundColor: Color
     let textColor: Color
     let font: Font
-    let imageRight: String
+    let horizontalPadding: CGFloat
+    let verticalPadding: CGFloat
+    let imageRight: String?
     let cornerRadius: CGFloat
     let action: () -> Void
     
@@ -28,7 +30,9 @@ struct FieldCustomButton: View {
         foregroundColor: Color = ColorPalette.blue100,
         textColor: Color = ColorPalette.blue700,
         font: Font = .footnoteEmphasized,
-        imageRight: String,
+        horizontalPadding: CGFloat = 16,
+        verticalPadding: CGFloat = 12,
+        imageRight: String? = nil,
         cornerRadius: CGFloat = 20,
         action: @escaping () -> Void,
     ) {
@@ -37,6 +41,8 @@ struct FieldCustomButton: View {
         self.foregroundColor = foregroundColor
         self.textColor = textColor
         self.font = font
+        self.horizontalPadding = horizontalPadding
+        self.verticalPadding = verticalPadding
         self.imageRight = imageRight
         self.action = action
         self.cornerRadius = cornerRadius
@@ -49,14 +55,16 @@ struct FieldCustomButton: View {
                     .foregroundStyle(textColor)
                     .font(font)
                 
-                Image(imageRight)
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(textColor)
-                    .frame(height: 24)
+                if let image = imageRight {
+                    Image(image)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(textColor)
+                        .frame(height: 24)
+                }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.horizontal, horizontalPadding)
+            .padding(.vertical, verticalPadding)
         }
         .buttonStyle(CustomButtonStyle(
             backgroundColor: backgroundColor,
@@ -74,7 +82,7 @@ struct FieldCustomButton: View {
 #Preview {
     VStack(spacing: 20) {
         if let img = FieldState.approved.CTAButtonImage {
-            FieldCustomButton(
+            CustomCTAButton(
                 text: "Siram",
                 imageRight: img) {
                 
