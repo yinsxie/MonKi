@@ -23,6 +23,7 @@ struct HomeView: View {
                 }
                 
                 Button {
+
                     navigationManager.goTo(.childGarden(.home))
                 } label: {
                     Text("Nav to children garden")

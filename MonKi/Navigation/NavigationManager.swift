@@ -35,7 +35,6 @@ final class NavigationManager: ObservableObject {
             navigationPath.append(route)
             return
         }
-        
         navigationPath[navigationPath.count - 1] = route
     }
     

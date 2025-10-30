@@ -11,13 +11,6 @@ struct ParentHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @StateObject private var viewModel = ParentHomeViewModel()
-    //    @State private var navigationPath = NavigationPath()
-    
-    // Grid layout: 2 columns
-    let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
     
     func didTapHomeButton() {
         print("Home Tapped")
@@ -27,33 +20,22 @@ struct ParentHomeView: View {
     func didTapNextButton() { print("Next Tapped") }
     
     var body: some View {
-        //        NavigationStack(path: $navigationPath) {
         GeometryReader { geometry in
             
-            // 1. ZStack for the static light gray background
             ZStack(alignment: .top) {
                 
-                // --- Static Background Layer (non-scrolling) ---
                 ColorPalette.neutral50.ignoresSafeArea(.all)
                 
-                // 2. ScrollView for ALL content
                 ScrollView {
-                    
-                    // 3. ZStack to layer the yellow circle BEHIND the content
-                    // This entire ZStack will scroll
                     ZStack(alignment: .top) {
                         
-                        // --- Scrolling Yellow Background ---
                         Circle()
-                            .fill(ColorPalette.yellow300)
-                        // Use the geometry from the outer GeometryReader
+                            .fill(ColorPalette.yellow100)
                             .offset(y: geometry.size.height / 3 )
                             .scaleEffect(3.0)
                         
-                        // --- Scrolling Content VStack ---
                         VStack(spacing: 0) {
                             
-                            // 4. Top Bar (Home Icon)
                             HStack {
                                 CustomButton(
                                     backgroundColor: ColorPalette.yellow600,
@@ -72,23 +54,32 @@ struct ParentHomeView: View {
                             .padding(.horizontal, 24)
                             .padding(.top, 20)
                             
-                            // 5. Header Text
                             VStack(spacing: 12) {
-                                Text("Hi, Parents!")
-                                    .font(.title1Emphasized)
-                                    .foregroundStyle(ColorPalette.neutral950)
-                                
-                                Text("Waktunya kasih pendapat apakah pilihan anak udah sesuai sama nilai keluarga?")
-                                    .font(.bodyRegular)
-                                    .multilineTextAlignment(.center)
-                                    .foregroundStyle(ColorPalette.neutral700)
-                                    .padding(.horizontal, 32)
+                                if viewModel.logsForParent.isEmpty {
+                                    Text("Belum ada permintaan")
+                                        .font(.title1Emphasized)
+                                        .foregroundStyle(ColorPalette.neutral950)
+                                    
+                                    Text("Ajak anak tulis keinginannya di MonKi, lalu parents bisa periksa di sini")
+                                        .font(.bodyRegular)
+                                        .multilineTextAlignment(.center)
+                                        .foregroundStyle(ColorPalette.neutral700)
+                                        .padding(.horizontal, 24)
+                                } else {
+                                    Text("Ada permintaan baru!")
+                                        .font(.title1Emphasized)
+                                        .foregroundStyle(ColorPalette.neutral950)
+                                    
+                                    Text("Waktunya periksa daftar keinginan anak, jangan lupa ajak diskusi biar anak makin paham")
+                                        .font(.bodyRegular)
+                                        .multilineTextAlignment(.center)
+                                        .foregroundStyle(ColorPalette.neutral700)
+                                        .padding(.horizontal, 24)
+                                }
                             }
                             .padding(.top, 20)
                             
-                            // 6. Card Area (Center content)
-                            HStack(spacing: 40) {
-                                // Left Arrow Button
+                            HStack(alignment: .bottom) {
                                 CustomButton(
                                     backgroundColor: ColorPalette.yellow600,
                                     foregroundColor: ColorPalette.yellow400,
@@ -101,12 +92,15 @@ struct ParentHomeView: View {
                                     type: .normal
                                 )
                                 
-                                // Gray Placeholder Card
+                                Spacer()
+                                
                                 RoundedRectangle(cornerRadius: 16)
                                     .fill(ColorPalette.neutral300)
                                     .frame(width: 125, height: 125)
+                                    .padding(.bottom, 15)
                                 
-                                // Right Arrow Button
+                                Spacer()
+                                
                                 CustomButton(
                                     backgroundColor: ColorPalette.yellow600,
                                     foregroundColor: ColorPalette.yellow400,
@@ -120,7 +114,7 @@ struct ParentHomeView: View {
                                 )
                             }
                             .padding(.horizontal, 16)
-                            .padding(.top, 60)
+                            .padding(.top, 70)
                             
                             // 7. Card Grid or Empty State
                             if viewModel.logsForParent.isEmpty {
@@ -139,24 +133,29 @@ struct ParentHomeView: View {
                                 .padding(.bottom, 100)
                                 
                             } else {
-                                LazyVGrid(columns: columns, spacing: 16) {
+                                VStack(spacing: 28) {
                                     ForEach(viewModel.logsForParent) { log in
-                                        ReviewCardView(log: log)
-                                            .frame(height: 241)
+                                        ReviewCardView(
+                                            log: log,
+                                            onReject: {
+                                                viewModel.rejectLog(log: log)
+                                            },
+                                            onApprove: {
+                                                viewModel.approveLog(log: log)
+                                            }
+                                        )
                                     }
                                 }
                                 .padding(.horizontal, 20)
-                                .padding(.top, 30)
+                                .padding(.top, 60)
                                 .padding(.bottom, 100)
                             }
                         }
                     }
                 }
-                // Prevents the scroll view from going under the status bar
                 .ignoresSafeArea(edges: .bottom)
             }
         }
-        //        }
         .onAppear {
             viewModel.loadLogs()
         }

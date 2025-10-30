@@ -38,12 +38,4 @@ final class ParentReviewDetailViewModel: ObservableObject {
         print("Approving log: \(logId)")
         logRepository.logApprovedByParent(withId: logId)
     }
-    
-    func rejectLog() {
-
-        guard let logId = log.id else { return }
-        print("NeedToTalkWithParents log: \(logId)")
-        logRepository.logNeedToTalkWithParents(withId: logId)
-
-    }
 }

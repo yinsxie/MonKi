@@ -14,7 +14,6 @@ protocol LogRepositoryProtocol {
     func childRelogged(withId id: UUID, isHappy: Bool, isBeneficial: Bool, tags: [String])
     
     func logApprovedByParent(withId id: UUID)
-    func logNeedToTalkWithParents(withId id: UUID)
     func logRejectedByParent(withId id: UUID)
     func logDone(withId id: UUID)
     func logArchieved(withId id: UUID)
@@ -76,10 +75,6 @@ final class LogRepository: LogRepositoryProtocol {
     
     func logApprovedByParent(withId id: UUID) {
         updateLogState(withId: id, newState: .approved)
-    }
-    
-    func logNeedToTalkWithParents(withId id: UUID) {
-        updateLogState(withId: id, newState: .needToTalk)
     }
     
     func logRejectedByParent(withId id: UUID) {

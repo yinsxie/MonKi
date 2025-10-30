@@ -70,7 +70,6 @@ struct ReflectionGuideView: View {
                         colorSet: .destructive,
                         font: .calloutEmphasized,
                         action: {
-                            viewModel.needToTalkLog()
                             navigationManager.popLast()
                         },
                         cornerRadius: 24,
@@ -84,8 +83,7 @@ struct ReflectionGuideView: View {
                         font: .calloutEmphasized,
                         imageRight: "arrow.right",
                         action: {
-                            viewModel.needToTalkLog()
-                            navigationManager.popLast()
+                            navigationManager.goTo(.parentHome(.reflectionGuideStory(log: log)))
                         },
                         cornerRadius: 24,
                         width: 187,
