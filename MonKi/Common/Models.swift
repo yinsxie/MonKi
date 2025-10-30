@@ -8,7 +8,6 @@
 enum ChildrenLogState {
     case created
     case approved
-    case needToTalk
     case rejected
     case done
     case archived
@@ -19,8 +18,6 @@ enum ChildrenLogState {
             return "Created"
         case .approved:
             return "Approved"
-        case .needToTalk:
-            return "Need to Talk"
         case .rejected:
             return "Rejected"
         case .done:

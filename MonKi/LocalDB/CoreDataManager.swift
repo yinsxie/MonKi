@@ -62,14 +62,14 @@ final class CoreDataManager: ObservableObject {
         log1.createdAt = Date()
         log1.updatedAt = Date()
 
-        // Log 2: Needs Review (state = "needToTalk")
+        // Log 2: Needs Review (state = "created")
         let log2 = MsLog(context: context)
         log2.id = UUID()
         log2.imagePath = "icecream_placeholder"
         log2.isHappy = true
         log2.isBeneficial = false
         log2.beneficialTags = "toy;expensive"
-        log2.state = ChildrenLogState.needToTalk.stringValue
+        log2.state = ChildrenLogState.created.stringValue
         log2.createdAt = Date()
         log2.updatedAt = Date()
         

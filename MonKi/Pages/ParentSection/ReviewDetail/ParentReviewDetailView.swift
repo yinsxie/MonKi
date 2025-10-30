@@ -175,7 +175,6 @@ struct ParentReviewDetailView: View {
                         colorSet: .normal,
                         font: .calloutEmphasized,
                         action: {
-                            viewModel.needToTalkLog()
                             navigationManager.replaceTop(with: .parentHome(.reflectionGuide(log: log)))
                         },
                         cornerRadius: 24,

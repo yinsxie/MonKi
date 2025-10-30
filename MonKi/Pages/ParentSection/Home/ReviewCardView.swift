@@ -12,67 +12,109 @@ struct ReviewCardView: View {
     let log: MsLog
     @EnvironmentObject var navigationManager: NavigationManager
     
-    private var needsReview: Bool {
-        log.state == ChildrenLogState.needToTalk.stringValue
+    var onReject: () -> Void = {}
+    var onApprove: () -> Void = {}
+    
+    private func parse(tagsString: String?) -> [String] {
+        guard let tagsString = tagsString, !tagsString.isEmpty else {
+            return []
+        }
+        return tagsString.split(separator: ";")
+            .map { String($0).trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+    }
+    
+    private var beneficialTags: [String] {
+        parse(tagsString: log.beneficialTags)
     }
     
     var body: some View {
-        ZStack(alignment: .center) {
+        ZStack {
             RoundedRectangle(cornerRadius: 24)
                 .fill(Color.white)
-                .shadow(color: Color.black.opacity(0.1), radius: 8, y: 2)
             
-            VStack(spacing: 10) {
-                Image(log.imagePath ?? "icecream_placeholder")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
+            RoundedRectangle(cornerRadius: 24)
+                .inset(by: 1)
+                .stroke(ColorPalette.yellow500, lineWidth: 2)
+            
+            VStack(spacing: 0) {
+                ZStack(alignment: .bottomTrailing) {
+                    HStack {
+                        Image(log.imagePath ?? "icecream_placeholder")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .offset(y: 3)
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Anak bilang,\nini berguna untuk...")
+                                .font(.subheadlineEmphasized)
+                                .foregroundColor(ColorPalette.orange900)
+                                .fixedSize(horizontal: false, vertical: true)
+                            
+                            FlowLayout(spacing: 4) {
+                                ForEach(beneficialTags, id: \.self) { tag in
+                                    Text(tag)
+                                        .font(.caption2Semibold)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(ColorPalette.yellow200)
+                                        .foregroundColor(ColorPalette.yellow800)
+                                        .cornerRadius(8)
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading) // <-- TAMBAHKAN INI
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+                    
+                    Circle()
+                        .fill(ColorPalette.neutral900)
+                        .frame(width: 72, height: 72)
+                        .offset(x: 12, y: 10)
+                }
                 
-                ZStack(alignment: .topTrailing) {
+                HStack(alignment: .center, spacing: 8) {
                     CustomButton(
-                        text: "Review",
+                        text: "Tolak",
+                        colorSet: .destructive,
+                        font: .headlineEmphasized,
+                        action: {
+                            onReject()
+                        },
+                        cornerRadius: 24,
+                        type: .normal
+                    )
+                    
+                    CustomButton(
+                        text: "Terima",
                         colorSet: .primary,
                         font: .headlineEmphasized,
                         action: {
-                            navigationManager.goTo(.parentHome(.reviewDetail(log: log)))
+                            onApprove()
                         },
                         cornerRadius: 24,
-                        width: 89,
                         type: .normal
                     )
-                    //                    CustomButton(
-                    //                        text: "Review",
-                    //                        colorSet: .primary,
-                    //                        font: .headlineEmphasized,
-                    //                        action: {},
-                    //                        cornerRadius: 24,
-                    //                        width: 89,
-                    //                        type: .normal
-                    //                    )
-                    if needsReview {
-                        Circle()
-                            .fill(ColorPalette.orange500)
-                            .frame(width: 12, height: 12)
-                    }
                 }
-                .padding(.top, 12)
-            }
-            
-            if needsReview {
-                HStack(spacing: 4) {
-                    Image(systemName: "exclamationmark.circle")
-                    Text("Perlu Ngobrol")
-                }
-                .font(.caption2Medium)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(ColorPalette.orange500)
-                .foregroundColor(ColorPalette.orange50)
-                .cornerRadius(8)
-                .padding(.top, 12)
-                .padding(.leading, 13.5)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .padding(.vertical, 24)
+                .padding(.horizontal, 16)
+                .background(
+                    UnevenRoundedRectangle(
+                        bottomLeadingRadius: 24,
+                        bottomTrailingRadius: 24
+                    )
+                    .fill(ColorPalette.yellow500)
+                )
+                
             }
         }
+    }
+}
+
+struct ReviewCardView_Previews: PreviewProvider {
+    static var previews: some View {
+        ParentHomeView()
     }
 }

@@ -195,7 +195,7 @@ struct ReflectionGuideStoryView: View {
     mockLog.isHappy = true
     mockLog.isBeneficial = false
     mockLog.beneficialTags = "toy;expensive"
-    mockLog.state = "needToTalk"
+    mockLog.state = "created"
     mockLog.createdAt = Date()
     mockLog.updatedAt = Date()
     
