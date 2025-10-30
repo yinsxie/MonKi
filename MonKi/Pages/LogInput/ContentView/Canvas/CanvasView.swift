@@ -19,10 +19,11 @@ struct CanvasView: View {
             
             Image(CanvasImageAsset.canvasViewCloth.imageName)
                 .resizable()
-                .scaledToFill()
-                .frame(width: UIScreen.main.bounds.width * 1.4,
-                       height: UIScreen.main.bounds.height * 0.7,
-                       alignment: .topLeading)
+                .scaledToFit()
+            //                .frame(height: UIScreen.main.bounds.height * 0.75,
+            //                                       alignment: .topLeading)
+                .frame(maxWidth: .infinity)
+                .clipped()
                 .offset(x: -150, y: -200)
                 .id("clothBackground")
                 .ignoresSafeArea()
@@ -42,9 +43,9 @@ struct CanvasView: View {
                         .frame(width: 384.68, height: 363.87)
                         .scaledToFit()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .offset(x: 70, y: 0)
+                    //                        .offset(x: 60, y: 0)
                     
-                    DrawingCanvasView(viewModel: _viewModel)
+                    DrawingCanvasView()
                         .frame(width: 300, height: 300)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                 }
@@ -59,10 +60,14 @@ struct CanvasView: View {
                 
                 Spacer()
             }
+            .ignoresSafeArea()
+            .padding(.vertical, 100)
         }
+        .ignoresSafeArea()
     }
 }
 
 #Preview {
     CanvasView()
+        .environmentObject(CanvasViewModel()) // Provide VM for preview
 }
