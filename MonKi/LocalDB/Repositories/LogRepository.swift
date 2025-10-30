@@ -10,7 +10,7 @@ import UIKit
 
 protocol LogRepositoryProtocol {
     
-    func createLogWithImage(_ uiImage: UIImage, imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String])
+    func createLogWithImage(_ uiImage: UIImage, isHappy: Bool, isBeneficial: Bool, tags: [String])
     func fetchLogs() -> [MsLog]
     func childRelogged(withId id: UUID, isHappy: Bool, isBeneficial: Bool, tags: [String])
     
@@ -29,7 +29,7 @@ final class LogRepository: LogRepositoryProtocol {
         self.context = context
     }
     
-    func createLogWithImage(_ uiImage: UIImage, imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String]) {
+    func createLogWithImage(_ uiImage: UIImage, isHappy: Bool, isBeneficial: Bool, tags: [String]) {
         
         guard let imagePath = ImageStorage.saveImage(uiImage) else {
             print("Failed to save image")
