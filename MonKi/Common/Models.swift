@@ -26,5 +26,23 @@ enum ChildrenLogState {
             return "Archived"
         }
     }
-    
+   
+    init(state: String) {
+        switch state {
+        case "Created":
+            self = .created
+        case "Approved":
+            self = .approved
+        case "Need to Talk":
+            self = .needToTalk
+        case "Rejected":
+            self = .rejected
+        case "Done":
+            self = .done
+        case "Archived":
+            self = .archived
+        default:
+            self = .created
+        }
+    }
 }

@@ -14,12 +14,7 @@ struct GardenWateringView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var viewModel: GardenViewModel
     
-    var logImage: UIImage
     @State private var fieldState: FieldState = .approved
-    
-    init(logImage: UIImage = UIImage(named: ColoredPencilAsset.canvasViewBlackPencil.imageName)!) {
-        self.logImage = logImage
-    }
     
     var body: some View {
         ZStack {
@@ -27,27 +22,31 @@ struct GardenWateringView: View {
                 .resizable()
                 .ignoresSafeArea()
             
-            if let fieldAsset = fieldState.fieldAsset, let thoughtBubbleImage = fieldState.thoughtBubbleImage {
+            if let fieldAsset = fieldState.fieldAsset {
                 ZStack {
                     Image(fieldAsset)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 190)
                         .offset(y: fieldState == .done ? 33: 50)
-                    
-                    ZStack {
-                        Image(thoughtBubbleImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 200)
-                        
-                        Image(uiImage: logImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 66)
-                            .offset(y: -20)
+                    if let thoughtBubbleImage = fieldState.thoughtBubbleImage {
+                        ZStack {
+                            Image(thoughtBubbleImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 200)
+                           
+                            if let image = viewModel.imageEventBuffer {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 66)
+                                    .offset(y: -20)
+
+                            }
+                        }
+                        .offset(x: -85, y: -90)
                     }
-                    .offset(x: -85, y: -90)
                 }
                 
             }

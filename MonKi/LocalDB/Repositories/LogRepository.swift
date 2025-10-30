@@ -6,10 +6,11 @@
 //
 
 import CoreData
+import UIKit
 
 protocol LogRepositoryProtocol {
     
-    func createLog(imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String])
+    func createLogWithImage(_ uiImage: UIImage, imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String])
     func fetchLogs() -> [MsLog]
     func childRelogged(withId id: UUID, isHappy: Bool, isBeneficial: Bool, tags: [String])
     
@@ -27,23 +28,14 @@ final class LogRepository: LogRepositoryProtocol {
         self.context = context
     }
     
-    func createLog(imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String]) {
-        let log = MsLog(context: context)
+    func createLogWithImage(_ uiImage: UIImage, imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String]) {
         
-        log.id = UUID()
-        log.beneficialTags = IOHelper.combineTag(tags)
-        log.isBeneficial = isBeneficial
-        log.isHappy = isHappy
-        log.state = ChildrenLogState.created.stringValue
-        log.imagePath = imagePath
-        log.createdAt = Date()
-        log.updatedAt = Date()
-        
-        do {
-            try context.save()
-        } catch {
-            print("Failed to save log: \(error.localizedDescription)")
+        guard let imagePath = ImageStorage.saveImage(uiImage) else {
+            print("Failed to save image")
+            return
         }
+        
+        createLog(imagePath: imagePath, isHappy: isHappy, isBeneficial: isBeneficial, tags: tags)
     }
     
     func fetchLogs() -> [MsLog] {
@@ -91,6 +83,26 @@ final class LogRepository: LogRepositoryProtocol {
 }
 
 private extension LogRepository {
+    
+    func createLog(imagePath: String, isHappy: Bool, isBeneficial: Bool, tags: [String]) {
+        let log = MsLog(context: context)
+        
+        log.id = UUID()
+        log.beneficialTags = IOHelper.combineTag(tags)
+        log.isBeneficial = isBeneficial
+        log.isHappy = isHappy
+        log.state = ChildrenLogState.created.stringValue
+        log.imagePath = imagePath
+        log.createdAt = Date()
+        log.updatedAt = Date()
+        
+        do {
+            try context.save()
+        } catch {
+            print("Failed to save log: \(error.localizedDescription)")
+        }
+    }
+    
     func updateLogState(withId id: UUID, newState: ChildrenLogState) {
         
         guard let log = fetchLogById(id: id) else {

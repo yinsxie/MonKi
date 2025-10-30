@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @StateObject var gardenViewModel = GardenViewModel()
     
     var body: some View {
         NavigationStack(path: $navigationManager.navigationPath) {
@@ -45,7 +46,7 @@ struct HomeView: View {
                 case .childGarden(let childGardenRoute):
                     childGardenRoute.delegateView()
                         .navigationBarBackButtonHidden(true)
-                        .environmentObject(GardenViewModel())
+                        .environmentObject(gardenViewModel)
                 case .parentHome(let parentRoute):
                     parentRoute.delegateView()
                         .navigationBarBackButtonHidden(true)

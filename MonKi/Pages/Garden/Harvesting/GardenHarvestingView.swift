@@ -13,19 +13,14 @@ struct GardenHarvestingView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var viewModel: GardenViewModel
     
-    var logImage: UIImage
     @State private var fieldState: FieldState = .done
-    
-    init(logImage: UIImage = UIImage(named: ColoredPencilAsset.canvasViewBlackPencil.imageName)!) {
-        self.logImage = logImage
-    }
     
     var body: some View {
         ZStack {
             Image(frame.imageName)
                 .resizable()
                 .ignoresSafeArea()
-            
+           
             if frame == .frame1, let fieldAsset = fieldState.fieldAsset, let thoughtBubbleImage = fieldState.thoughtBubbleImage {
                 ZStack {
                     Image(fieldAsset)
@@ -39,12 +34,14 @@ struct GardenHarvestingView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 200)
-                        
-                        Image(uiImage: logImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 66)
-                            .offset(y: -20)
+                       
+                        if let image = viewModel.imageEventBuffer {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 66)
+                                .offset(y: -20)
+                        }
                     }
                     .offset(x: -85, y: -90)
                 }
@@ -59,10 +56,13 @@ struct GardenHarvestingView: View {
             if frame == .frame2 {
                 VStack {
                     Spacer()
-                    Image(uiImage: logImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 328)
+                    
+                    if let image = viewModel.imageEventBuffer {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 328)
+                    }
                     
                     Spacer()
                     CustomCTAButton(
