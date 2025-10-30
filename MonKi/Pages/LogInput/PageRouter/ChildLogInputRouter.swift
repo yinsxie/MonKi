@@ -11,30 +11,43 @@ struct ChildLogRouter: View {
     
     @ObservedObject var viewModel: ChildLogViewModel
     @EnvironmentObject var canvasViewModel: CanvasViewModel
-
-    private var currentPage: ChildLogPageEnum {
-        return ChildLogPageEnum(rawValue: viewModel.currentIndex) ?? .selectMode
-    }
-
+    
     var body: some View {
         Group {
-            switch currentPage {
-            case .selectMode:
-                SelectModePage(
-                    selectedMode: $viewModel.selectedMode,
-                    isGalleryPermissionGranted: $viewModel.isGalleryPermissionGranted,
-                    viewModel: viewModel
-                )
-
-            case .mainInput:
-                if viewModel.selectedMode == "Draw" {
-                    CanvasView()
-                } else {
-                    UploadPage(viewModel: viewModel)
+            if let inputPage = viewModel.currentInputPage {
+                switch inputPage {
+                case .selectMode:
+                    SelectModePage(
+                        selectedMode: $viewModel.inputSelectedMode,
+                        isGalleryPermissionGranted: $viewModel.isGalleryPermissionGranted,
+                        viewModel: viewModel
+                    )
+                    
+                case .mainInput:
+                    if viewModel.inputSelectedMode == "Draw" {
+                        CanvasView()
+                    } else {
+                        UploadPage(viewModel: viewModel)
+                    }
+                    
+                case .finalImage:
+                    FinalImagePage(processedImage: viewModel.finalProcessedImage)
                 }
-
-            case .finalImage:
-                FinalImagePage(processedImage: viewModel.finalProcessedImage)
+            }
+            
+            else if let tagPage = viewModel.currentTagPage {
+                switch tagPage {
+                case .howHappy:
+                    HowHappyView(selectedMode: $viewModel.tagSelectedMode, viewModel: viewModel)
+                case .happyIllust:
+                    Text("Placeholder: Happy Illustration Page")
+                case .howBeneficial:
+                    HowBeneficialView(viewModel: viewModel)
+                }
+            }
+            
+            else {
+                Text("Error: Indeks navigasi tidak valid (\(viewModel.currentIndex)).")
             }
         }
         .environmentObject(canvasViewModel)

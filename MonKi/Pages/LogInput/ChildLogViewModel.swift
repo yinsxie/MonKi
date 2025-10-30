@@ -13,7 +13,8 @@ import CoreData
 internal class ChildLogViewModel: ObservableObject {
     // MARK: - Navigation & State
     @Published var currentIndex: Int = 0
-    @Published var selectedMode: String?
+    @Published var inputSelectedMode: String?
+    @Published var tagSelectedMode: String?
     @Published var isGalleryPermissionGranted: Bool = false
     @Published var showingPermissionAlert: Bool = false
     
@@ -31,9 +32,33 @@ internal class ChildLogViewModel: ObservableObject {
     // MARK: - Core Data Log
     private let context: NSManagedObjectContext
     
+    // MARK: - Inject Beneficial Tag dummy data
+    @Published var beneficialTagsString: String = "Sehat;Senang;Kuat;Cepat;Baru;Lama"
+        
+    var beneficialTagLabels: [String] {
+        return IOHelper.expandTags(beneficialTagsString)
+    }
+    
+    @Published var selectedBeneficialTags = Set<BeneficialTag>()
+    
     // MARK: - Computed Properties
-    var currentPage: ChildLogPageEnum {
-        return ChildLogPageEnum(rawValue: currentIndex) ?? .selectMode
+    
+    private var inputFlowPageCount: Int {
+        ChildLogPageEnum.allCases.count
+    }
+    
+    var totalPageCount: Int {
+        ChildLogPageEnum.allCases.count + ChildLogTagEnum.allCases.count
+    }
+
+    var currentInputPage: ChildLogPageEnum? {
+        guard currentIndex < inputFlowPageCount else { return nil }
+        return ChildLogPageEnum(rawValue: currentIndex)
+    }
+    
+    var currentTagPage: ChildLogTagEnum? {
+        guard currentIndex >= inputFlowPageCount else { return nil }
+        return ChildLogTagEnum(rawValue: currentIndex)
     }
     
     // MARK: - Initialization
@@ -55,12 +80,12 @@ internal class ChildLogViewModel: ObservableObject {
                 self.isGalleryPermissionGranted = granted
                 if !granted {
                     self.showingPermissionAlert = true
-                    if self.selectedMode == "Gallery" { self.selectedMode = nil }
+                    if self.inputSelectedMode == "Gallery" { self.inputSelectedMode = nil }
                 } else {
-                    if self.selectedMode == "Gallery" {
+                    if self.inputSelectedMode == "Gallery" {
                         completion(granted)
                     } else {
-                        self.selectedMode = "Gallery"
+                        self.inputSelectedMode = "Gallery"
                         completion(granted)
                     }
                 }
@@ -108,39 +133,55 @@ internal class ChildLogViewModel: ObservableObject {
     
     // MARK: - Navigation Logic
     func handleNextAction(defaultAction: @escaping () -> Void) {
-        switch currentPage {
-        case .selectMode:
-            guard selectedMode != nil else { return }
-            
-            if selectedMode == "Gallery" {
-                if isGalleryPermissionGranted { showPhotoPicker = true }
-                else {
-                    requestGalleryPermission { [weak self] granted in
-                        if granted { Task { @MainActor in self?.showPhotoPicker = true } }
+        
+        guard currentIndex < totalPageCount - 1 else {
+            // TODO: Panggil fungsi saveLog di sini
+            print("Navigasi selesai, panggil defaultAction (close)")
+            defaultAction() // Tutup navigasi
+            return
+        }
+        
+        if let inputPage = currentInputPage {
+            switch inputPage {
+            case .selectMode:
+                guard inputSelectedMode != nil else { return }
+                
+                if inputSelectedMode == "Gallery" {
+                    if isGalleryPermissionGranted { showPhotoPicker = true }
+                    else {
+                        requestGalleryPermission { [weak self] granted in
+                            if granted { Task { @MainActor in self?.showPhotoPicker = true } }
+                        }
                     }
+                } else if inputSelectedMode == "Draw" {
+                    withAnimation { currentIndex = ChildLogPageEnum.mainInput.rawValue }
                 }
-            } else if selectedMode == "Draw" {
-                withAnimation { currentIndex = ChildLogPageEnum.mainInput.rawValue }
+                
+            case .mainInput:
+                if inputSelectedMode == "Draw" {
+                    canvasViewModel.saveDrawing()
+                } else { // Gallery Mode
+                    if selectedItem != nil && !backgroundRemover.isProcessing && finalProcessedImage != nil {
+                        withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
+                    } else if selectedItem == nil { imageLoadError = "Please select a photo first." }
+                    else if backgroundRemover.isProcessing { /* Do nothing while processing */ }
+                    else { imageLoadError = "Image processing failed. Try again." }
+                }
+                
+            case .finalImage:
+                print("Lanjut dari .finalImage ke .howHappy")
+                withAnimation { currentIndex += 1 }
             }
-            
-        case .mainInput:
-            if selectedMode == "Draw" {
-                canvasViewModel.saveDrawing()
-            } else { // Gallery Mode
-                if selectedItem != nil && !backgroundRemover.isProcessing && finalProcessedImage != nil {
-                    withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
-                } else if selectedItem == nil { imageLoadError = "Please select a photo first." }
-                else if backgroundRemover.isProcessing { /* Do nothing while processing */ }
-                else { imageLoadError = "Image processing failed. Try again." }
-            }
-            
-        case .finalImage:
-            defaultAction()
+        }
+        else if let tagPage = currentTagPage {
+            // TODO: Tambahkan validasi jika perlu
+            print("Lanjut dari \(tagPage) ke halaman berikutnya")
+            withAnimation { currentIndex += 1 }
         }
     }
     
     func handleNoImageSelected() {
-        if selectedMode == "Gallery", currentPage == .mainInput {
+        if inputSelectedMode == "Gallery", currentInputPage == .mainInput {
             withAnimation {
                 currentIndex = ChildLogPageEnum.selectMode.rawValue
                 selectedItem = nil
@@ -164,47 +205,54 @@ internal class ChildLogViewModel: ObservableObject {
     }
     
     func handleBackAction() {
-        switch currentPage {
-        case .finalImage:
-            withAnimation {
-                currentIndex = ChildLogPageEnum.mainInput.rawValue
-                finalProcessedImage = nil
-                if selectedMode == "Gallery" { backgroundRemover.partialReset() }
-            }
-        case .mainInput:
-            withAnimation {
-                currentIndex = ChildLogPageEnum.selectMode.rawValue
-                selectedItem = nil
-                backgroundRemover.reset()
-            }
-        case .selectMode:
-            break
+        guard currentIndex > 0 else { return }
+
+        withAnimation { currentIndex -= 1 }
+        
+        if currentInputPage == .finalImage {
+            tagSelectedMode = nil
+            selectedBeneficialTags.removeAll()
+        }
+        else if currentInputPage == .mainInput {
+            finalProcessedImage = nil
+            if inputSelectedMode == "Gallery" { backgroundRemover.partialReset() }
+        }
+        else if currentInputPage == .selectMode { // Kembali ke .selectMode (indeks 0)
+            // (Reset state jika ada)
         }
     }
     
     func shouldDisableNext() -> Bool {
-        let isModeInvalid = selectedMode == nil || selectedMode!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        let isProcessingBG = backgroundRemover.isProcessing
-        let isProcessingCanvas = canvasViewModel.isProcessing
-        let isGalleryInputInvalid = selectedMode == "Gallery" && currentPage == .mainInput && (selectedItem == nil || finalProcessedImage == nil)
-        let isDrawingInputInvalid = selectedMode == "Draw" && currentPage == .mainInput && isProcessingCanvas
-        let isFinalImageInvalid = currentPage == .finalImage && finalProcessedImage == nil
-        
-        switch currentPage {
-        case .selectMode:
-            return isModeInvalid
-        case .mainInput:
-            if selectedMode == "Gallery" {
-                return isProcessingBG || isGalleryInputInvalid
-            } else { // Draw Mode
-                return isDrawingInputInvalid
+        if let inputPage = currentInputPage {
+            switch inputPage {
+            case .selectMode:
+                return inputSelectedMode == nil || inputSelectedMode!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            case .mainInput:
+                if inputSelectedMode == "Gallery" {
+                    return backgroundRemover.isProcessing || (selectedItem == nil || finalProcessedImage == nil)
+                } else { // Draw Mode
+                    return canvasViewModel.isProcessing
+                }
+            case .finalImage:
+                return finalProcessedImage == nil
             }
-        case .finalImage:
-            return isFinalImageInvalid // Disable Done if no final image
+        } else if let tagPage = currentTagPage {
+            // TODO: Tambahkan validasi untuk halaman tag
+            switch tagPage {
+            case .howHappy:
+                // Contoh: return tagSelectedMode == nil
+                return false // Izinkan lanjut untuk sekarang
+            case .happyIllust:
+                return false // Izinkan lanjut untuk sekarang
+            case .howBeneficial:
+                // Contoh: return selectedBeneficialTags.isEmpty
+                return false // Izinkan lanjut untuk sekarang
+            }
         }
+        return false // Default
     }
     
     var shouldHideProgressBar: Bool {
-        return selectedMode == "Draw" && currentPage == .mainInput
+        return inputSelectedMode == "Draw" && currentInputPage == .mainInput
     }
 }

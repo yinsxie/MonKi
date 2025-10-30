@@ -8,20 +8,23 @@
 import SwiftUI
 
 struct ChildInputCard: View {
-    let text: String
+    let text: String?
+    let image: String
     let isSelected: Bool
     let cornerRadius: CGFloat
     let width: CGFloat
     let action: () -> Void
     
     init(
-        text: String,
+        text: String? = nil,
+        image: String,
         isSelected: Bool,
         cornerRadius: CGFloat = 20,
         width: CGFloat = 160,
         action: @escaping () -> Void
     ) {
         self.text = text
+        self.image = image
         self.isSelected = isSelected
         self.cornerRadius = cornerRadius
         self.width = width
@@ -38,16 +41,19 @@ struct ChildInputCard: View {
             }
         } label: {
             VStack(spacing: 16) {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(colorSet.textColor)
+                Image(image)
+                    .resizable()
+                    .scaledToFit()
                     .frame(height: UIScreen.main.bounds.height * 0.15)
                 
-                Text(text)
-                    .font(Font.title3Emphasized)
-                    .foregroundStyle(colorSet.textColor)
+                if let safeText = text {
+                    Text(safeText)
+                        .font(Font.title3Emphasized)
+                        .foregroundStyle(colorSet.textColor)
+                }
             }
             .frame(maxWidth: .infinity)
-            .padding(24)
+            .padding(16)
         }
         .buttonStyle(CustomButtonStyle(
             backgroundColor: colorSet.backgroundColor,
@@ -59,5 +65,6 @@ struct ChildInputCard: View {
             width: width,
             height: UIScreen.main.bounds.height * 0.3
         )
+        .frame(maxWidth: width == .infinity ? .infinity : nil)
     }
 }
