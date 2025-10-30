@@ -33,8 +33,6 @@ enum ChildrenLogState {
             self = .created
         case "Approved":
             self = .approved
-        case "Need to Talk":
-            self = .needToTalk
         case "Rejected":
             self = .rejected
         case "Done":
