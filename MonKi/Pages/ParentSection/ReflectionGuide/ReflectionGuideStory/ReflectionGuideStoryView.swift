@@ -33,9 +33,16 @@ struct ReflectionGuideStoryView: View {
                     .id(viewModel.currentPageIndex)
             }
             
+            if let imagePath = log.imagePath, let uiImage = UIImage(named: imagePath) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 70)
+                    .offset(x: 125, y: 180)
+            }
+            
             VStack(alignment: .leading, spacing: 24) {
                 
-                // 2. CLOSE BUTTON
                 closeButton
                     .padding(.horizontal, 24)
                 
@@ -46,14 +53,13 @@ struct ReflectionGuideStoryView: View {
                 )
                 .padding(.horizontal, 24)
                 
-                // 3. STORY PAGE CONTENT
                 ZStack {
                     if !viewModel.pages.isEmpty && viewModel.currentPageIndex < viewModel.pages.count {
                         StoryPageView(page: viewModel.pages[viewModel.currentPageIndex])
-                            .padding(.horizontal, 26)
-                            .frame(maxHeight: .infinity) // Make it take up the remaining space
+                            .padding(.horizontal, 20)
+                            .frame(maxHeight: .infinity)
                     } else {
-                        Spacer() // Placeholder if pages are empty
+                        Spacer()
                     }
                     
                     tapNavigationOverlay
@@ -129,7 +135,7 @@ struct ReflectionGuideStoryView: View {
         HStack(spacing: 0) {
             // Left Side (Regress)
             Rectangle()
-                .fill(Color.black.opacity(0.001)) // Use a near-zero opacity to make it tappable
+                .fill(Color.black.opacity(0.001))
                 .onTapGesture {
                     viewModel.regressStory()
                 }
