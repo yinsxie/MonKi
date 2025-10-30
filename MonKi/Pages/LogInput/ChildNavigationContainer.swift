@@ -10,10 +10,12 @@ import SwiftUI
 import CoreData
 
 struct ChildLogNavigationContainer: View {
+    @EnvironmentObject var navigationManager: NavigationManager
     @StateObject private var viewModel: ChildLogViewModel
 
     init() {
-        _viewModel = StateObject(wrappedValue: ChildLogViewModel(context: CoreDataManager.shared.viewContext))
+        let repository = LogRepository()
+        _viewModel = StateObject(wrappedValue: ChildLogViewModel())
     }
 
     var body: some View {
@@ -86,9 +88,4 @@ struct ChildLogNavigationContainer: View {
         }
          // TODO: Add alert for Canvas processing errors if needed
     }
-}
-
-#Preview {
-    ChildLogNavigationContainer()
-        .environment(\.managedObjectContext, CoreDataManager.shared.viewContext)
 }

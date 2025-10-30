@@ -11,6 +11,7 @@ struct HomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @StateObject var gardenViewModel = GardenViewModel()
+    @StateObject var childlogViewModel = ChildLogViewModel()
     
     var body: some View {
         NavigationStack(path: $navigationManager.navigationPath) {
@@ -43,6 +44,7 @@ struct HomeView: View {
                 case .childLog(let childLogRoute):
                     childLogRoute.delegateView()
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(childlogViewModel)
                 case .childGarden(let childGardenRoute):
                     childGardenRoute.delegateView()
                         .navigationBarBackButtonHidden(true)

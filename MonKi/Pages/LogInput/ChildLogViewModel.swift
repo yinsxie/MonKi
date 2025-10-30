@@ -10,7 +10,7 @@ import PhotosUI
 import CoreData
 
 @MainActor
-internal class ChildLogViewModel: ObservableObject {
+final class ChildLogViewModel: ObservableObject {
     // MARK: - Navigation & State
     @Published var currentIndex: Int = 0
     @Published var inputSelectedMode: String?
@@ -30,11 +30,12 @@ internal class ChildLogViewModel: ObservableObject {
     @Published var finalProcessedImage: UIImage?
     
     // MARK: - Core Data Log
-    private let context: NSManagedObjectContext
+    @Published var logs: [MsLog] = []
+    var logRepo: LogRepositoryProtocol
     
     // MARK: - Inject Beneficial Tag dummy data
     @Published var beneficialTagsString: String = "Sehat;Senang;Kuat;Cepat;Baru;Lama"
-        
+    
     var beneficialTagLabels: [String] {
         return IOHelper.expandTags(beneficialTagsString)
     }
@@ -50,7 +51,7 @@ internal class ChildLogViewModel: ObservableObject {
     var totalPageCount: Int {
         ChildLogPageEnum.allCases.count + ChildLogTagEnum.allCases.count
     }
-
+    
     var currentInputPage: ChildLogPageEnum? {
         guard currentIndex < inputFlowPageCount else { return nil }
         return ChildLogPageEnum(rawValue: currentIndex)
@@ -61,9 +62,27 @@ internal class ChildLogViewModel: ObservableObject {
         return ChildLogTagEnum(rawValue: currentIndex)
     }
     
+    var isHappy: Bool {
+        return tagSelectedMode == "Happy"
+    }
+    
+    var isBeneficial: Bool {
+        return !selectedBeneficialTags.isEmpty
+    }
+    
+    var beneficialTags: [String] {
+        let allLabels = self.beneficialTagLabels
+        let allShapes = BeneficialTag.allCases
+        let tagMap = Dictionary(uniqueKeysWithValues: zip(allShapes, allLabels))
+        let selectedLabels = selectedBeneficialTags.compactMap { selectedTag in
+            return tagMap[selectedTag]
+        }
+        return selectedLabels
+    }
+    
     // MARK: - Initialization
-    init(context: NSManagedObjectContext = CoreDataManager.shared.viewContext) {
-        self.context = context
+    init(logRepo: LogRepositoryProtocol = LogRepository()) {
+        self.logRepo = logRepo
         self.canvasViewModel.onDrawingProcessed = { [weak self] image in
             guard let self else { return }
             Task { @MainActor in
@@ -135,9 +154,9 @@ internal class ChildLogViewModel: ObservableObject {
     func handleNextAction(defaultAction: @escaping () -> Void) {
         
         guard currentIndex < totalPageCount - 1 else {
-            // TODO: Panggil fungsi saveLog di sini
             print("Navigasi selesai, panggil defaultAction (close)")
-            defaultAction() // Tutup navigasi
+            saveLog()
+            defaultAction()
             return
         }
         
@@ -174,8 +193,15 @@ internal class ChildLogViewModel: ObservableObject {
             }
         }
         else if let tagPage = currentTagPage {
-            // TODO: Tambahkan validasi jika perlu
-            print("Lanjut dari \(tagPage) ke halaman berikutnya")
+            switch tagPage {
+            case .howHappy:
+                guard tagSelectedMode != nil else { return }
+                print("Data 'isHappy' disimpan sementara: \(isHappy)")
+            case .happyIllust:
+                print("Halaman ilustrasi, lanjut saja.")
+            case .howBeneficial:
+                break
+            }
             withAnimation { currentIndex += 1 }
         }
     }
@@ -206,7 +232,7 @@ internal class ChildLogViewModel: ObservableObject {
     
     func handleBackAction() {
         guard currentIndex > 0 else { return }
-
+        
         withAnimation { currentIndex -= 1 }
         
         if currentInputPage == .finalImage {
@@ -237,16 +263,13 @@ internal class ChildLogViewModel: ObservableObject {
                 return finalProcessedImage == nil
             }
         } else if let tagPage = currentTagPage {
-            // TODO: Tambahkan validasi untuk halaman tag
             switch tagPage {
             case .howHappy:
-                // Contoh: return tagSelectedMode == nil
-                return false // Izinkan lanjut untuk sekarang
+                return tagSelectedMode == nil
             case .happyIllust:
-                return false // Izinkan lanjut untuk sekarang
+                return false
             case .howBeneficial:
-                // Contoh: return selectedBeneficialTags.isEmpty
-                return false // Izinkan lanjut untuk sekarang
+                return false
             }
         }
         return false // Default
@@ -254,5 +277,23 @@ internal class ChildLogViewModel: ObservableObject {
     
     var shouldHideProgressBar: Bool {
         return inputSelectedMode == "Draw" && currentInputPage == .mainInput
+    }
+    
+    private func saveLog() {
+        guard let imageToSave = finalProcessedImage else {
+            print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
+            return
+        }
+        
+        let happy = self.isHappy
+        let beneficial = self.isBeneficial
+        let tags = self.beneficialTags
+        
+        logRepo.createLogWithImage(
+            imageToSave,
+            isHappy: happy,
+            isBeneficial: beneficial,
+            tags: tags
+        )
     }
 }
