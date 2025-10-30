@@ -9,9 +9,23 @@ enum FieldState {
     case empty
     case created
     case approved
-    case needToTalk
     case declined
     case done
+    
+    init(state: String){
+        switch state {
+        case "Created":
+            self = .created
+        case "Approved":
+            self = .approved
+        case "Declined":
+            self = .declined
+        case "Done":
+            self = .done
+        default:
+            self = .empty
+        }
+    }
     
     var stringValue: String {
         switch self {
@@ -21,8 +35,6 @@ enum FieldState {
             return "Created"
         case .approved:
             return "Approved"
-        case .needToTalk:
-            return "NeedToTalk"
         case .declined:
             return "Declined"
         case .done:

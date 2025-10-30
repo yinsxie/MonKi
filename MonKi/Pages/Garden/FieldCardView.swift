@@ -22,12 +22,10 @@ struct FieldCardView: View {
         switch type {
         case .empty:
             return widthAndPotField
-        case .created:
+        case .created, .declined:
             return 158.59
         case .approved, .done:
             return 181.71
-        case .needToTalk, .declined:
-            return 158.59
         }
     }
     

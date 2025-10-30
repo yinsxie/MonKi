@@ -19,16 +19,7 @@ struct GardenHomeView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
-                fieldCardViewBuilder(type: .empty)
-                
-                fieldCardViewBuilder(type: .approved)
-                
-                fieldCardViewBuilder(type: .created)
-                
-                fieldCardViewBuilder(type: .done)
-            }
-            .offset(y: 40)
+            fieldView
             
             VStack {
                 HStack {
@@ -46,15 +37,57 @@ struct GardenHomeView: View {
             .padding(.bottom, 57)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            viewModel.fetchLogData()
+        }
     }
     
     @ViewBuilder
-    func fieldCardViewBuilder(type: FieldState) -> some View {
-        FieldCardView(type: type) {
-            // OnEmptyTapped
+    var fieldView: some View {
+        if viewModel.isLoading {
+            ProgressView()
+        } else {
+            // Filter out archived logs before both rendering and counting
+            let activeLogs = viewModel.logs.filter {
+                if let state = $0.state {
+                    return ChildrenLogState(state: state) != .archived
+                }
+                return false
+            }
+            
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
+                
+                ForEach(activeLogs, id: \.self) { log in
+                    let fieldState = FieldState(state: log.state ?? "")
+                    fieldCardViewBuilder(for: log, type: fieldState)
+                }
+                
+                // Now count fillers based on filtered logs
+                if activeLogs.count < 4 {
+                    ForEach(0..<(4 - activeLogs.count), id: \.self) { _ in
+                        fieldCardViewBuilder(for: nil, type: .empty)
+                    }
+                }
+            }
+            .offset(y: 40)
+        }
+    }
+    
+    @ViewBuilder
+    func fieldCardViewBuilder(for log: MsLog?, type: FieldState) -> some View {
+        //TODO: Gnti ke ImageStorage.loadImage(from: String) kalau inputLog udh
+        let image: UIImage? = {
+            if let imagePath = log?.imagePath {
+                return UIImage(named: imagePath)
+            } else {
+                return nil
+            }
+        }()
+        FieldCardView(type: type, logImage: image) {
             viewModel.navigateTo(route: .childLog(.logInput), context: navigationManager)
         } onCTAButtonTapped: {
-            viewModel.handleCTAButtonTapped(for: type, context: navigationManager)
+            print("CTA button tapped")
+            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager)
         }
     }
     
