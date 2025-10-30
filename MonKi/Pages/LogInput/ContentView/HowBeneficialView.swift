@@ -33,11 +33,3 @@ struct HowBeneficialView: View {
         .padding(.vertical, 140)
     }
 }
-
-#Preview {
-    let previewContext = CoreDataManager.shared.viewContext
-    let viewModel = ChildLogViewModel(context: previewContext)
-    
-    HowBeneficialView(viewModel: viewModel)
-        .environment(\.managedObjectContext, previewContext)
-}
