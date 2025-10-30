@@ -23,7 +23,7 @@ struct HomeView: View {
                 }
                 
                 Button {
-                    navigationManager.goTo(.childGarden(.garden))
+                    navigationManager.goTo(.childGarden(.home))
                 } label: {
                     Text("Nav to children garden")
                 }
@@ -40,10 +40,14 @@ struct HomeView: View {
                 switch route {
                 case .childLog(let childLogRoute):
                     childLogRoute.delegateView()
+                        .navigationBarBackButtonHidden(true)
                 case .childGarden(let childGardenRoute):
                     childGardenRoute.delegateView()
+                        .navigationBarBackButtonHidden(true)
+                        .environmentObject(GardenViewModel())
                 case .parentHome(let parentRoute):
                     parentRoute.delegateView()
+                        .navigationBarBackButtonHidden(true)
                 }
             }
         }

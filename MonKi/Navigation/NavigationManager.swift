@@ -15,10 +15,12 @@ final class NavigationManager: ObservableObject {
     }
     
     func popToRoot() {
+        if navigationPath.isEmpty { return }
         navigationPath.removeAll()
     }
     
     func popLast() {
+        if navigationPath.isEmpty { return }
         _ = navigationPath.popLast()
     }
     
@@ -27,12 +29,28 @@ final class NavigationManager: ObservableObject {
         let countToRemove = min(n, navigationPath.count)
         navigationPath.removeLast(countToRemove)
     }
-    
+
     func replaceTop(with route: MainRoute) {
         guard !navigationPath.isEmpty else {
             navigationPath.append(route)
             return
         }
+        
         navigationPath[navigationPath.count - 1] = route
+    }
+    
+    func replaceTopAnimate(with route: MainRoute) {
+        guard !navigationPath.isEmpty else {
+            navigationPath.append(route)
+            return
+        }
+
+        navigationPath.removeLast()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation {
+                self.navigationPath.append(route)
+            }
+        }
     }
 }

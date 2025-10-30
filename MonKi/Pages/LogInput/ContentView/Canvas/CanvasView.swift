@@ -8,41 +8,41 @@
 import SwiftUI
 
 struct CanvasView: View {
+    
     @EnvironmentObject var viewModel: CanvasViewModel
-
+    
     var body: some View {
         ZStack {
-            Image(ImageAsset.canvasBackground.imageName)
+            Image(CanvasImageAsset.canvasBackground.imageName)
                 .resizable()
                 .ignoresSafeArea()
             
-            Image(ImageAsset.canvasViewCloth.imageName)
+            Image(CanvasImageAsset.canvasViewCloth.imageName)
                 .resizable()
-                .scaledToFit()
-            //                .frame(height: UIScreen.main.bounds.height * 0.75,
-            //                                       alignment: .topLeading)
-                .frame(maxWidth: .infinity)
-                .clipped()
+                .scaledToFill()
+                .frame(width: UIScreen.main.bounds.width * 1.4,
+                       height: UIScreen.main.bounds.height * 0.7,
+                       alignment: .topLeading)
                 .offset(x: -150, y: -200)
                 .id("clothBackground")
                 .ignoresSafeArea()
             
-            Image(ImageAsset.canvasViewButton.imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 357.26, height: 278.08)
-                .offset(x: 50, y: -320)
-                .ignoresSafeArea()
+            Image(CanvasImageAsset.canvasViewButton.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 357.26, height: 278.08)
+                    .offset(x: 50, y: -320)
+                    .ignoresSafeArea()
             
             VStack {
                 Spacer()
                 ZStack {
-                    Image(ImageAsset.canvasViewPaperNote.imageName)
+                    Image(CanvasImageAsset.canvasViewPaperNote.imageName)
                         .resizable()
                         .frame(width: 384.68, height: 363.87)
                         .scaledToFit()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    //                        .offset(x: 60, y: 0)
+                        .offset(x: 70, y: 0)
                     
                     DrawingCanvasView(viewModel: _viewModel)
                         .frame(width: 300, height: 300)
@@ -59,14 +59,10 @@ struct CanvasView: View {
                 
                 Spacer()
             }
-            .ignoresSafeArea()
-            .padding(.vertical, 100)
         }
-        .ignoresSafeArea()
     }
 }
 
 #Preview {
     CanvasView()
-        .environmentObject(CanvasViewModel()) // Provide VM for preview
 }
