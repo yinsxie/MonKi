@@ -93,6 +93,7 @@ struct ReviewCardView: View {
                         font: .headlineEmphasized,
                         action: {
                             onApprove()
+                            navigationManager.goTo(.parentHome(.reviewSuccess))
                         },
                         cornerRadius: 24,
                         type: .normal

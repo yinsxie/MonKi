@@ -42,86 +42,25 @@ class ReflectionGuideStoryViewModel: ObservableObject {
     
     private func loadReflectionPages() {
         self.pages = [
-            // Page 1
             ReflectionPage(
                 title: "#1",
                 subtitle: "Tanya alasan di balik pilihan anak...",
-                cards: [
-                    ReflectionCard(
-                        title: "Contoh pertanyaan:",
-                        mainTextPrefix: "“Mama/papa pengen tahu kenapa kamu ",
-                        mainTextHighlight: "merasa bahagia",
-                        mainTextSuffix: " kalau memiliki...",
-                        highlightedText: nil,
-                        imageName: "icecream_placeholder"
-                    ),
-                    ReflectionCard(
-                        title: "Contoh pertanyaan:",
-                        mainTextPrefix: "“Mama/papa pengen tahu kenapa kamu ",
-                        mainTextHighlight: "merasa ini berguna",
-                        mainTextSuffix: " untuk",
-                        highlightedText: "kesehatan",
-                        imageName: "icecream_placeholder"
-                    )
-                ]
+                text: "“Mama/Papa ingin tahu kenapa barang ini bikin merasa bahagia dan merasa barang ini berguna untuk...”"
             ),
-            
-            // Page 2
             ReflectionPage(
                 title: "#2",
                 subtitle: "Jangan lupa, validasi perasaan anak...",
-                cards: [
-                    ReflectionCard(
-                        title: "Contoh pernyataan:",
-                        mainTextPrefix: "“Iya, bisa memiliki yang kamu mau emang bikin senang, dan hal yang bikin senang juga penting kok!”",
-                        mainTextHighlight: "",
-                        mainTextSuffix: "",
-                        highlightedText: nil,
-                        imageName: "icecream_placeholder"
-                    )
-                ]
+                text: "“Bisa punya apa yang kamu mau emang bikin senang, dan hal yang bikin senang juga penting kok!”"
             ),
-            
-            // ... (rest of your pages) ...
-            
-            // Page 3
             ReflectionPage(
                 title: "#3",
                 subtitle: "Waktunya hubungkan ke nilai keluarga...",
-                cards: [
-                    ReflectionCard(
-                        title: "Contoh pernyataan:",
-                        mainTextPrefix: "“Di keluarga kita, yang penting tuh hal yang bisa bikin senang tapi juga gak boros, ya.”",
-                        mainTextHighlight: "",
-                        mainTextSuffix: "",
-                        highlightedText: nil,
-                        imageName: "icecream_placeholder"
-                    ),
-                    ReflectionCard(
-                        title: "Contoh pernyataan:",
-                        mainTextPrefix: "“Keluarga kita lebih suka hal-hal yang bisa dipakai lama, jadi rasa happy-nya bisa awet juga, deh“",
-                        mainTextHighlight: "",
-                        mainTextSuffix: "",
-                        highlightedText: nil,
-                        imageName: "icecream_placeholder"
-                    )
-                ]
+                text: "“Di keluarga kita, yang penting tuh hal yang bisa bikin senang tapi juga gak boros, ya.”"
             ),
-            
-            // Page 4
             ReflectionPage(
                 title: "#4",
                 subtitle: "Sekarang, ajak anak ikut tarik kesimpulan...",
-                cards: [
-                    ReflectionCard(
-                        title: "Contoh pernyataan:",
-                        mainTextPrefix: "“Jadi, kalau besok ingin jenis barang kayak gini lagi, kamu bakal kasih tau MonKi kalau ini berguna untuk...”",
-                        mainTextHighlight: "",
-                        mainTextSuffix: "",
-                        highlightedText: nil,
-                        imageName: "icecream_placeholder"
-                    )
-                ]
+                text: "“Jadi, kalau nanti mau barang kayak gini lagi, kamu kasih tau MonKi kalau ini berguna untuk...”"
             )
         ]
     }
@@ -129,25 +68,20 @@ class ReflectionGuideStoryViewModel: ObservableObject {
     /// Moves to the next story page, or finishes if at the end.
     func advanceStory() {
         if currentPageIndex < pages.count - 1 {
-            // Move to next page
             currentPageIndex += 1
-            startTimer() // Start timer for the new page
+            startTimer()
         } else {
-            // Reached the end, stop timer
             stopTimer()
             self.progress = 1.0
-            // You could call a completion handler here to dismiss the view
         }
     }
     
     /// Moves to the previous story page.
     func regressStory() {
         if currentPageIndex > 0 {
-            // Move to previous page
             currentPageIndex -= 1
-            startTimer() // Start timer for the new page
+            startTimer()
         } else {
-            // Already at the first page, just reset its timer
             startTimer()
         }
     }
@@ -156,41 +90,10 @@ class ReflectionGuideStoryViewModel: ObservableObject {
     
     /// Starts or restarts the timer for the current page.
     func startTimer() {
-        // Always reset progress to 0 when (re)starting
         self.progress = 0.0
         
-        // Invalidate any existing timer
         timerCancellable?.cancel()
         
-        // Create a new timer that fires every 0.05 seconds
-        timerCancellable = Timer.publish(every: 0.05, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                
-                // Calculate the increment
-                let increment = 0.05 / self.pageDuration
-                var newProgress = self.progress + increment
-                
-                if newProgress >= 1.0 {
-                    // Progress is complete, advance the story
-                    newProgress = 1.0 // Cap it at 1.0
-                    self.advanceStory()
-                } else {
-                    // Update progress
-                    self.progress = newProgress
-                }
-            }
-    }
-    
-    /// Pauses the timer (e.g., on long press)
-    func pauseTimer() {
-        timerCancellable?.cancel()
-    }
-    
-    /// Resumes the timer (e.g., on long press end)
-    func resumeTimer() {
-        // We create a new timer that continues from the *current* progress.
         timerCancellable = Timer.publish(every: 0.05, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
@@ -208,7 +111,28 @@ class ReflectionGuideStoryViewModel: ObservableObject {
             }
     }
     
-    /// Stops the timer completely (e.g., on disappear)
+    func pauseTimer() {
+        timerCancellable?.cancel()
+    }
+    
+    func resumeTimer() {
+        timerCancellable = Timer.publish(every: 0.05, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                
+                let increment = 0.05 / self.pageDuration
+                var newProgress = self.progress + increment
+                
+                if newProgress >= 1.0 {
+                    newProgress = 1.0
+                    self.advanceStory()
+                } else {
+                    self.progress = newProgress
+                }
+            }
+    }
+    
     func stopTimer() {
         timerCancellable?.cancel()
         timerCancellable = nil

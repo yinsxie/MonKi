@@ -11,9 +11,8 @@ struct StoryPageView: View {
     let page: ReflectionPage
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) { // Add spacing between title and cards
+        VStack(alignment: .leading, spacing: 24) {
             
-            // 1. Title/Subtitle Block
             VStack(alignment: .leading, spacing: 0) {
                 Text(page.title)
                     .opacity(0.5)
@@ -24,12 +23,12 @@ struct StoryPageView: View {
             .foregroundStyle(ColorPalette.orange900)
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            // 2. ScrollView for the Cards
-            VStack(spacing: 28) { // Spacing between cards
-                ForEach(page.cards) { card in
-                    ReflectionCardView(card: card)
-                }
-            }
+            Spacer()
+            
+            Text(page.text)
+                .font(.title3Semibold)
+                .foregroundStyle(ColorPalette.orange900)
+                .multilineTextAlignment(.center)
             
         }
         .frame(maxHeight: .infinity, alignment: .top)
@@ -40,27 +39,10 @@ struct StoryPageView: View {
     let previewPage = ReflectionPage(
         title: "#1",
         subtitle: "Tanya alasan di balik pilihan anak...",
-        cards: [
-            ReflectionCard(
-                title: "Contoh pertanyaan:",
-                mainTextPrefix: "“Mama/papa pengen tahu kenapa kamu ",
-                mainTextHighlight: "merasa bahagia",
-                mainTextSuffix: " kalau memiliki...”",
-                highlightedText: nil,
-                imageName: "icecream_placeholder"
-            ),
-            ReflectionCard(
-                title: "Contoh pertanyaan:",
-                mainTextPrefix: "“Mama/papa pengen tahu kenapa kamu ",
-                mainTextHighlight: "merasa ini berguna",
-                mainTextSuffix: " untuk”",
-                highlightedText: "kesehatan",
-                imageName: "icecream_placeholder"
-            )
-        ]
+        text: "“Mama/Papa ingin tahu kenapa barang ini bikin merasa bahagia dan merasa barang ini berguna untuk...”"
     )
     
     StoryPageView(page: previewPage)
-        .padding(26) // Add padding to mimic the main view
+        .padding(26)
         .background(ColorPalette.yellow500)
 }

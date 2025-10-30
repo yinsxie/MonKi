@@ -7,21 +7,9 @@
 
 import Foundation
 
-struct ReflectionCard: Identifiable, Hashable {
-    let id = UUID()
-    let title: String
-    
-    let mainTextPrefix: String
-    let mainTextHighlight: String
-    let mainTextSuffix: String
-    
-    let highlightedText: String?
-    let imageName: String
-}
-
 struct ReflectionPage: Identifiable, Hashable {
     let id = UUID()
     let title: String
     let subtitle: String
-    let cards: [ReflectionCard]
+    let text: String
 }
