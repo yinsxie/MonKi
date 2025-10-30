@@ -24,6 +24,7 @@ struct CustomButton: View {
     let cornerRadius: CGFloat
     let width: CGFloat
     let type: ButtonType
+    let isDisabled: Bool
     
     init(
         text: String? = nil,
@@ -36,7 +37,8 @@ struct CustomButton: View {
         action: @escaping () -> Void,
         cornerRadius: CGFloat = 12,
         width: CGFloat = .infinity,
-        type: ButtonType = .normal
+        type: ButtonType = .normal,
+        isDisabled: Bool = false
     ) {
         self.text = text
         self.backgroundColor = backgroundColor
@@ -49,6 +51,7 @@ struct CustomButton: View {
         self.cornerRadius = cornerRadius
         self.width = width
         self.type = type
+        self.isDisabled = isDisabled
     }
     
     init(
@@ -60,7 +63,8 @@ struct CustomButton: View {
         action: @escaping () -> Void,
         cornerRadius: CGFloat = 12,
         width: CGFloat = .infinity,
-        type: ButtonType = .normal
+        type: ButtonType = .normal,
+        isDisabled: Bool = false
     ) {
         self.init(
             text: text,
@@ -73,7 +77,8 @@ struct CustomButton: View {
             action: action,
             cornerRadius: cornerRadius,
             width: width,
-            type: type
+            type: type,
+            isDisabled: isDisabled
         )
     }
     
@@ -83,12 +88,12 @@ struct CustomButton: View {
                 if let image = image {
                     Image(systemName: image)
                         .font(font)
-                        .foregroundStyle(textColor)
+                        .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor :textColor)
                 }
                 
                 if let text = text, !text.isEmpty {
                     Text(text)
-                        .foregroundStyle(textColor)
+                        .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor : textColor)
                         .font(font)
                 }
                 
@@ -102,14 +107,17 @@ struct CustomButton: View {
             
         }
         .buttonStyle(CustomButtonStyle(
-            backgroundColor: backgroundColor,
-            foregroundColor: foregroundColor,
+        backgroundColor: isDisabled ? ButtonColorSet.disabled.backgroundColor : backgroundColor,
+        foregroundColor: isDisabled ? ButtonColorSet.disabled.foregroundColor :foregroundColor,
             cornerRadius: cornerRadius,
             shape: type == .normal ? .rectangle : .borderedRectangle
             
         ))
         .frame(width: width, height: 60)
-        .contentShape(Rectangle())
+        .contentShape(Rectangle()) // TODO: nanya aret fungsinya, line dari aret
+        .padding(.horizontal, 2.5)
+        .padding(.top, 2.5)
+        .disabled(isDisabled)
     }
 }
 
