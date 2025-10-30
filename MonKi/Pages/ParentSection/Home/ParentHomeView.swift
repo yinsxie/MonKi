@@ -138,10 +138,15 @@ struct ParentHomeView: View {
                                         ReviewCardView(
                                             log: log,
                                             onReject: {
-                                                viewModel.rejectLog(log: log)
+                                                withAnimation {
+                                                    viewModel.setBufferLog(log: log)
+                                                    viewModel.toggleModalityOnRejection(to: true)
+                                                }
                                             },
                                             onApprove: {
-                                                viewModel.approveLog(log: log)
+                                                withAnimation {
+                                                    viewModel.approveLog(log: log)
+                                                }
                                             }
                                         )
                                     }
@@ -154,11 +159,51 @@ struct ParentHomeView: View {
                     }
                 }
                 .ignoresSafeArea(edges: .bottom)
+                
+                //Alerts
+                if viewModel.showModalityOnRejection {
+                    popUpView
+                }
+                
             }
         }
         .onAppear {
             viewModel.loadLogs()
         }
+    }
+    
+    var popUpView: some View {
+        PopUpView(
+            type: ParentSectionModalType.onRejectButtonTapped(
+                onPrimaryTap: {
+                    if let log = viewModel.logBuffer {
+                        viewModel.rejectLog(log: log)
+                    }
+                    viewModel.navigateToReflectionStory(context: navigationManager, forLog: viewModel.logBuffer)
+                    withAnimation {
+                        viewModel.toggleModalityOnRejection(to: false)
+                    }
+                },
+                onSecondaryTap: {
+                    withAnimation {
+                        viewModel.toggleModalityOnRejection(to: false)
+                    }
+                    if let log = viewModel.logBuffer {
+                        viewModel.rejectLog(log: log)
+                    }
+                    //TODO: Kata aret pindahin ke Home Aja
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        navigationManager.popLast()
+                    }
+                }
+            )
+        ) {
+            withAnimation {
+                viewModel.toggleModalityOnRejection(to: false)
+                viewModel.setBufferLog(log: nil)
+            }
+        }
+        .zIndex(1)
     }
 }
 

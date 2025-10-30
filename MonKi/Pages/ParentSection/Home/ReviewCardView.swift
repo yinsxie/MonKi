@@ -80,9 +80,7 @@ struct ReviewCardView: View {
                         text: "Tolak",
                         colorSet: .destructive,
                         font: .headlineEmphasized,
-                        action: {
-                            onReject()
-                        },
+                        action: onReject,
                         cornerRadius: 24,
                         type: .normal
                     )

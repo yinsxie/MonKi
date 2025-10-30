@@ -74,6 +74,10 @@ struct ReflectionGuideStoryView: View {
             }
             .padding(.top, 20)
             
+            //Alerts
+            if viewModel.showModalityOnStoryViewCancelButtonTapped {
+                popUpView
+            }
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
@@ -87,14 +91,15 @@ struct ReflectionGuideStoryView: View {
     }
     
     // MARK: - Subviews
-    
     private var closeButton: some View {
         CustomButton(
             colorSet: .destructive,
             font: .system(size: 20, weight: .black, design: .rounded),
             image: "xmark",
             action: {
-                navigationManager.popLast()
+                withAnimation {
+                    viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: true)
+                }
             },
             cornerRadius: 24,
             width: 64,
@@ -155,8 +160,32 @@ struct ReflectionGuideStoryView: View {
             perform: { }
         )
     }
+    
+    var popUpView: some View {
+        PopUpView(
+            type: ParentSectionModalType.onStoryViewCancelButtonTapped(
+                onPrimaryTap: {
+                    withAnimation {
+                        viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
+                    }
+                },
+                onSecondaryTap: {
+                    withAnimation {
+                        viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
+                        viewModel.rejectLog()
+                        //Kata aret: ke home
+                        navigationManager.popToRoot()
+                    }
+                }
+            )
+        ){
+            withAnimation {
+                viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
+            }
+        }
+        .zIndex(1)
+    }
 }
-
 
 #Preview {
     

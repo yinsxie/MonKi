@@ -7,15 +7,26 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 final class ParentHomeViewModel: ObservableObject {
     
     @Published var logsForParent: [MsLog] = []
+    @Published var showModalityOnRejection: Bool = false
+    @Published var logBuffer: MsLog?
     
     private let logRepository: LogRepositoryProtocol
     
     init(logRepository: LogRepositoryProtocol = LogRepository()) {
         self.logRepository = logRepository
+    }
+    
+    func toggleModalityOnRejection(to state: Bool) {
+        showModalityOnRejection = state
+    }
+    
+    func setBufferLog(log: MsLog?) {
+        logBuffer = log
     }
     
     func loadLogs() {
@@ -55,10 +66,23 @@ final class ParentHomeViewModel: ObservableObject {
                 return
             }
             print("Rejecting log: \(logId)")
+            setBufferLog(log: log)
             logRepository.logRejectedByParent(withId: logId)
             
             DispatchQueue.main.async {
                 self.logsForParent.removeAll { $0.id == logId }
             }
         }
+    
+    func navigateToReflectionStory(context: NavigationManager, forLog log: MsLog?) {
+        if let log = log {
+            context.goTo(.parentHome(.reflectionGuideStory(log: log)))
+        }
+    }
+}
+
+private extension ParentHomeViewModel {
+    func setBufferLog(log: MsLog) {
+        logBuffer = log
+    }
 }
