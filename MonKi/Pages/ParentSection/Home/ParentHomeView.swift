@@ -5,13 +5,6 @@
 //  Created by Aretha Natalova Wahyudi on 27/10/25.
 //
 
-//
-//  ParentHomeView.swift
-//  MonKi
-//
-//  Created by Aretha Natalova Wahyudi on 27/10/25.
-//
-
 import SwiftUI
 
 struct ParentHomeView: View {

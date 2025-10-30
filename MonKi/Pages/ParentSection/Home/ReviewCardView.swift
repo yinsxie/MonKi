@@ -64,7 +64,7 @@ struct ReviewCardView: View {
                                 }
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading) // <-- TAMBAHKAN INI
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 16)

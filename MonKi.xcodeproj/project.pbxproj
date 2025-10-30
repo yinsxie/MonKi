@@ -29,37 +29,9 @@
 		EBD025152EAB5DA5004E1875 /* MonKiUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MonKiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		41CF09172EB31EAE00566B54 /* Exceptions for "MonKi" folder in "MonKi" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Pages/ParentSection/Home/ParentHomeView.swift,
-				Pages/ParentSection/Home/ParentHomeViewModel.swift,
-				Pages/ParentSection/Home/ReviewCardView.swift,
-			);
-			target = EBD024F82EAB5DA4004E1875 /* MonKi */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		41CF09182EB31EAE00566B54 /* Exceptions for "MonKi" folder in "Copy Bundle Resources" phase from "MonKi" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = EBD024F72EAB5DA4004E1875 /* Resources */;
-			membershipExceptions = (
-				Pages/ParentSection/Home/ParentHomeView.swift,
-				Pages/ParentSection/Home/ParentHomeViewModel.swift,
-				Pages/ParentSection/Home/ReviewCardView.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		EBD024FB2EAB5DA4004E1875 /* MonKi */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				41CF09172EB31EAE00566B54 /* Exceptions for "MonKi" folder in "MonKi" target */,
-				41CF09182EB31EAE00566B54 /* Exceptions for "MonKi" folder in "Copy Bundle Resources" phase from "MonKi" target */,
-			);
 			path = MonKi;
 			sourceTree = "<group>";
 		};

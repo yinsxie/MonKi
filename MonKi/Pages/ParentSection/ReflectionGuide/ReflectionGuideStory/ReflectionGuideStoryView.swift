@@ -24,7 +24,15 @@ struct ReflectionGuideStoryView: View {
             
             ColorPalette.yellow500.ignoresSafeArea(.all)
             
-            // Main content VStack
+            if !viewModel.pages.isEmpty && viewModel.currentPageIndex < viewModel.pages.count {
+                Image(viewModel.pages[viewModel.currentPageIndex].imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .ignoresSafeArea(.container, edges: .bottom)
+                    .id(viewModel.currentPageIndex)
+            }
+            
             VStack(alignment: .leading, spacing: 24) {
                 
                 // 2. CLOSE BUTTON

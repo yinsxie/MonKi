@@ -12,4 +12,5 @@ struct ReflectionPage: Identifiable, Hashable {
     let title: String
     let subtitle: String
     let text: String
+    let imageName: String
 }

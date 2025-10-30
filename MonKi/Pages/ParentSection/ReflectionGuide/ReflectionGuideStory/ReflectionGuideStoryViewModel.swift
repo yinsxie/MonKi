@@ -45,22 +45,26 @@ class ReflectionGuideStoryViewModel: ObservableObject {
             ReflectionPage(
                 title: "#1",
                 subtitle: "Tanya alasan di balik pilihan anak...",
-                text: "“Mama/Papa ingin tahu kenapa barang ini bikin merasa bahagia dan merasa barang ini berguna untuk...”"
+                text: "“Mama/Papa ingin tahu kenapa barang ini bikin merasa bahagia dan merasa barang ini berguna untuk...”",
+                imageName: "monki_think_normal"
             ),
             ReflectionPage(
                 title: "#2",
                 subtitle: "Jangan lupa, validasi perasaan anak...",
-                text: "“Bisa punya apa yang kamu mau emang bikin senang, dan hal yang bikin senang juga penting kok!”"
+                text: "“Bisa punya apa yang kamu mau emang bikin senang, dan hal yang bikin senang juga penting kok!”",
+                imageName: "monki_think_smile"
             ),
             ReflectionPage(
                 title: "#3",
                 subtitle: "Waktunya hubungkan ke nilai keluarga...",
-                text: "“Di keluarga kita, yang penting tuh hal yang bisa bikin senang tapi juga gak boros, ya.”"
+                text: "“Di keluarga kita, yang penting tuh hal yang bisa bikin senang tapi juga gak boros, ya.”",
+                imageName: "monki_think_normal"
             ),
             ReflectionPage(
                 title: "#4",
                 subtitle: "Sekarang, ajak anak ikut tarik kesimpulan...",
-                text: "“Jadi, kalau nanti mau barang kayak gini lagi, kamu kasih tau MonKi kalau ini berguna untuk...”"
+                text: "“Jadi, kalau nanti mau barang kayak gini lagi, kamu kasih tau MonKi kalau ini berguna untuk...”",
+                imageName: "monki_think_smile"
             )
         ]
     }
