@@ -27,7 +27,7 @@ struct FinalImagePage: View {
                         .shadow(color: .black.opacity(0.3), radius: 15, x: 0, y: 8)
                         .padding()
                 } else {
-                    Image(systemName: "MonkiInputPlaceholder")
+                    Image("MonkiInputPlaceholder")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 200)
