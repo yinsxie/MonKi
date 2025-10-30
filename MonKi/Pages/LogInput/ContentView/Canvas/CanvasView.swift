@@ -9,19 +9,15 @@ import SwiftUI
 
 struct CanvasView: View {
     
-    @StateObject var viewModel: CanvasViewModel
-    
-    init(viewModel: CanvasViewModel = CanvasViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-    }
+    @EnvironmentObject var viewModel: CanvasViewModel
     
     var body: some View {
         ZStack {
-            Image(ImageAsset.canvasBackground.imageName)
+            Image(CanvasImageAsset.canvasBackground.imageName)
                 .resizable()
                 .ignoresSafeArea()
             
-            Image(ImageAsset.canvasViewCloth.imageName)
+            Image(CanvasImageAsset.canvasViewCloth.imageName)
                 .resizable()
                 .scaledToFill()
                 .frame(width: UIScreen.main.bounds.width * 1.4,
@@ -31,7 +27,7 @@ struct CanvasView: View {
                 .id("clothBackground")
                 .ignoresSafeArea()
             
-            Image(ImageAsset.canvasViewButton.imageName)
+            Image(CanvasImageAsset.canvasViewButton.imageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 357.26, height: 278.08)
@@ -41,14 +37,14 @@ struct CanvasView: View {
             VStack {
                 Spacer()
                 ZStack {
-                    Image(ImageAsset.canvasViewPaperNote.imageName)
+                    Image(CanvasImageAsset.canvasViewPaperNote.imageName)
                         .resizable()
                         .frame(width: 384.68, height: 363.87)
                         .scaledToFit()
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .offset(x: 70, y: 0)
                     
-                    DrawingCanvasView(viewModel: viewModel)
+                    DrawingCanvasView(viewModel: _viewModel)
                         .frame(width: 300, height: 300)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                 }

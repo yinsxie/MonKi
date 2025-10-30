@@ -8,7 +8,7 @@
 import SwiftUI
 import UIKit
 
-enum ImageAsset {
+enum CanvasImageAsset {
     case canvasBackground
     case canvasViewCloth
     case canvasViewPaperNote

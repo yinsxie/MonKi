@@ -33,19 +33,11 @@ class FingerCanvasView: UIView {
         backgroundColor = .clear
         isOpaque = false
     }
-    
-    func setColor(_ color: UIColor) {
-        currentColor = color
-    }
-    
-    func enableEraser(_ enabled: Bool) {
-        isEraser = enabled
-    }
 
-    func setLineWidth(_ width: CGFloat) {
-        currentWidth = width
-    }
-    
+    func setColor(_ color: UIColor) { self.currentColor = color }
+    func enableEraser(_ enabled: Bool) { self.isEraser = enabled }
+    func setLineWidth(_ width: CGFloat) { self.currentWidth = width }
+
     // MARK: Touch Handling
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         undoneLines.removeAll()
@@ -74,29 +66,26 @@ class FingerCanvasView: UIView {
 
     // MARK: Draw Canvas
     override func draw(_ rect: CGRect) {
-        let ctx = UIGraphicsGetCurrentContext()
-
+        guard let ctx = UIGraphicsGetCurrentContext() else { return }
         drawLines(lines, ctx)
         if let line = currentLine {
             drawLines([line], ctx)
         }
     }
-
-    private func drawLines(_ lines: [Line], _ ctx: CGContext?) {
+    private func drawLines(_ lines: [Line], _ ctx: CGContext) {
         lines.forEach { line in
             guard let first = line.points.first else { return }
 
             let path = UIBezierPath()
             path.move(to: first)
-            for point in line.points.dropFirst() { path.addLine(to: point) }
-
-            // Apply stroke attributes to the path so stroke width actually takes effect
+            line.points.dropFirst().forEach { path.addLine(to: $0) }
             path.lineWidth = line.lineWidth
             path.lineCapStyle = .round
 
-            // Use clear blend mode to erase when needed
-            ctx?.setBlendMode(line.color == .clear ? .clear : .normal)
+//            // Use clear blend mode to erase when needed
+//            ctx?.setBlendMode(line.color == .clear ? .clear : .normal)
             line.color.setStroke()
+            ctx.setBlendMode(line.color == .clear ? .clear : .normal)
             path.stroke()
         }
     }
@@ -113,19 +102,33 @@ class FingerCanvasView: UIView {
         lines.append(redoLine)
         setNeedsDisplay()
     }
+
+    // MARK: - Snapshot Function (Added)
+    func getSnapshot() -> UIImage {
+        let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
+        return renderer.image { context in
+            self.layer.render(in: context.cgContext)
+        }
+    }
 }
 
-// MARK: - SwiftUI Wrapper
+// MARK: - SwiftUI Wrapper (DrawingCanvasView)
 struct DrawingCanvasView: UIViewRepresentable {
-    
-    @ObservedObject var viewModel: CanvasViewModel
-    
+    @EnvironmentObject var viewModel: CanvasViewModel
+
     func makeUIView(context: Context) -> FingerCanvasView {
-        let view = FingerCanvasView()
-        return view
+        return FingerCanvasView()
     }
 
     func updateUIView(_ uiView: FingerCanvasView, context: Context) {
+        if viewModel.takeSnapshot {
+            let snapshot = uiView.getSnapshot()
+            viewModel.processDrawing(snapshot: snapshot)
+            DispatchQueue.main.async {
+                viewModel.takeSnapshot = false
+            }
+        }
+
         updateCanvas(uiView)
     }
     
