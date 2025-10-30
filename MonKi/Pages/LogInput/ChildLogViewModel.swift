@@ -34,7 +34,7 @@ final class ChildLogViewModel: ObservableObject {
     var logRepo: LogRepositoryProtocol
     
     // MARK: - Inject Beneficial Tag dummy data
-    @Published var beneficialTagsString: String = "Sehat;Senang;Kuat;Cepat;Baru;Lama"
+    @Published var beneficialTagsString: String = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
     
     var beneficialTagLabels: [String] {
         return IOHelper.expandTags(beneficialTagsString)
@@ -152,50 +152,69 @@ final class ChildLogViewModel: ObservableObject {
     
     // MARK: - Navigation Logic
     func handleNextAction(defaultAction: @escaping () -> Void) {
-        
         guard currentIndex < totalPageCount - 1 else {
-            print("Navigasi selesai, panggil defaultAction (close)")
             saveLog()
             defaultAction()
             return
         }
         
         if let inputPage = currentInputPage {
-            switch inputPage {
+            handleInputFlowNext(for: inputPage)
+        }
+        else if let tagPage = currentTagPage {
+            handleTagFlowNext(for: tagPage)
+        }
+    }
+        
+        private func handleInputFlowNext(for page: ChildLogPageEnum) {
+            switch page {
             case .selectMode:
-                guard inputSelectedMode != nil else { return }
-                
-                if inputSelectedMode == "Gallery" {
-                    if isGalleryPermissionGranted { showPhotoPicker = true }
-                    else {
-                        requestGalleryPermission { [weak self] granted in
-                            if granted { Task { @MainActor in self?.showPhotoPicker = true } }
-                        }
-                    }
-                } else if inputSelectedMode == "Draw" {
-                    withAnimation { currentIndex = ChildLogPageEnum.mainInput.rawValue }
-                }
-                
+                handleSelectModeNext()
             case .mainInput:
-                if inputSelectedMode == "Draw" {
-                    canvasViewModel.saveDrawing()
-                } else { // Gallery Mode
-                    if selectedItem != nil && !backgroundRemover.isProcessing && finalProcessedImage != nil {
-                        withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
-                    } else if selectedItem == nil { imageLoadError = "Please select a photo first." }
-                    else if backgroundRemover.isProcessing { /* Do nothing while processing */ }
-                    else { imageLoadError = "Image processing failed. Try again." }
-                }
-                
+                handleMainInputNext()
             case .finalImage:
                 print("Lanjut dari .finalImage ke .howHappy")
                 withAnimation { currentIndex += 1 }
             }
         }
-        else if let tagPage = currentTagPage {
-            switch tagPage {
+        
+        private func handleSelectModeNext() {
+            guard inputSelectedMode != nil else { return }
+            
+            if inputSelectedMode == "Gallery" {
+                if isGalleryPermissionGranted { showPhotoPicker = true }
+                else {
+                    requestGalleryPermission { [weak self] granted in
+                        if granted { Task { @MainActor in self?.showPhotoPicker = true } }
+                    }
+                }
+            } else if inputSelectedMode == "Draw" {
+                withAnimation { currentIndex = ChildLogPageEnum.mainInput.rawValue }
+            }
+        }
+        
+        private func handleMainInputNext() {
+            if inputSelectedMode == "Draw" {
+                canvasViewModel.saveDrawing()
+            } else { // Gallery Mode
+                if selectedItem != nil && !backgroundRemover.isProcessing && finalProcessedImage != nil {
+                    withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
+                } else if selectedItem == nil {
+                    imageLoadError = "Please select a photo first."
+                } else if backgroundRemover.isProcessing {
+                } else {
+                    imageLoadError = "Image processing failed. Try again."
+                }
+            }
+        }
+        
+        private func handleTagFlowNext(for page: ChildLogTagEnum) {
+            switch page {
             case .howHappy:
-                guard tagSelectedMode != nil else { return }
+                guard tagSelectedMode != nil else {
+                    print("howHappy guard failed (seharusnya ditangani shouldDisableNext)")
+                    return
+                }
                 print("Data 'isHappy' disimpan sementara: \(isHappy)")
             case .happyIllust:
                 print("Halaman ilustrasi, lanjut saja.")
@@ -204,7 +223,6 @@ final class ChildLogViewModel: ObservableObject {
             }
             withAnimation { currentIndex += 1 }
         }
-    }
     
     func handleNoImageSelected() {
         if inputSelectedMode == "Gallery", currentInputPage == .mainInput {

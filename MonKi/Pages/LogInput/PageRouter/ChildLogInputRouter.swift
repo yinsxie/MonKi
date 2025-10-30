@@ -33,20 +33,16 @@ struct ChildLogRouter: View {
                 case .finalImage:
                     FinalImagePage(processedImage: viewModel.finalProcessedImage)
                 }
-            }
-            
-            else if let tagPage = viewModel.currentTagPage {
+            } else if let tagPage = viewModel.currentTagPage {
                 switch tagPage {
                 case .howHappy:
                     HowHappyView(selectedMode: $viewModel.tagSelectedMode, viewModel: viewModel)
                 case .happyIllust:
-                    Text("Placeholder: Happy Illustration Page")
+                    FinalImagePage(processedImage: nil)
                 case .howBeneficial:
                     HowBeneficialView(viewModel: viewModel)
                 }
-            }
-            
-            else {
+            } else {
                 Text("Error: Indeks navigasi tidak valid (\(viewModel.currentIndex)).")
             }
         }

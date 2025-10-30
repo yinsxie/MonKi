@@ -25,7 +25,7 @@ struct ChildLogNavigationContainer: View {
             isProgressBarHidden: viewModel.shouldHideProgressBar,
             onClose: {
                 print("Navigation closed via close button.")
-                // Example: navigationManager.popLast()
+                navigationManager.popLast()
             },
             customNextAction: { defaultCloseAction in
                 viewModel.handleNextAction(defaultAction: defaultCloseAction)
