@@ -69,10 +69,17 @@ struct ReviewCardView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     
-                    Circle()
-                        .fill(ColorPalette.neutral900)
-                        .frame(width: 72, height: 72)
-                        .offset(x: 12, y: 10)
+                    if log.isHappy == true {
+                        Image("loveEmote")
+                            .resizable()
+                            .frame(width: 72, height: 72)
+                            .offset(x: 12, y: 10)
+                    } else {
+                        Image("smileEmote")
+                            .resizable()
+                            .frame(width: 72, height: 72)
+                            .offset(x: 12, y: 10)
+                    }
                 }
                 
                 HStack(alignment: .center, spacing: 8) {
