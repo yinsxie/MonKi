@@ -125,7 +125,7 @@ struct ReflectionGuideStoryView: View {
             imageRight: "arrow.right",
             action: {
                 viewModel.rejectLog()
-                navigationManager.pop(times: 2)
+                navigationManager.goTo(.parentHome(.reviewReject(log: log)))
             },
             cornerRadius: 24,
             width: 189,
@@ -179,9 +179,8 @@ struct ReflectionGuideStoryView: View {
                     withAnimation {
                         viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
                         viewModel.rejectLog()
-                        //Kata aret: ke home
-                        navigationManager.popToRoot()
                     }
+                    navigationManager.goTo(.parentHome(.reviewReject(log: log)))
                 }
             )
         ){
