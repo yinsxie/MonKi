@@ -69,8 +69,14 @@ final class UserDefaultsManager {
         return get(for: .parentalGateAnswer)
     }
     
-    func setCurrentFilledField(_ count: Int) {
-        set(value: count, for: .currentFilledField)
+    func incrementCurrentFilledField(by num: Int) {
+        let current = getCurrentFilledField() ?? 0
+        setCurrentFilledField(current + num)
+    }
+    
+    func decrementCurrentFilledField(by num: Int) {
+        let current = getCurrentFilledField() ?? 0
+        setCurrentFilledField(max(0, current - num))
     }
     
     func getCurrentFilledField() -> Int? {
@@ -85,6 +91,18 @@ final class UserDefaultsManager {
         }
         
         set(value: count, for: .maxFieldCount)
+    }
+    
+    func getMaxFieldCount() -> Int? {
+        return get(for: .maxFieldCount)
+    }
+    
+    func isFieldMaxedOut() -> Bool {
+        if let current = getCurrentFilledField(), let max = getMaxFieldCount() {
+            return current >= max
+        }
+        
+        return true
     }
     
     func setIsNewUser(_ isNew: Bool) {
@@ -103,5 +121,36 @@ private extension UserDefaultsManager {
     
     func get<T>(for identifier: UserDefaultsIdentifier) -> T? {
         return UserDefaults.standard.object(forKey: identifier.value) as? T
+    }
+    
+    func setCurrentFilledField(_ count: Int) {
+        set(value: count, for: .currentFilledField)
+    }
+}
+
+//MARK: Dev Purposes Only
+extension UserDefaultsManager {
+    func resetAll() {
+        UserDefaults.standard.dictionaryRepresentation().keys.forEach {
+            UserDefaults.standard.removeObject(forKey: $0)
+        }
+    }
+    
+    func printAll() {
+        let all = UserDefaults.standard.dictionaryRepresentation()
+        for (key, value) in all {
+            print("\(key): \(value)")
+        }
+    }
+    
+    //MARK: Change this as needed
+    func initDevUserDefaults() {
+        resetAll()
+        setCurrentFilledField(0)
+        do {
+           try setMaxFieldCount(4)
+        } catch {
+            print("Error")
+        }
     }
 }

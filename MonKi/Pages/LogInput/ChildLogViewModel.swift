@@ -17,6 +17,7 @@ final class ChildLogViewModel: ObservableObject {
     @Published var tagSelectedMode: String?
     @Published var isGalleryPermissionGranted: Bool = false
     @Published var showingPermissionAlert: Bool = false
+    @Published var isShowGardenFullAlert: Bool = false
     
     // MARK: - Image Handling
     @Published var selectedItem: PhotosPickerItem?
@@ -79,6 +80,8 @@ final class ChildLogViewModel: ObservableObject {
         }
         return selectedLabels
     }
+    
+    @Published var bufferedLogData: GardenFullDataBuffer?
     
     // MARK: - Initialization
     init(logRepo: LogRepositoryProtocol = LogRepository()) {
@@ -153,8 +156,17 @@ final class ChildLogViewModel: ObservableObject {
     // MARK: - Navigation Logic
     func handleNextAction(defaultAction: @escaping () -> Void) {
         guard currentIndex < totalPageCount - 1 else {
-            saveLog()
-            defaultAction()
+            
+            let isGardenFull = UserDefaultsManager.shared.isFieldMaxedOut()
+            
+            bufferedLogData = constructBufferedLogData()
+            if !isGardenFull {
+                saveLog()
+                defaultAction()
+            } else {
+                isShowGardenFullAlert = true
+            }
+            
             return
         }
         
@@ -297,21 +309,38 @@ final class ChildLogViewModel: ObservableObject {
         return inputSelectedMode == "Draw" && currentInputPage == .mainInput
     }
     
-    private func saveLog() {
+    func constructBufferedLogData() -> GardenFullDataBuffer? {
         guard let imageToSave = finalProcessedImage else {
             print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
-            return
+            return nil
         }
         
         let happy = self.isHappy
         let beneficial = self.isBeneficial
         let tags = self.beneficialTags
         
-        logRepo.createLogWithImage(
-            imageToSave,
-            isHappy: happy,
-            isBeneficial: beneficial,
-            tags: tags
-        )
+        return GardenFullDataBuffer(image: imageToSave, isHappy: happy, isBeneficial: beneficial, tags: tags)
     }
+    
+    private func saveLog() {
+        
+        guard let bufferedLogData = bufferedLogData else {
+            print("Error: 'bufferedLogData' nil saat mencoba menyimpan.")
+            return
+        }
+        
+        logRepo.createLogWithImage(
+            bufferedLogData.image,
+            isHappy: bufferedLogData.isHappy,
+            isBeneficial: bufferedLogData.isBeneficial,
+            tags: bufferedLogData.tags
+        )
+        
+        UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
+    }
+    
+    func setAlertonGardenFull(to value: Bool) {
+        isShowGardenFullAlert = value
+    }
+        
 }
