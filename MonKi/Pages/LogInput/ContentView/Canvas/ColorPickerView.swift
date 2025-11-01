@@ -20,6 +20,7 @@ struct ColorPickerView: View {
                     .offset(y: viewModel.selectedPencil == coloredPencil ? -10 : 0)
                     .animation(.spring(), value: viewModel.selectedPencil)
                     .onTapGesture {
+                        SoundManager.shared.play(.pickCrayon)
                         viewModel.toggleColoredPencil(to: coloredPencil)
                     }
             }

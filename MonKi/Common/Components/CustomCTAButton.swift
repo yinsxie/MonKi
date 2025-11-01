@@ -34,7 +34,7 @@ struct CustomCTAButton: View {
         verticalPadding: CGFloat = 12,
         imageRight: String? = nil,
         cornerRadius: CGFloat = 20,
-        action: @escaping () -> Void,
+        action: @escaping () -> Void
     ) {
         self.text = text
         self.backgroundColor = backgroundColor

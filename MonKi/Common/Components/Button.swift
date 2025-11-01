@@ -83,7 +83,9 @@ struct CustomButton: View {
     }
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            SoundManager.shared.play(.buttonClick)
+            action()}) {
             HStack(spacing: 8) {
                 if let image = image {
                     Image(systemName: image)
@@ -131,7 +133,7 @@ struct CustomButtonComponent_Previews: PreviewProvider {
                 colorSet: .primary,
                 image: "arrow.right",
                 action: {},
-                type: .normal,
+                type: .normal
             )
             
             // Previous Button (has border)
@@ -140,7 +142,7 @@ struct CustomButtonComponent_Previews: PreviewProvider {
                 colorSet: .normal,
                 image: "arrow.left",
                 action: {},
-                type: .bordered,
+                type: .bordered
             )
             
             // Right Image Button
@@ -149,7 +151,7 @@ struct CustomButtonComponent_Previews: PreviewProvider {
                 colorSet: .normal,
                 imageRight: "arrow.right",
                 action: {},
-                type: .bordered,
+                type: .bordered
             )
             
             // Icon-only Previous Button
@@ -158,7 +160,7 @@ struct CustomButtonComponent_Previews: PreviewProvider {
                 image: "arrow.left",
                 action: {},
                 width: 70,
-                type: .bordered,
+                type: .bordered
             )
             
             // --- NEW: Custom Font Button ---

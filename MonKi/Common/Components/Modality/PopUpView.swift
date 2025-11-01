@@ -42,7 +42,7 @@ struct PopUpView: View {
                     colorSet: .primary,
                     action: type.onPrimaryButtonTap ?? {},
                     cornerRadius: 24,
-                    type: .normal,
+                    type: .normal
                 )
             }
             
@@ -52,7 +52,7 @@ struct PopUpView: View {
                     colorSet: .cancel,
                     action: type.onSecondaryButtonTap ?? {},
                     cornerRadius: 24,
-                    type: .normal,
+                    type: .normal
                 )
             }
         }
