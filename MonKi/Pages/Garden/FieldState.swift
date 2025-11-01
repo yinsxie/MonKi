@@ -5,6 +5,8 @@
 //  Created by William on 29/10/25.
 //
 
+import SwiftUI
+
 enum FieldState {
     case empty
     case created
@@ -49,6 +51,8 @@ enum FieldState {
             return "FieldSmall"
         case .done:
             return "FieldBig"
+        case .declined:
+            return "FieldSmallDeclined"
         default:
             return nil
         }
@@ -60,6 +64,8 @@ enum FieldState {
             return "Siram"
         case .done:
             return "Panen"
+        case .declined:
+            return "Ulang"
         default:
             return nil
         }
@@ -67,16 +73,26 @@ enum FieldState {
     
     var CTAButtonImage: String? {
         switch self {
-        case .approved, .done:
+        case .approved, .done, .declined:
             return "CTAImage\(stringValue)"
         default:
             return nil
         }
     }
     
+    // (Primary,Secondary)
+    var CTAButtonColor: (Color, Color) {
+        switch self {
+        case .declined:
+            return (ColorPalette.pink100, ColorPalette.pink200)
+        default:
+            return (ColorPalette.blue100, ColorPalette.blue200)
+        }
+    }
+    
     var thoughtBubbleImage: String? {
         switch self {
-        case .created, .approved, .done:
+        case .created, .approved, .done, .declined:
             return "ThoughtBubble\(stringValue)"
         default:
             return nil

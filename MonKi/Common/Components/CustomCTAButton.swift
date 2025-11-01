@@ -60,7 +60,7 @@ struct CustomCTAButton: View {
                         .resizable()
                         .scaledToFit()
                         .foregroundStyle(textColor)
-                        .frame(height: 24)
+                        .frame(width: 16)
                 }
             }
             .padding(.horizontal, horizontalPadding)
