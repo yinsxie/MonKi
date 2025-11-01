@@ -33,7 +33,7 @@ struct ChildLogNavigationContainer: View {
             customBackAction: {
                 viewModel.handleBackAction()
             },
-            isNextDisabled: viewModel.shouldDisableNext(),
+            isNextDisabled: viewModel.isNextDisabled,
             content: {
                 ChildLogRouter(viewModel: viewModel)
                     .environmentObject(viewModel.canvasViewModel)

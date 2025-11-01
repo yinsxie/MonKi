@@ -37,6 +37,9 @@ final class CanvasViewModel: ObservableObject {
     @Published var processedImage: UIImage?
     @Published var isProcessing: Bool = false
     
+    //MARK: Navigation Flow State (Block
+    @Published var isExistDrawing: Bool = false
+    
     // MARK: - Dependencies
     private let composer = BackgroundRemoverImageComposer()
     private let processor = BackgroundRemoverProcessor()
