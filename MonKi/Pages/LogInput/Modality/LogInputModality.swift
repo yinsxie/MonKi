@@ -5,15 +5,21 @@
 //  Created by William on 01/11/25.
 //
 
+import UIKit
+
 enum LogInputModality: PopUpModalityProtocol {
     
     case gardenFull(onPrimaryTap: () -> Void = {})
     
-    var imageIcon: ImageModalityIcon {
+    var imageIcon: ImageModalityIcon? {
         switch self {
         case .gardenFull:
             return .monkiThinking
         }
+    }
+    
+    var imageDirect: UIImage? {
+        return nil
     }
     
     var title: String {

@@ -83,6 +83,17 @@ final class CoreDataManager: ObservableObject {
         log3.state = ChildrenLogState.approved.stringValue
         log3.createdAt = Date()
         log3.updatedAt = Date()
+        
+        
+        let log4 = MsLog(context: context)
+        log4.id = UUID()
+        log4.imagePath = "icecream_placeholder"
+        log4.isHappy = false
+        log4.isBeneficial = true
+        log4.beneficialTags = "book;education"
+        log4.state = ChildrenLogState.approved.stringValue
+        log4.createdAt = Date()
+        log4.updatedAt = Date()
 
         // 3. Save the new data to the database
         do {
@@ -92,6 +103,6 @@ final class CoreDataManager: ObservableObject {
             print("Failed to save seed data: \(error.localizedDescription)")
         }
         
-        UserDefaultsManager.shared.incrementCurrentFilledField(by: 3)
+        UserDefaultsManager.shared.incrementCurrentFilledField(by: 4)
     }
 }
