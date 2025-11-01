@@ -125,7 +125,7 @@ struct ReflectionGuideStoryView: View {
             imageRight: "arrow.right",
             action: {
                 viewModel.rejectLog()
-                navigationManager.goTo(.parentHome(.reviewReject(log: log)))
+                navigationManager.replaceTop(with:.parentHome(.reviewReject(log: log)))
             },
             cornerRadius: 24,
             width: 189,
@@ -180,7 +180,7 @@ struct ReflectionGuideStoryView: View {
                         viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
                         viewModel.rejectLog()
                     }
-                    navigationManager.goTo(.parentHome(.reviewReject(log: log)))
+                    navigationManager.replaceTop(with:.parentHome(.reviewReject(log: log)))
                 }
             )
         ){

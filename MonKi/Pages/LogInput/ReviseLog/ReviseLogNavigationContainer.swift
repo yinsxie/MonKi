@@ -38,8 +38,9 @@ struct ReLogNavigationContainer: View {
                 viewModel.handleNextAction(onClose: {
                     print("ReLog finished, closing.")
                     // defaultCloseAction() is the built-in function to close the view
-                    defaultCloseAction()
-                    
+//                    defaultCloseAction()
+                    navigationManager.popToRoot()
+                    navigationManager.goTo(.childGarden(.home))
                     // You might also need to pop from your custom navigationManager
                     // if defaultCloseAction() doesn't do it.
                     // navigationManager.popLast()
