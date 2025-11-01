@@ -31,5 +31,14 @@ struct HowBeneficialView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
+        .onAppear {
+            AudioManager.shared.stop()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                AudioManager.shared.play("HowBeneficial")
+            }
+        }
+        .onDisappear {
+            AudioManager.shared.stop()
+        }
     }
 }

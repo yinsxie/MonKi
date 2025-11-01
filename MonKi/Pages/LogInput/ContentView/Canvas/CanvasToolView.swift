@@ -79,6 +79,14 @@ struct CanvasToolButton: View {
     var body: some View {
         Button {
             onClick()
+            switch toolType {
+                case .undo:
+                    SoundManager.shared.play(.popUredo)
+                case .redo:
+                    SoundManager.shared.play(.popUredo)
+                default:
+                    break
+                }
         } label: {
             Image(isPressed ? toolType.selectedAssetName : toolType.defaultAssetName)
                 .resizable()

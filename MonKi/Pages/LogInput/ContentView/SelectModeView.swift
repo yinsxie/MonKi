@@ -29,6 +29,8 @@ struct SelectModePage: View {
                     width: .infinity
                 ) {
                     selectedMode = "Draw"
+                    AudioManager.shared.stop() // stop narasi sebelumnya
+                    AudioManager.shared.play("DrawCardChoice")
                 }
                 
                 ChildInputCard(
@@ -38,6 +40,8 @@ struct SelectModePage: View {
                     width: .infinity
                 ) {
                     selectedMode = "Gallery"
+                    AudioManager.shared.stop()
+                    AudioManager.shared.play("GalleryCardChoice")
                 }
             }
             .frame(height: 400, alignment: .top)
@@ -51,5 +55,8 @@ struct SelectModePage: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
+        .onDisappear {
+            AudioManager.shared.stop()
+        }
     }
 }
