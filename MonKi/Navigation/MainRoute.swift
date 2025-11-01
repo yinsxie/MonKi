@@ -10,4 +10,5 @@ enum MainRoute: Hashable {
     case childLog(ChildLogRoute)
     case childGarden(ChildGardenRoute)
     case reLog(log: MsLog)
+    case parentValue
 }

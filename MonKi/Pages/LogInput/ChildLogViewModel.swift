@@ -62,9 +62,11 @@ final class ChildLogViewModel: ObservableObject {
     // MARK: - Core Data Log
     @Published var logs: [MsLog] = []
     var logRepo: LogRepositoryProtocol
+    var parentValueTagRepo: ParentValueTagRepositoryProtocol
     
     // MARK: - Inject Beneficial Tag dummy data
-    @Published var beneficialTagsString: String = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
+//    @Published var beneficialTagsString: String = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
+    @Published var beneficialTagsString: String = ""
     
     var beneficialTagLabels: [String] {
         return IOHelper.expandTags(beneficialTagsString)
@@ -113,6 +115,7 @@ final class ChildLogViewModel: ObservableObject {
     // MARK: - Initialization
     init(logRepo: LogRepositoryProtocol = LogRepository()) {
         self.logRepo = logRepo
+        self.parentValueTagRepo = ParentValueTagRepository()
         
         canvasViewModel.objectWillChange
                     .receive(on: RunLoop.main)
@@ -125,6 +128,8 @@ final class ChildLogViewModel: ObservableObject {
                 self.handleDrawingProcessed(image: image)
             }
         }
+        
+        fetchBeneficialTags()
     }
     
     // MARK: - Permission
@@ -301,6 +306,34 @@ final class ChildLogViewModel: ObservableObject {
             // (Reset state jika ada)
         }
     }
+    
+    func shouldDisableNext() -> Bool {
+        if let inputPage = currentInputPage {
+            switch inputPage {
+            case .selectMode:
+                return inputSelectedMode == nil || inputSelectedMode!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            case .mainInput:
+                if inputSelectedMode == "Gallery" {
+                    return backgroundRemover.isProcessing || (selectedItem == nil || finalProcessedImage == nil)
+                } else { // Draw Mode
+                    return canvasViewModel.isProcessing
+                }
+            case .finalImage:
+                return finalProcessedImage == nil
+            }
+        } else if let tagPage = currentTagPage {
+            switch tagPage {
+            case .howHappy:
+                return tagSelectedMode == nil
+            case .happyIllust:
+                return false
+            case .howBeneficial:
+                return false
+            }
+        }
+        return false
+    }
+    
 
     var shouldHideProgressBar: Bool {
         return inputSelectedMode == "Draw" && currentInputPage == .mainInput
@@ -323,4 +356,13 @@ final class ChildLogViewModel: ObservableObject {
             tags: tags
         )
     }
+    
+    private func fetchBeneficialTags() {
+            if let tagsObject = parentValueTagRepo.fetchAllParentValueTags().first {
+                self.beneficialTagsString = tagsObject.valueTag ?? ""
+            } else {
+                print("LOG: No ParentValueTag found in Core Data. Beneficial tags will be empty.")
+                self.beneficialTagsString = ""
+            }
+        }
 }
