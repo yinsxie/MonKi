@@ -33,7 +33,7 @@ struct ReflectionGuideStoryView: View {
                     .id(viewModel.currentPageIndex)
             }
             
-            if let imagePath = log.imagePath, let uiImage = UIImage(named: imagePath) {
+            if let imagePath = log.imagePath, let uiImage = ImageStorage.loadImage(from: imagePath) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
