@@ -52,6 +52,9 @@ struct HomeView: View {
                 case .parentHome(let parentRoute):
                     parentRoute.delegateView()
                         .navigationBarBackButtonHidden(true)
+                case .reLog(let log):
+                    ReLogNavigationContainer(logToEdit: log)
+                        .navigationBarBackButtonHidden(true)
                 }
             }
         }

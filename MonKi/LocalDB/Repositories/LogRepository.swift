@@ -60,6 +60,7 @@ final class LogRepository: LogRepositoryProtocol {
         
         do {
             try context.save()
+            updateLogState(withId: id, newState: .created)
         } catch {
             print("Failed to update log state: \(error.localizedDescription)")
         }
