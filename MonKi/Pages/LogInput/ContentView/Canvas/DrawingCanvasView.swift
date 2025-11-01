@@ -110,6 +110,11 @@ class FingerCanvasView: UIView {
             self.layer.render(in: context.cgContext)
         }
     }
+    
+    //Mark get how much line exist in the current canvas
+    func isExistLine() -> Bool {
+        return lines.count > 0
+    }
 }
 
 // MARK: - SwiftUI Wrapper (DrawingCanvasView)
@@ -153,6 +158,11 @@ struct DrawingCanvasView: UIViewRepresentable {
             DispatchQueue.main.async {
                 viewModel.onGoingAction = nil
             }
+        }
+        
+        // Check if theres a exist a line, to enable the next button
+        DispatchQueue.main.async {
+            viewModel.isExistDrawing = uiView.isExistLine()
         }
     }
 }

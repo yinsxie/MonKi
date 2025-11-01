@@ -71,7 +71,7 @@ struct GardenHarvestingView: View {
                         foregroundColor: ColorPalette.blue600, textColor: ColorPalette.neutral50,
                         font: .calloutEmphasized,
                         horizontalPadding: 18,
-                        verticalPadding: 18,
+                        verticalPadding: 18
                     ) {
                         viewModel.pushReplaceToCollectibleView(context: navigationManager)
                     }
@@ -81,10 +81,22 @@ struct GardenHarvestingView: View {
             }
         }
         .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                SoundManager.shared.play(.shovelClick)
+                }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation(.easeInOut(duration: 0.5)) {
                     frame = .frame2
                 }
+            }
+        }
+        .onChange(of: frame) { oldFrame, newFrame in
+            if newFrame == .frame2 {
+                SoundManager.shared.stop()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            SoundManager.shared.play(.cropDone)
+                        }
             }
         }
     }

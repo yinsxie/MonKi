@@ -17,7 +17,9 @@ struct ProgressBar: View {
     var body: some View {
         if !isHidden {
             HStack(spacing: 10) {
-                Button(action: action) {
+                Button(action: {
+                    SoundManager.shared.play(.cancelAction)
+                    action()}) {
                     Image(systemName: "xmark")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(.gray)

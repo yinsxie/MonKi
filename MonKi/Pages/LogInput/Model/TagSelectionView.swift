@@ -79,9 +79,13 @@ struct TagSelectionPageView: View {
     
     private func handleTap(on tag: BeneficialTag) {
         if selectedTags.contains(tag) {
+            SoundManager.shared.play(.tagClick)
             selectedTags.remove(tag)
         } else if selectedTags.count < maxSelection {
+            SoundManager.shared.play(.tagClick)
             selectedTags.insert(tag)
+        } else{
+            SoundManager.shared.play(.popUredo)
         }
     }
 }
