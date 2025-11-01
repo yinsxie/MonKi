@@ -32,9 +32,11 @@ final class ChildLogViewModel: ObservableObject {
     // MARK: - Core Data Log
     @Published var logs: [MsLog] = []
     var logRepo: LogRepositoryProtocol
+    var parentValueTagRepo: ParentValueTagRepositoryProtocol
     
     // MARK: - Inject Beneficial Tag dummy data
-    @Published var beneficialTagsString: String = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
+//    @Published var beneficialTagsString: String = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
+    @Published var beneficialTagsString: String = ""
     
     var beneficialTagLabels: [String] {
         return IOHelper.expandTags(beneficialTagsString)
@@ -83,12 +85,15 @@ final class ChildLogViewModel: ObservableObject {
     // MARK: - Initialization
     init(logRepo: LogRepositoryProtocol = LogRepository()) {
         self.logRepo = logRepo
+        self.parentValueTagRepo = ParentValueTagRepository()
         self.canvasViewModel.onDrawingProcessed = { [weak self] image in
             guard let self else { return }
             Task { @MainActor in
                 self.handleDrawingProcessed(image: image)
             }
         }
+        
+        fetchBeneficialTags()
     }
     
     // MARK: - Permission
@@ -290,7 +295,7 @@ final class ChildLogViewModel: ObservableObject {
                 return false
             }
         }
-        return false // Default
+        return false
     }
     
     var shouldHideProgressBar: Bool {
@@ -314,4 +319,13 @@ final class ChildLogViewModel: ObservableObject {
             tags: tags
         )
     }
+    
+    private func fetchBeneficialTags() {
+            if let tagsObject = parentValueTagRepo.fetchAllParentValueTags().first {
+                self.beneficialTagsString = tagsObject.valueTag ?? ""
+            } else {
+                print("LOG: No ParentValueTag found in Core Data. Beneficial tags will be empty.")
+                self.beneficialTagsString = ""
+            }
+        }
 }
