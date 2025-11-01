@@ -48,6 +48,8 @@ final class GardenViewModel: ObservableObject {
                 onApproveFieldTapped(log, context: context)
             case .done:
                 onDoneFieldTapped(log, context: context)
+            case .declined:
+                onDeclinedFieldTapped(log, context: context)
             default:
                 return
             }
@@ -102,4 +104,9 @@ private extension GardenViewModel {
             }
         }
     }
+    
+    func onDeclinedFieldTapped(_ log: MsLog, context: NavigationManager) {
+        context.goTo(.reLog(log: log))
+    }
+    
 }
