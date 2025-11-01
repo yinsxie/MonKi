@@ -82,7 +82,7 @@ final class ParentHomeViewModel: ObservableObject {
     
     func navigateToRejectView(context: NavigationManager, forLog log: MsLog?) {
         if let log = log {
-            context.goTo(.parentHome(.reviewReject(log: log)))
+            context.replaceTop(with: .parentHome(.reviewReject(log: log)))
         }
     }
 }
