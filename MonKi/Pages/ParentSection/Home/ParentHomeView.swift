@@ -191,9 +191,8 @@ struct ParentHomeView: View {
                     if let log = viewModel.logBuffer {
                         viewModel.rejectLog(log: log)
                     }
-                    //TODO: Kata aret pindahin ke Home Aja
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        navigationManager.popLast()
+                        viewModel.navigateToRejectView(context: navigationManager, forLog: viewModel.logBuffer)
                     }
                 }
             )

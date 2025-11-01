@@ -52,4 +52,9 @@ final class NavigationManager: ObservableObject {
             }
         }
     }
+    
+    func popToFlowRoot() {
+            guard navigationPath.count > 1 else { return }
+            navigationPath.removeLast(navigationPath.count - 1)
+        }
 }
