@@ -68,9 +68,8 @@ final class GardenViewModel: ObservableObject {
 
 private extension GardenViewModel {
     func bufferImageFromLogForEvent(_ log: MsLog, completion: @escaping (Bool) -> Void) {
-        //TODO: Gnti ke ImageStorage.loadImage(from: String) kalau inputLog udh
-        if let imagePath = log.imagePath, let uiImage = UIImage(named: imagePath) {
-            imageEventBuffer = uiImage
+        if let imagePath = log.imagePath, let image = ImageStorage.loadImage(from: imagePath) {
+            imageEventBuffer = image
             completion(true)
         } else {
             completion(false)
