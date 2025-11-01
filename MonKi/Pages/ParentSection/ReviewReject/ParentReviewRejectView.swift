@@ -45,7 +45,7 @@ struct ParentReviewRejectView: View {
                 .padding(.horizontal, 50)
                 .multilineTextAlignment(.center)
                 
-                if let imagePath = log.imagePath, let uiImage = UIImage(named: imagePath) {
+                if let imagePath = log.imagePath, let uiImage = ImageStorage.loadImage(from: imagePath) {
                     ZStack {
                         Image("ThoughtBubbleApproved")
                             .resizable()

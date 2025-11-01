@@ -40,12 +40,15 @@ struct ReviewCardView: View {
             VStack(spacing: 0) {
                 ZStack(alignment: .bottomTrailing) {
                     HStack {
-                        Image(log.imagePath ?? "icecream_placeholder")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .offset(y: 3)
-                        
+
+                        if let imagePath = log.imagePath, let uiImage = ImageStorage.loadImage(from: imagePath) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .offset(y: 3)
+                        }
+                                                
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Anak bilang,\nini berguna untuk...")
                                 .font(.subheadlineEmphasized)
