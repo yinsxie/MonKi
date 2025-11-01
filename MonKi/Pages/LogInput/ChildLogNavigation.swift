@@ -103,6 +103,7 @@ struct ChildLogNavigationView<Content: View>: View {
                             type: .normal,
                             isDisabled: isNextDisabled
                         )
+                        .animation(.easeInOut(duration: 0.2), value: isNextDisabled)
                     }
                     .frame(width: totalWidth)
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)

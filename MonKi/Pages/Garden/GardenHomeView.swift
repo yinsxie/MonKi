@@ -88,10 +88,9 @@ struct GardenHomeView: View {
     
     @ViewBuilder
     func fieldCardViewBuilder(for log: MsLog?, type: FieldState) -> some View {
-        //TODO: Gnti ke ImageStorage.loadImage(from: String) kalau inputLog udh
         let image: UIImage? = {
             if let imagePath = log?.imagePath {
-                return UIImage(named: imagePath)
+                return ImageStorage.loadImage(from: imagePath)
             } else {
                 return nil
             }

@@ -37,6 +37,12 @@ struct HomeView: View {
                     Text("Nav to parent home")
                 }
                 
+                Button {
+                    navigationManager.goTo(.parentValue)
+                } label: {
+                    Text("Parent values")
+                }
+                
             }
             .navigationDestination(for: MainRoute.self) { route in
                 switch route {
@@ -54,6 +60,8 @@ struct HomeView: View {
                 case .reLog(let log):
                     ReLogNavigationContainer(logToEdit: log)
                         .navigationBarBackButtonHidden(true)
+                case .parentValue:
+                    ParentValueTagView()
                 }
             }
         }

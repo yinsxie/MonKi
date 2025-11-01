@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 final class CoreDataManager: ObservableObject {
     
@@ -51,10 +52,13 @@ final class CoreDataManager: ObservableObject {
 
         print("Seeding initial data...")
         
+        // Initial Image, same across all logs
+        let imagePath = ImageStorage.saveImage(UIImage(named: "icecream_placeholder")!)
+
         // Log 1: Needs Review (state = "created")
         let log1 = MsLog(context: context)
         log1.id = UUID()
-        log1.imagePath = "icecream_placeholder"
+        log1.imagePath = imagePath
         log1.isHappy = true
         log1.isBeneficial = true
         log1.beneficialTags = "snack;sweet" // Your IOHelper combines tags
@@ -65,7 +69,7 @@ final class CoreDataManager: ObservableObject {
         // Log 2: Needs Review (state = "created")
         let log2 = MsLog(context: context)
         log2.id = UUID()
-        log2.imagePath = "icecream_placeholder"
+        log2.imagePath = imagePath
         log2.isHappy = true
         log2.isBeneficial = false
         log2.beneficialTags = "toy;expensive"
@@ -76,7 +80,7 @@ final class CoreDataManager: ObservableObject {
         // Log 3: Already Approved (state = "approved")
         let log3 = MsLog(context: context)
         log3.id = UUID()
-        log3.imagePath = "icecream_placeholder"
+        log3.imagePath = imagePath
         log3.isHappy = false
         log3.isBeneficial = true
         log3.beneficialTags = "book;education"

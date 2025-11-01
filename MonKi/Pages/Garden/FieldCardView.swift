@@ -81,6 +81,8 @@ struct FieldCardView: View {
             if let CTATitle = type.CTAButtonTitle, let CTAButtonImage = type.CTAButtonImage {
                 CustomCTAButton(
                     text: CTATitle,
+                    backgroundColor: type.CTAButtonColor.1,
+                    foregroundColor: type.CTAButtonColor.0,
                     imageRight: CTAButtonImage, action: onCTAButtonTapped ?? {})
                 .offset(y: 130)
             }

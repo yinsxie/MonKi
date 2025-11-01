@@ -48,6 +48,8 @@ final class GardenViewModel: ObservableObject {
                 onApproveFieldTapped(log, context: context)
             case .done:
                 onDoneFieldTapped(log, context: context)
+            case .declined:
+                onDeclinedFieldTapped(log, context: context)
             default:
                 return
             }
@@ -68,9 +70,8 @@ final class GardenViewModel: ObservableObject {
 
 private extension GardenViewModel {
     func bufferImageFromLogForEvent(_ log: MsLog, completion: @escaping (Bool) -> Void) {
-        //TODO: Gnti ke ImageStorage.loadImage(from: String) kalau inputLog udh
-        if let imagePath = log.imagePath, let uiImage = UIImage(named: imagePath) {
-            imageEventBuffer = uiImage
+        if let imagePath = log.imagePath, let image = ImageStorage.loadImage(from: imagePath) {
+            imageEventBuffer = image
             completion(true)
         } else {
             completion(false)
@@ -102,4 +103,9 @@ private extension GardenViewModel {
             }
         }
     }
+    
+    func onDeclinedFieldTapped(_ log: MsLog, context: NavigationManager) {
+        context.goTo(.reLog(log: log))
+    }
+    
 }

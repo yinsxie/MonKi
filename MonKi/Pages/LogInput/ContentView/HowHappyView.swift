@@ -33,7 +33,7 @@ struct HowHappyView: View {
                 ChildInputCard(
                     image: "EmoteLove",
                     isSelected: selectedMode == "Happy",
-                    width: .infinity,
+                    width: .infinity
                 ) {
                     selectedMode = "Happy"
                 }
@@ -41,7 +41,7 @@ struct HowHappyView: View {
                 ChildInputCard(
                     image: "EmoteBiasa",
                     isSelected: selectedMode == "Biasa",
-                    width: .infinity,
+                    width: .infinity
                 ) {
                     selectedMode = "Biasa"
                 }
@@ -56,5 +56,14 @@ struct HowHappyView: View {
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
         .padding(.horizontal, 24)
+        .onAppear {
+            AudioManager.shared.stop()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                AudioManager.shared.play("HowHappy")
+            }
+        }
+        .onDisappear {
+            AudioManager.shared.stop()
+        }
     }
 }

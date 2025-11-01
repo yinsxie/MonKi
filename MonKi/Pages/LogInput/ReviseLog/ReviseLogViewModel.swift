@@ -22,13 +22,12 @@ final class ReLogViewModel: ObservableObject {
     // MARK: - Injected Properties
     private let logId: UUID
     private let logRepository: LogRepositoryProtocol
+    var parentValueTagRepo: ParentValueTagRepositoryProtocol
     
-    // MARK: - Tag Data (Copied from ChildLogViewModel)
-    // This should ideally be moved to a shared helper or config
-    let beneficialTagsString: String = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
-    
+    // MARK: - Tag Data 
+    @Published var beneficialTagsString: String = ""
+
     var beneficialTagLabels: [String] {
-        // Assuming IOHelper is available
         return IOHelper.expandTags(beneficialTagsString)
     }
 
@@ -42,6 +41,7 @@ final class ReLogViewModel: ObservableObject {
     /// Creates a new ViewModel to edit an existing log.
     init(logToEdit: MsLog, logRepository: LogRepositoryProtocol = LogRepository()) {
         self.logRepository = logRepository
+        self.parentValueTagRepo = ParentValueTagRepository()
         
         // We only store the ID, as requested.
         guard let id = logToEdit.id else {
@@ -58,6 +58,8 @@ final class ReLogViewModel: ObservableObject {
         self.tagSelectedMode = logToEdit.isHappy ? "Happy" : "Biasa"
         
         // 2. Load 'beneficialTags' state
+        fetchBeneficialTags()
+
         let allLabels = self.beneficialTagLabels
         // Assuming BeneficialTag enum is available and CaseIterable
         let allShapes = BeneficialTag.allCases
@@ -134,4 +136,13 @@ final class ReLogViewModel: ObservableObject {
         
         print("ReLog: Save complete for log \(logId).")
     }
+    
+    private func fetchBeneficialTags() {
+            if let tagsObject = parentValueTagRepo.fetchAllParentValueTags().first {
+                self.beneficialTagsString = tagsObject.valueTag ?? ""
+            } else {
+                print("LOG: No ParentValueTag found in Core Data. Beneficial tags will be empty.")
+                self.beneficialTagsString = ""
+            }
+        }
 }

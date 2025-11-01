@@ -71,7 +71,7 @@ final class LogRepository: LogRepositoryProtocol {
     }
     
     func logRejectedByParent(withId id: UUID) {
-        updateLogState(withId: id, newState: .rejected)
+        updateLogState(withId: id, newState: .declined)
     }
     
     func logDone(withId id: UUID) {
