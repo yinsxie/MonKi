@@ -25,8 +25,7 @@ struct HomeView: View {
                 }
                 
                 Button {
-
-                    navigationManager.goTo(.childGarden(.home))
+                    navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
                 } label: {
                     Text("Nav to children garden")
                 }

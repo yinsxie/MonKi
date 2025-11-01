@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum ChildGardenRoute: Hashable {
-    case home
+    case home(logToBePlanted: GardenFullDataBuffer?)
     case collectible
     case watering
     case harvesting
@@ -18,7 +18,7 @@ extension ChildGardenRoute {
     @ViewBuilder
     func delegateView() -> some View {
         switch self {
-        case .home:
+        case .home(let buffer):
             GardenHomeView()
         case .collectible:
             CollectiblesHomeView()
