@@ -23,32 +23,6 @@ final class ChildLogViewModel: ObservableObject {
     @Published var showingPermissionAlert: Bool = false
     @Published var isShowGardenFullAlert: Bool = false
     
-    var isNextDisabled: Bool {
-            if let inputPage = currentInputPage {
-                switch inputPage {
-                case .selectMode:
-                    let text = (inputSelectedMode ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-                    return text.isEmpty
-                case .mainInput:
-                    if inputSelectedMode == "Gallery" {
-                        return backgroundRemover.isProcessing || selectedItem == nil || finalProcessedImage == nil
-                    } else {
-                        // Draw mode
-                        return canvasViewModel.isProcessing || !canvasViewModel.isExistDrawing
-                    }
-                case .finalImage:
-                    return finalProcessedImage == nil
-                }
-            } else if let tagPage = currentTagPage {
-                switch tagPage {
-                case .howHappy: return tagSelectedMode == nil
-                case .happyIllust: return false
-                case .howBeneficial: return false
-                }
-            }
-            return false
-        }
-    
     // MARK: - Image Handling
     @Published var selectedItem: PhotosPickerItem?
     @Published var previewImage: UIImage?

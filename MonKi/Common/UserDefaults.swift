@@ -99,6 +99,7 @@ final class UserDefaultsManager {
     
     func isFieldMaxedOut() -> Bool {
         if let current = getCurrentFilledField(), let max = getMaxFieldCount() {
+            print("Current Field: \(current), Max Field: \(max)")
             return current >= max
         }
         
@@ -145,8 +146,9 @@ extension UserDefaultsManager {
     
     //MARK: Change this as needed
     func initDevUserDefaults() {
-        resetAll()
-        setCurrentFilledField(0)
+        if getCurrentFilledField() == nil {
+            setCurrentFilledField(0)
+        }
         do {
            try setMaxFieldCount(4)
         } catch {

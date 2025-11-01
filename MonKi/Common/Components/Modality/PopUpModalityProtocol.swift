@@ -5,6 +5,8 @@
 //  Created by William on 30/10/25.
 //
 
+import UIKit
+
 enum ImageModalityIcon {
     case monkiThinking
     
@@ -18,7 +20,8 @@ enum ImageModalityIcon {
 }
 
 protocol PopUpModalityProtocol {
-    var imageIcon: ImageModalityIcon { get }
+    var imageIcon: ImageModalityIcon? { get }
+    var imageDirect: UIImage? { get}
     var title: String { get }
     var subtitle: String? { get }
     var primaryButtonTitle: String? { get }

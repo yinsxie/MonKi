@@ -19,7 +19,7 @@ extension ChildGardenRoute {
     func delegateView() -> some View {
         switch self {
         case .home(let buffer):
-            GardenHomeView()
+            GardenHomeView(bufferDataFromLogFull: buffer)
         case .collectible:
             CollectiblesHomeView()
         case .watering:

@@ -11,6 +11,12 @@ struct GardenHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var viewModel: GardenViewModel
+    @State var isShovelMode: Bool = false
+    let bufferDataFromLogFull: GardenFullDataBuffer? = nil
+    
+    init(bufferDataFromLogFull: GardenFullDataBuffer?) {
+        _isShovelMode = State(initialValue: bufferDataFromLogFull != nil)
+    }
     
     var body: some View {
         ZStack {
@@ -23,9 +29,14 @@ struct GardenHomeView: View {
             
             VStack {
                 HStack {
-                    homeButton
-                    Spacer()
-                    collectibleButton
+                    if !isShovelMode {
+                        homeButton
+                        Spacer()
+                        collectibleButton
+                    } else {
+                        cancelButton
+                        Spacer()
+                    }
                 }
                 .padding(.top, 70)
                 
@@ -35,6 +46,8 @@ struct GardenHomeView: View {
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 57)
+            
+            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
@@ -148,6 +161,22 @@ struct GardenHomeView: View {
             image: "house.fill",
             action: {
                 viewModel.navigateToHome(context: navigationManager)
+            },
+            cornerRadius: 24,
+            width: 64,
+            type: .normal
+        )
+    }
+    
+    var cancelButton: some View {
+        CustomButton(
+            backgroundColor: ColorPalette.yellow600,
+            foregroundColor: ColorPalette.yellow400,
+            textColor: ColorPalette.yellow50,
+            font: .system(size: 20, weight: .black, design: .rounded),
+            image: "xmark",
+            action: {
+                
             },
             cornerRadius: 24,
             width: 64,

@@ -11,6 +11,7 @@ struct FieldCardView: View {
     //    var msLog: MsLog
     var type: FieldState
     var logImage: UIImage?
+    var isShovelMode: Bool?
     
     var onEmptyFieldTapped: (() -> Void)?
     var onCTAButtonTapped: (() -> Void)?
@@ -34,11 +35,13 @@ struct FieldCardView: View {
     init(
         type: FieldState,
         logImage: UIImage? = UIImage(named: ColoredPencilAsset.canvasViewBlackPencil.imageName),
+        isShovelMode: Bool? = false,
         onEmptyFieldTapped: (() -> Void)? = nil,
         onCTAButtonTapped: (() -> Void)? = nil
     ) {
         self.type = type
         self.logImage = logImage
+        self.isShovelMode = isShovelMode
         self.onEmptyFieldTapped = onEmptyFieldTapped
         self.onCTAButtonTapped = onCTAButtonTapped
     }
