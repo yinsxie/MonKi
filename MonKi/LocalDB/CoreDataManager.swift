@@ -24,7 +24,7 @@ final class CoreDataManager: ObservableObject {
             if let error = error {
                 fatalError("Core Data Failed \(error.localizedDescription)")
             }
-            self.seedInitialData(context: self.viewContext)
+//            self.seedInitialData(context: self.viewContext)
         }
     }
     
@@ -84,10 +84,9 @@ final class CoreDataManager: ObservableObject {
         log3.isHappy = false
         log3.isBeneficial = true
         log3.beneficialTags = "book;education"
-        log3.state = ChildrenLogState.approved.stringValue
+        log3.state = ChildrenLogState.declined.stringValue
         log3.createdAt = Date()
         log3.updatedAt = Date()
-        
         
         let log4 = MsLog(context: context)
         log4.id = UUID()
