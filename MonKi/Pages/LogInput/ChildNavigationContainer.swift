@@ -27,7 +27,9 @@ struct ChildLogNavigationContainer: View {
                 onClose: {
                     print("Navigation closed via close button.")
                     navigationManager.popLast()
-                    navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
+                    }
                 },
                 customNextAction: { defaultCloseAction in
                     viewModel.handleNextAction(defaultAction: defaultCloseAction)
