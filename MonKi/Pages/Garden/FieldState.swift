@@ -14,7 +14,7 @@ enum FieldState {
     case declined
     case done
     
-    init(state: String){
+    init(state: String) {
         switch state {
         case "Created":
             self = .created
@@ -66,6 +66,8 @@ enum FieldState {
             return "Panen"
         case .declined:
             return "Ulang"
+        case .created:
+            return "Cangkul"
         default:
             return nil
         }
@@ -73,7 +75,7 @@ enum FieldState {
     
     var CTAButtonImage: String? {
         switch self {
-        case .approved, .done, .declined:
+        case .approved, .done, .declined, .created:
             return "CTAImage\(stringValue)"
         default:
             return nil
@@ -85,6 +87,8 @@ enum FieldState {
         switch self {
         case .declined:
             return (ColorPalette.pink100, ColorPalette.pink200)
+        case .created:
+            return (ColorPalette.yellow100, ColorPalette.yellow200)
         default:
             return (ColorPalette.blue100, ColorPalette.blue200)
         }

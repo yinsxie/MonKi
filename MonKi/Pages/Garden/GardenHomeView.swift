@@ -11,11 +11,10 @@ struct GardenHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var viewModel: GardenViewModel
-    @State var isShovelMode: Bool = false
-    let bufferDataFromLogFull: GardenFullDataBuffer? = nil
+    var bufferDataFromLogFull: GardenFullDataBuffer?
     
     init(bufferDataFromLogFull: GardenFullDataBuffer?) {
-        _isShovelMode = State(initialValue: bufferDataFromLogFull != nil)
+        self.bufferDataFromLogFull = bufferDataFromLogFull
     }
     
     var body: some View {
@@ -29,7 +28,7 @@ struct GardenHomeView: View {
             
             VStack {
                 HStack {
-                    if !isShovelMode {
+                    if !viewModel.isShovelMode {
                         homeButton
                         Spacer()
                         collectibleButton
@@ -47,10 +46,12 @@ struct GardenHomeView: View {
             .padding(.horizontal, 24)
             .padding(.bottom, 57)
             
-            
+            popUpView
+        
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
+            viewModel.validateShovelMode(bufferData: bufferDataFromLogFull)
             viewModel.fetchLogData()
         }
     }
@@ -95,11 +96,23 @@ struct GardenHomeView: View {
                 return nil
             }
         }()
-        FieldCardView(type: type, logImage: image) {
+        
+        FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
             viewModel.navigateTo(route: .childLog(.logInput), context: navigationManager)
         } onCTAButtonTapped: {
-            print("CTA button tapped")
-            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager)
+            print("CTA button tapped") 
+            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, bufferData: bufferDataFromLogFull, logImage: image)
+        }
+    }
+    
+    @ViewBuilder
+    var popUpView: some View {
+        if let alert = viewModel.alertConfirmationType {
+            PopUpView(type: alert) {
+                withAnimation {
+                    viewModel.enableShovelModeAlert(toType: nil)
+                }
+            }
         }
     }
     
@@ -176,7 +189,17 @@ struct GardenHomeView: View {
             font: .system(size: 20, weight: .black, design: .rounded),
             image: "xmark",
             action: {
-                
+                // Show confirmation popup to exit shovel mode
+                // Prefer the buffered image; if missing, fall back to a placeholder asset
+                let fallback = UIImage(named: "icecream_placeholder")
+                let imageToUse = bufferDataFromLogFull?.image ?? fallback
+                guard let imageToUse else { return }
+                let alertType: GardenShovelModality = .exit(image: imageToUse) {
+                    withAnimation { viewModel.isShovelMode = false }
+                    // Dismiss the popup after confirming
+                    viewModel.enableShovelModeAlert(toType: nil)
+                }
+                viewModel.enableShovelModeAlert(toType: alertType)
             },
             cornerRadius: 24,
             width: 64,

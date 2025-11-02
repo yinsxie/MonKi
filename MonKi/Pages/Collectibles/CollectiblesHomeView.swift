@@ -22,7 +22,5 @@ struct CollectiblesHomeView: View {
             }
             
         }
-        
-        
     }
 }

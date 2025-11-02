@@ -23,6 +23,32 @@ final class ChildLogViewModel: ObservableObject {
     @Published var showingPermissionAlert: Bool = false
     @Published var isShowGardenFullAlert: Bool = false
     
+    var isNextDisabled: Bool {
+                if let inputPage = currentInputPage {
+                    switch inputPage {
+                    case .selectMode:
+                        let text = (inputSelectedMode ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                        return text.isEmpty
+                    case .mainInput:
+                        if inputSelectedMode == "Gallery" {
+                            return backgroundRemover.isProcessing || selectedItem == nil || finalProcessedImage == nil
+                        } else {
+                            // Draw mode
+                            return canvasViewModel.isProcessing || !canvasViewModel.isExistDrawing
+                        }
+                    case .finalImage:
+                        return finalProcessedImage == nil
+                    }
+                } else if let tagPage = currentTagPage {
+                    switch tagPage {
+                    case .howHappy: return tagSelectedMode == nil
+                    case .happyIllust: return false
+                    case .howBeneficial: return false
+                    }
+                }
+                return false
+            }
+    
     // MARK: - Image Handling
     @Published var selectedItem: PhotosPickerItem?
     @Published var previewImage: UIImage?
@@ -66,7 +92,9 @@ final class ChildLogViewModel: ObservableObject {
     
     var currentTagPage: ChildLogTagEnum? {
         guard currentIndex >= inputFlowPageCount else { return nil }
-        return ChildLogTagEnum(rawValue: currentIndex)
+        // Map to tag page by offsetting from the input flow count (robust even if enum rawValues change)
+        let tagIndex = currentIndex - inputFlowPageCount
+        return ChildLogTagEnum(rawValue: tagIndex)
     }
     
     var isHappy: Bool {
@@ -292,34 +320,6 @@ final class ChildLogViewModel: ObservableObject {
             // (Reset state jika ada)
         }
     }
-    
-    func shouldDisableNext() -> Bool {
-        if let inputPage = currentInputPage {
-            switch inputPage {
-            case .selectMode:
-                return inputSelectedMode == nil || inputSelectedMode!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            case .mainInput:
-                if inputSelectedMode == "Gallery" {
-                    return backgroundRemover.isProcessing || (selectedItem == nil || finalProcessedImage == nil)
-                } else { // Draw Mode
-                    return canvasViewModel.isProcessing
-                }
-            case .finalImage:
-                return finalProcessedImage == nil
-            }
-        } else if let tagPage = currentTagPage {
-            switch tagPage {
-            case .howHappy:
-                return tagSelectedMode == nil
-            case .happyIllust:
-                return false
-            case .howBeneficial:
-                return false
-            }
-        }
-        return false
-    }
-    
 
     var shouldHideProgressBar: Bool {
         return inputSelectedMode == "Draw" && currentInputPage == .mainInput
@@ -360,11 +360,13 @@ final class ChildLogViewModel: ObservableObject {
     }
     
     private func fetchBeneficialTags() {
-            if let tagsObject = parentValueTagRepo.fetchAllParentValueTags().first {
-                self.beneficialTagsString = tagsObject.valueTag ?? ""
+            let fetched = parentValueTagRepo.fetchAllParentValueTags().first?.valueTag?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if !fetched.isEmpty {
+                self.beneficialTagsString = fetched
             } else {
-                print("LOG: No ParentValueTag found in Core Data. Beneficial tags will be empty.")
-                self.beneficialTagsString = ""
+                // Provide a sensible default so TagSelectionPageView has content even if Core Data is empty
+                print("LOG: No ParentValueTag found in Core Data. Using default beneficial tags.")
+                self.beneficialTagsString = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
             }
         }
 }
