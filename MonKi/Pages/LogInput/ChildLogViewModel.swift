@@ -42,7 +42,7 @@ final class ChildLogViewModel: ObservableObject {
                 } else if let tagPage = currentTagPage {
                     switch tagPage {
                     case .howHappy: return tagSelectedMode == nil
-                    case .happyIllust: return false
+//                    case .happyIllust: return false
                     case .howBeneficial: return false
                     }
                 }
@@ -65,7 +65,7 @@ final class ChildLogViewModel: ObservableObject {
     var logRepo: LogRepositoryProtocol
     var parentValueTagRepo: ParentValueTagRepositoryProtocol
     
-    // MARK: - Inject Beneficial Tag dummy data
+    // MARK: - Beneficial Tag
 //    @Published var beneficialTagsString: String = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
     @Published var beneficialTagsString: String = ""
     
@@ -215,8 +215,7 @@ final class ChildLogViewModel: ObservableObject {
         
         if let inputPage = currentInputPage {
             handleInputFlowNext(for: inputPage)
-        }
-        else if let tagPage = currentTagPage {
+        } else if let tagPage = currentTagPage {
             handleTagFlowNext(for: tagPage)
         }
     }
@@ -271,8 +270,8 @@ final class ChildLogViewModel: ObservableObject {
                     return
                 }
                 print("Data 'isHappy' disimpan sementara: \(isHappy)")
-            case .happyIllust:
-                print("Halaman ilustrasi, lanjut saja.")
+//            case .happyIllust:
+//                print("Halaman ilustrasi, lanjut saja.")
             case .howBeneficial:
                 break
             }
@@ -311,12 +310,10 @@ final class ChildLogViewModel: ObservableObject {
         if currentInputPage == .finalImage {
             tagSelectedMode = nil
             selectedBeneficialTags.removeAll()
-        }
-        else if currentInputPage == .mainInput {
+        } else if currentInputPage == .mainInput {
             finalProcessedImage = nil
             if inputSelectedMode == "Gallery" { backgroundRemover.partialReset() }
-        }
-        else if currentInputPage == .selectMode { // Kembali ke .selectMode (indeks 0)
+        } else if currentInputPage == .selectMode { // Kembali ke .selectMode (indeks 0)
             // (Reset state jika ada)
         }
     }
@@ -364,9 +361,7 @@ final class ChildLogViewModel: ObservableObject {
             if !fetched.isEmpty {
                 self.beneficialTagsString = fetched
             } else {
-                // Provide a sensible default so TagSelectionPageView has content even if Core Data is empty
-                print("LOG: No ParentValueTag found in Core Data. Using default beneficial tags.")
-                self.beneficialTagsString = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
+                print("LOG: No ParentValueTag found in Core Data.")
             }
         }
 }

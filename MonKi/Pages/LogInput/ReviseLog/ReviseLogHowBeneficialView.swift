@@ -16,11 +16,11 @@ struct ReLogHowBeneficialView: View {
         VStack {
             
             // MARK: - Bagian Atas: Teks
-            Text("Perasaanmu tentang barang itu gimana?")
+            Text("Menurut kamu, itu berguna buat apa?")
                 .font(Font.title2Emphasized)
                 .multilineTextAlignment(.center)
-//                .padding(.bottom, 40)
-            
+                .padding(.horizontal, 40)
+
             // MARK: - Bagian Tengah: Card
             TagSelectionPageView(
                 tagTexts: viewModel.beneficialTagLabels,
@@ -33,5 +33,14 @@ struct ReLogHowBeneficialView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
+        .onAppear {
+            AudioManager.shared.stop()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                AudioManager.shared.play("HowBeneficial")
+            }
+        }
+        .onDisappear {
+            AudioManager.shared.stop()
+        }
     }
 }

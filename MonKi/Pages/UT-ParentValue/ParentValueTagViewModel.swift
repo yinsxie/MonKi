@@ -25,6 +25,22 @@ final class ParentValueTagViewModel: ObservableObject {
     /// A reference to the single Core Data object we are editing.
     private var parentTagObject: ParentValueTag?
     
+    // <<< ADDED >>>
+    /// A static list of all possible suggested tags.
+    private let allSuggestedTags: [String] = [
+        "Sehat", "Pintar"
+    ]
+    
+    // <<< ADDED >>>
+    /// A computed property that shows only suggestions
+    /// that haven't been added to the `tags` list yet.
+    var availableSuggestions: [String] {
+        // Use a Set for efficient (O(1)) lookup
+        let addedTagsSet = Set(tags)
+        // Filter the main list
+        return allSuggestedTags.filter { !addedTagsSet.contains($0) }
+    }
+    
     // MARK: - Initialization
     
     init(repo: ParentValueTagRepositoryProtocol = ParentValueTagRepository()) {
@@ -59,15 +75,30 @@ final class ParentValueTagViewModel: ObservableObject {
     func addNewTag() {
         let trimmedTag = newTagText.trimmingCharacters(in: .whitespacesAndNewlines)
         
+        // Always clear the text field
+        defer { newTagText = "" }
+        
         // Guard against empty or duplicate tags
         guard !trimmedTag.isEmpty, !tags.contains(trimmedTag) else {
-            newTagText = "" // Clear field even if it's a duplicate
             return
         }
         
         // Add to the local array and save.
         self.tags.append(trimmedTag)
-        self.newTagText = ""
+        persistTags()
+    }
+    
+    // <<< ADDED >>>
+    /// Adds a tag from the suggestion list.
+    func addTagFromSuggestion(_ tag: String) {
+        // Guard against duplicates (shouldn't happen if `availableSuggestions`
+        // is used, but good for safety).
+        guard !tags.contains(tag) else {
+            return
+        }
+        
+        // Add to the local array and save.
+        self.tags.append(tag)
         persistTags()
     }
     

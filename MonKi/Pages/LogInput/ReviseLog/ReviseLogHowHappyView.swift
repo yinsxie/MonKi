@@ -14,7 +14,7 @@ struct ReLogHowHappyView: View {
     
     var body: some View {
         // This 'body' is copied *exactly* from your HowHappyView.swift
-        VStack(alignment: .center, spacing: 0){
+        VStack(alignment: .center, spacing: 0) {
             // MARK: - Bagian Atas: Teks
             Text("Perasaanmu tentang barang itu gimana?")
                 .font(Font.title2Emphasized)
@@ -58,5 +58,10 @@ struct ReLogHowHappyView: View {
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
         .padding(.horizontal, 24)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                AudioManager.shared.play("HowHappy")
+            }
+        }
     }
 }

@@ -55,8 +55,5 @@ struct SelectModePage: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
-        .onDisappear {
-            AudioManager.shared.stop()
-        }
     }
 }
