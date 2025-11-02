@@ -65,7 +65,7 @@ struct GardenWateringView: View {
                     foregroundColor: ColorPalette.blue600, textColor: ColorPalette.neutral50,
                     font: .calloutEmphasized,
                     horizontalPadding: 18,
-                    verticalPadding: 18,
+                    verticalPadding: 18
                    ) {
                        viewModel.navigateBack(context: navigationManager)
                    }
@@ -75,11 +75,24 @@ struct GardenWateringView: View {
             }
         }
         .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    SoundManager.shared.play(.pourWater)
+                }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation(.easeInOut(duration: 0.5)) {
                     frame = .frame2
                 }
                 fieldState = .done
+            }
+        
+        }
+        .onChange(of: frame) { oldFrame, newFrame in
+            if newFrame == .frame2 {
+                SoundManager.shared.stop()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    AudioManager.shared.stop()
+                    AudioManager.shared.play("WateringBackGarden")
+                }
             }
         }
     }

@@ -27,8 +27,11 @@ struct StoryPageView: View {
                     .font(.title3Semibold)
                     .foregroundStyle(ColorPalette.orange900)
                     .multilineTextAlignment(.center)
-                
-            }.frame(maxHeight: .infinity, alignment: .top)
+                    .frame(maxWidth: .infinity, alignment: .top)
+                    .padding(.top, 100)
+
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 

@@ -20,6 +20,8 @@ class ReflectionGuideStoryViewModel: ObservableObject {
     /// Progress of the current story segment (0.0 to 1.0)
     @Published var progress: Double = 0.0
     
+    @Published var showModalityOnStoryViewCancelButtonTapped: Bool = false
+    
     private let log: MsLog
     private let logRepository: LogRepositoryProtocol
 
@@ -140,5 +142,14 @@ class ReflectionGuideStoryViewModel: ObservableObject {
     func stopTimer() {
         timerCancellable?.cancel()
         timerCancellable = nil
+    }
+    
+    func setShowModalityOnStoryViewCancelButtonTapped(to state: Bool) {
+        showModalityOnStoryViewCancelButtonTapped = state
+        if state {
+            pauseTimer()
+        } else {
+            resumeTimer()
+        }
     }
 }

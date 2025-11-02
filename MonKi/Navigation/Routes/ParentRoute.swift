@@ -13,6 +13,7 @@ enum ParentRoute: Hashable {
     case reviewSuccess
     case reflectionGuide(log: MsLog)
     case reflectionGuideStory(log: MsLog)
+    case reviewReject(log: MsLog)
 }
 
 extension ParentRoute {
@@ -34,6 +35,9 @@ extension ParentRoute {
                 .navigationBarBackButtonHidden(true)
         case .reflectionGuideStory(let log):
             ReflectionGuideStoryView(log: log)
+                .navigationBarBackButtonHidden(true)
+        case .reviewReject(log: let log):
+            ParentReviewRejectView(log: log)
                 .navigationBarBackButtonHidden(true)
         }
     }

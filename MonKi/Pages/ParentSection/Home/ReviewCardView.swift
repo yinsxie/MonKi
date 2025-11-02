@@ -40,12 +40,15 @@ struct ReviewCardView: View {
             VStack(spacing: 0) {
                 ZStack(alignment: .bottomTrailing) {
                     HStack {
-                        Image(log.imagePath ?? "icecream_placeholder")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .offset(y: 3)
-                        
+
+                        if let imagePath = log.imagePath, let uiImage = ImageStorage.loadImage(from: imagePath) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .offset(y: 3)
+                        }
+                                                
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Anak bilang,\nini berguna untuk...")
                                 .font(.subheadlineEmphasized)
@@ -69,10 +72,17 @@ struct ReviewCardView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     
-                    Circle()
-                        .fill(ColorPalette.neutral900)
-                        .frame(width: 72, height: 72)
-                        .offset(x: 12, y: 10)
+                    if log.isHappy == true {
+                        Image("loveEmote")
+                            .resizable()
+                            .frame(width: 72, height: 72)
+                            .offset(x: 12, y: 10)
+                    } else {
+                        Image("smileEmote")
+                            .resizable()
+                            .frame(width: 72, height: 72)
+                            .offset(x: 12, y: 10)
+                    }
                 }
                 
                 HStack(alignment: .center, spacing: 8) {
@@ -80,9 +90,7 @@ struct ReviewCardView: View {
                         text: "Tolak",
                         colorSet: .destructive,
                         font: .headlineEmphasized,
-                        action: {
-                            onReject()
-                        },
+                        action: onReject,
                         cornerRadius: 24,
                         type: .normal
                     )

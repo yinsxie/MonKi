@@ -33,9 +33,16 @@ struct ReflectionGuideStoryView: View {
                     .id(viewModel.currentPageIndex)
             }
             
+            if let imagePath = log.imagePath, let uiImage = ImageStorage.loadImage(from: imagePath) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 70)
+                    .offset(x: 125, y: 180)
+            }
+            
             VStack(alignment: .leading, spacing: 24) {
                 
-                // 2. CLOSE BUTTON
                 closeButton
                     .padding(.horizontal, 24)
                 
@@ -46,14 +53,13 @@ struct ReflectionGuideStoryView: View {
                 )
                 .padding(.horizontal, 24)
                 
-                // 3. STORY PAGE CONTENT
                 ZStack {
                     if !viewModel.pages.isEmpty && viewModel.currentPageIndex < viewModel.pages.count {
                         StoryPageView(page: viewModel.pages[viewModel.currentPageIndex])
-                            .padding(.horizontal, 26)
-                            .frame(maxHeight: .infinity) // Make it take up the remaining space
+                            .padding(.horizontal, 20)
+                            .frame(maxHeight: .infinity)
                     } else {
-                        Spacer() // Placeholder if pages are empty
+                        Spacer()
                     }
                     
                     tapNavigationOverlay
@@ -74,6 +80,10 @@ struct ReflectionGuideStoryView: View {
             }
             .padding(.top, 20)
             
+            //Alerts
+            if viewModel.showModalityOnStoryViewCancelButtonTapped {
+                popUpView
+            }
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
@@ -87,14 +97,15 @@ struct ReflectionGuideStoryView: View {
     }
     
     // MARK: - Subviews
-    
     private var closeButton: some View {
         CustomButton(
             colorSet: .destructive,
             font: .system(size: 20, weight: .black, design: .rounded),
             image: "xmark",
             action: {
-                navigationManager.popLast()
+                withAnimation {
+                    viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: true)
+                }
             },
             cornerRadius: 24,
             width: 64,
@@ -114,7 +125,7 @@ struct ReflectionGuideStoryView: View {
             imageRight: "arrow.right",
             action: {
                 viewModel.rejectLog()
-                navigationManager.pop(times: 2)
+                navigationManager.replaceTop(with:.parentHome(.reviewReject(log: log)))
             },
             cornerRadius: 24,
             width: 189,
@@ -129,7 +140,7 @@ struct ReflectionGuideStoryView: View {
         HStack(spacing: 0) {
             // Left Side (Regress)
             Rectangle()
-                .fill(Color.black.opacity(0.001)) // Use a near-zero opacity to make it tappable
+                .fill(Color.black.opacity(0.001))
                 .onTapGesture {
                     viewModel.regressStory()
                 }
@@ -155,8 +166,31 @@ struct ReflectionGuideStoryView: View {
             perform: { }
         )
     }
+    
+    var popUpView: some View {
+        PopUpView(
+            type: ParentSectionModalType.onStoryViewCancelButtonTapped(
+                onPrimaryTap: {
+                    withAnimation {
+                        viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
+                    }
+                },
+                onSecondaryTap: {
+                    withAnimation {
+                        viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
+                        viewModel.rejectLog()
+                    }
+                    navigationManager.replaceTop(with:.parentHome(.reviewReject(log: log)))
+                }
+            )
+        ){
+            withAnimation {
+                viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
+            }
+        }
+        .zIndex(1)
+    }
 }
-
 
 #Preview {
     

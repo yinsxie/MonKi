@@ -27,17 +27,20 @@ struct FinalImagePage: View {
                         .shadow(color: .black.opacity(0.3), radius: 15, x: 0, y: 8)
                         .padding()
                 } else {
-                    Image(systemName: "hand.thumbsup.fill")
+                    Image("MonkiInputPlaceholder")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 120)
-                        .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.3), radius: 15, x: 0, y: 8)
+                        .frame(height: 200)
                 }
             }
             .zIndex(1)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
+        .onAppear{
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                SoundManager.shared.play(.cropDone)
+            }
+        }
     }
 }

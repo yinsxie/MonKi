@@ -11,6 +11,7 @@ struct FieldCardView: View {
     //    var msLog: MsLog
     var type: FieldState
     var logImage: UIImage?
+    var isShovelMode: Bool?
     
     var onEmptyFieldTapped: (() -> Void)?
     var onCTAButtonTapped: (() -> Void)?
@@ -18,13 +19,15 @@ struct FieldCardView: View {
     let emptyFieldSize: CGFloat = 141.0
     let widthAndPotField: CGFloat = 130.0
     
+    var isShowCTAButton: Bool
+    
     var heightPot: CGFloat {
         switch type {
         case .empty:
             return widthAndPotField
-        case .created, .declined:
+        case .created, .declined, .approved:
             return 158.59
-        case .approved, .done:
+        case .done:
             return 181.71
         }
     }
@@ -34,13 +37,26 @@ struct FieldCardView: View {
     init(
         type: FieldState,
         logImage: UIImage? = UIImage(named: ColoredPencilAsset.canvasViewBlackPencil.imageName),
+        isShovelMode: Bool? = false,
         onEmptyFieldTapped: (() -> Void)? = nil,
         onCTAButtonTapped: (() -> Void)? = nil
     ) {
         self.type = type
         self.logImage = logImage
+        self.isShovelMode = isShovelMode
         self.onEmptyFieldTapped = onEmptyFieldTapped
         self.onCTAButtonTapped = onCTAButtonTapped
+        
+        switch type {
+        case .approved, .done:
+            self.isShowCTAButton = true
+        case .declined:
+            self.isShowCTAButton = !(isShovelMode ?? true)
+        case .created:
+            self.isShowCTAButton = isShovelMode ?? true
+        default:
+            self.isShowCTAButton = true
+        }
     }
     
     var body: some View {
@@ -75,9 +91,11 @@ struct FieldCardView: View {
                 
             }
             
-            if let CTATitle = type.CTAButtonTitle, let CTAButtonImage = type.CTAButtonImage {
+            if isShowCTAButton ,let CTATitle = type.CTAButtonTitle, let CTAButtonImage = type.CTAButtonImage {
                 CustomCTAButton(
                     text: CTATitle,
+                    backgroundColor: type.CTAButtonColor.1,
+                    foregroundColor: type.CTAButtonColor.0,
                     imageRight: CTAButtonImage, action: onCTAButtonTapped ?? {})
                 .offset(y: 130)
             }

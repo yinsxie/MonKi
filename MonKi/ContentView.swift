@@ -22,6 +22,8 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            //MARK: DEV purposes only
+            UserDefaultsManager.shared.initDevUserDefaults()
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 withAnimation {
                     isSplashShown = false

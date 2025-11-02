@@ -11,6 +11,7 @@ struct HomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @StateObject var gardenViewModel = GardenViewModel()
+    @StateObject var childlogViewModel = ChildLogViewModel()
     
     var body: some View {
         NavigationStack(path: $navigationManager.navigationPath) {
@@ -24,8 +25,7 @@ struct HomeView: View {
                 }
                 
                 Button {
-
-                    navigationManager.goTo(.childGarden(.home))
+                    navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
                 } label: {
                     Text("Nav to children garden")
                 }
@@ -37,12 +37,19 @@ struct HomeView: View {
                     Text("Nav to parent home")
                 }
                 
+                Button {
+                    navigationManager.goTo(.parentValue)
+                } label: {
+                    Text("Parent values")
+                }
+                
             }
             .navigationDestination(for: MainRoute.self) { route in
                 switch route {
                 case .childLog(let childLogRoute):
                     childLogRoute.delegateView()
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(childlogViewModel)
                 case .childGarden(let childGardenRoute):
                     childGardenRoute.delegateView()
                         .navigationBarBackButtonHidden(true)
@@ -50,6 +57,11 @@ struct HomeView: View {
                 case .parentHome(let parentRoute):
                     parentRoute.delegateView()
                         .navigationBarBackButtonHidden(true)
+                case .reLog(let log):
+                    ReLogNavigationContainer(logToEdit: log)
+                        .navigationBarBackButtonHidden(true)
+                case .parentValue:
+                    ParentValueTagView()
                 }
             }
         }

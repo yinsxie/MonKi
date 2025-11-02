@@ -13,9 +13,7 @@ struct SelectModePage: View {
     @ObservedObject var viewModel: ChildLogViewModel
     
     var body: some View {
-        VStack {
-            Spacer()
-            
+        VStack(alignment: .center, spacing: 0) {
             // MARK: - Bagian Atas: Teks
             Text("Yuk, tunjukkin impianmu!")
                 .font(Font.title2Emphasized)
@@ -23,19 +21,27 @@ struct SelectModePage: View {
                 .padding(.bottom, 40)
             
             // MARK: - Bagian Tengah: Card
-            HStack(spacing: 8) {
+            HStack(alignment: .top, spacing: 8) {
                 ChildInputCard(
                     text: "Draw",
-                    isSelected: selectedMode == "Draw"
+                    image: "MonkiDraw",
+                    isSelected: selectedMode == "Draw",
+                    width: .infinity
                 ) {
                     selectedMode = "Draw"
+                    AudioManager.shared.stop() // stop narasi sebelumnya
+                    AudioManager.shared.play("DrawCardChoice")
                 }
                 
                 ChildInputCard(
                     text: "Gallery",
-                    isSelected: selectedMode == "Gallery"
+                    image: "MonkiPhoto",
+                    isSelected: selectedMode == "Gallery",
+                    width: .infinity
                 ) {
                     selectedMode = "Gallery"
+                    AudioManager.shared.stop()
+                    AudioManager.shared.play("GalleryCardChoice")
                 }
             }
             .frame(height: 400, alignment: .top)
@@ -49,5 +55,8 @@ struct SelectModePage: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
+        .onDisappear {
+            AudioManager.shared.stop()
+        }
     }
 }

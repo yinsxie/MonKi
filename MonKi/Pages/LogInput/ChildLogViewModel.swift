@@ -8,14 +8,46 @@
 import SwiftUI
 import PhotosUI
 import CoreData
+import Combine
 
 @MainActor
-internal class ChildLogViewModel: ObservableObject {
+final class ChildLogViewModel: ObservableObject {
+    
+    private var cancellables = Set<AnyCancellable>()
+    
     // MARK: - Navigation & State
     @Published var currentIndex: Int = 0
-    @Published var selectedMode: String?
+    @Published var inputSelectedMode: String?
+    @Published var tagSelectedMode: String?
     @Published var isGalleryPermissionGranted: Bool = false
     @Published var showingPermissionAlert: Bool = false
+    @Published var isShowGardenFullAlert: Bool = false
+    
+    var isNextDisabled: Bool {
+                if let inputPage = currentInputPage {
+                    switch inputPage {
+                    case .selectMode:
+                        let text = (inputSelectedMode ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                        return text.isEmpty
+                    case .mainInput:
+                        if inputSelectedMode == "Gallery" {
+                            return backgroundRemover.isProcessing || selectedItem == nil || finalProcessedImage == nil
+                        } else {
+                            // Draw mode
+                            return canvasViewModel.isProcessing || !canvasViewModel.isExistDrawing
+                        }
+                    case .finalImage:
+                        return finalProcessedImage == nil
+                    }
+                } else if let tagPage = currentTagPage {
+                    switch tagPage {
+                    case .howHappy: return tagSelectedMode == nil
+                    case .happyIllust: return false
+                    case .howBeneficial: return false
+                    }
+                }
+                return false
+            }
     
     // MARK: - Image Handling
     @Published var selectedItem: PhotosPickerItem?
@@ -29,22 +61,80 @@ internal class ChildLogViewModel: ObservableObject {
     @Published var finalProcessedImage: UIImage?
     
     // MARK: - Core Data Log
-    private let context: NSManagedObjectContext
+    @Published var logs: [MsLog] = []
+    var logRepo: LogRepositoryProtocol
+    var parentValueTagRepo: ParentValueTagRepositoryProtocol
     
-    // MARK: - Computed Properties
-    var currentPage: ChildLogPageEnum {
-        return ChildLogPageEnum(rawValue: currentIndex) ?? .selectMode
+    // MARK: - Inject Beneficial Tag dummy data
+//    @Published var beneficialTagsString: String = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
+    @Published var beneficialTagsString: String = ""
+    
+    var beneficialTagLabels: [String] {
+        return IOHelper.expandTags(beneficialTagsString)
     }
     
+    @Published var selectedBeneficialTags = Set<BeneficialTag>()
+    
+    // MARK: - Computed Properties
+    
+    private var inputFlowPageCount: Int {
+        ChildLogPageEnum.allCases.count
+    }
+    
+    var totalPageCount: Int {
+        ChildLogPageEnum.allCases.count + ChildLogTagEnum.allCases.count
+    }
+    
+    var currentInputPage: ChildLogPageEnum? {
+        guard currentIndex < inputFlowPageCount else { return nil }
+        return ChildLogPageEnum(rawValue: currentIndex)
+    }
+    
+    var currentTagPage: ChildLogTagEnum? {
+        guard currentIndex >= inputFlowPageCount else { return nil }
+        // Map to tag page by offsetting from the input flow count (robust even if enum rawValues change)
+        let tagIndex = currentIndex - inputFlowPageCount
+        return ChildLogTagEnum(rawValue: tagIndex)
+    }
+    
+    var isHappy: Bool {
+        return tagSelectedMode == "Happy"
+    }
+    
+    var isBeneficial: Bool {
+        return !selectedBeneficialTags.isEmpty
+    }
+    
+    var beneficialTags: [String] {
+        let allLabels = self.beneficialTagLabels
+        let allShapes = BeneficialTag.allCases
+        let tagMap = Dictionary(uniqueKeysWithValues: zip(allShapes, allLabels))
+        let selectedLabels = selectedBeneficialTags.compactMap { selectedTag in
+            return tagMap[selectedTag]
+        }
+        return selectedLabels
+    }
+    
+    @Published var bufferedLogData: GardenFullDataBuffer?
+    
     // MARK: - Initialization
-    init(context: NSManagedObjectContext = CoreDataManager.shared.viewContext) {
-        self.context = context
+    init(logRepo: LogRepositoryProtocol = LogRepository()) {
+        self.logRepo = logRepo
+        self.parentValueTagRepo = ParentValueTagRepository()
+        
+        canvasViewModel.objectWillChange
+                    .receive(on: RunLoop.main)
+                    .sink { [weak self] _ in self?.objectWillChange.send() }
+                    .store(in: &cancellables)
+        
         self.canvasViewModel.onDrawingProcessed = { [weak self] image in
             guard let self else { return }
             Task { @MainActor in
                 self.handleDrawingProcessed(image: image)
             }
         }
+        
+        fetchBeneficialTags()
     }
     
     // MARK: - Permission
@@ -55,12 +145,12 @@ internal class ChildLogViewModel: ObservableObject {
                 self.isGalleryPermissionGranted = granted
                 if !granted {
                     self.showingPermissionAlert = true
-                    if self.selectedMode == "Gallery" { self.selectedMode = nil }
+                    if self.inputSelectedMode == "Gallery" { self.inputSelectedMode = nil }
                 } else {
-                    if self.selectedMode == "Gallery" {
+                    if self.inputSelectedMode == "Gallery" {
                         completion(granted)
                     } else {
-                        self.selectedMode = "Gallery"
+                        self.inputSelectedMode = "Gallery"
                         completion(granted)
                     }
                 }
@@ -108,39 +198,89 @@ internal class ChildLogViewModel: ObservableObject {
     
     // MARK: - Navigation Logic
     func handleNextAction(defaultAction: @escaping () -> Void) {
-        switch currentPage {
-        case .selectMode:
-            guard selectedMode != nil else { return }
+        guard currentIndex < totalPageCount - 1 else {
             
-            if selectedMode == "Gallery" {
+            let isGardenFull = UserDefaultsManager.shared.isFieldMaxedOut()
+            
+            bufferedLogData = constructBufferedLogData()
+            if !isGardenFull {
+                saveLog()
+                defaultAction()
+            } else {
+                isShowGardenFullAlert = true
+            }
+            
+            return
+        }
+        
+        if let inputPage = currentInputPage {
+            handleInputFlowNext(for: inputPage)
+        }
+        else if let tagPage = currentTagPage {
+            handleTagFlowNext(for: tagPage)
+        }
+    }
+        
+        private func handleInputFlowNext(for page: ChildLogPageEnum) {
+            switch page {
+            case .selectMode:
+                handleSelectModeNext()
+            case .mainInput:
+                handleMainInputNext()
+            case .finalImage:
+                print("Lanjut dari .finalImage ke .howHappy")
+                withAnimation { currentIndex += 1 }
+            }
+        }
+        
+        private func handleSelectModeNext() {
+            guard inputSelectedMode != nil else { return }
+            
+            if inputSelectedMode == "Gallery" {
                 if isGalleryPermissionGranted { showPhotoPicker = true }
                 else {
                     requestGalleryPermission { [weak self] granted in
                         if granted { Task { @MainActor in self?.showPhotoPicker = true } }
                     }
                 }
-            } else if selectedMode == "Draw" {
+            } else if inputSelectedMode == "Draw" {
                 withAnimation { currentIndex = ChildLogPageEnum.mainInput.rawValue }
             }
-            
-        case .mainInput:
-            if selectedMode == "Draw" {
+        }
+        
+        private func handleMainInputNext() {
+            if inputSelectedMode == "Draw" {
                 canvasViewModel.saveDrawing()
             } else { // Gallery Mode
                 if selectedItem != nil && !backgroundRemover.isProcessing && finalProcessedImage != nil {
                     withAnimation { currentIndex = ChildLogPageEnum.finalImage.rawValue }
-                } else if selectedItem == nil { imageLoadError = "Please select a photo first." }
-                else if backgroundRemover.isProcessing { /* Do nothing while processing */ }
-                else { imageLoadError = "Image processing failed. Try again." }
+                } else if selectedItem == nil {
+                    imageLoadError = "Please select a photo first."
+                } else if backgroundRemover.isProcessing {
+                } else {
+                    imageLoadError = "Image processing failed. Try again."
+                }
             }
-            
-        case .finalImage:
-            defaultAction()
         }
-    }
+        
+        private func handleTagFlowNext(for page: ChildLogTagEnum) {
+            switch page {
+            case .howHappy:
+                guard tagSelectedMode != nil else {
+                    print("howHappy guard failed (seharusnya ditangani shouldDisableNext)")
+                    return
+                }
+                print("Data 'isHappy' disimpan sementara: \(isHappy)")
+            case .happyIllust:
+                print("Halaman ilustrasi, lanjut saja.")
+            case .howBeneficial:
+                break
+            }
+            withAnimation { currentIndex += 1 }
+        }
     
     func handleNoImageSelected() {
-        if selectedMode == "Gallery", currentPage == .mainInput {
+        if inputSelectedMode == "Gallery", currentInputPage == .mainInput {
             withAnimation {
                 currentIndex = ChildLogPageEnum.selectMode.rawValue
                 selectedItem = nil
@@ -164,47 +304,69 @@ internal class ChildLogViewModel: ObservableObject {
     }
     
     func handleBackAction() {
-        switch currentPage {
-        case .finalImage:
-            withAnimation {
-                currentIndex = ChildLogPageEnum.mainInput.rawValue
-                finalProcessedImage = nil
-                if selectedMode == "Gallery" { backgroundRemover.partialReset() }
-            }
-        case .mainInput:
-            withAnimation {
-                currentIndex = ChildLogPageEnum.selectMode.rawValue
-                selectedItem = nil
-                backgroundRemover.reset()
-            }
-        case .selectMode:
-            break
-        }
-    }
-    
-    func shouldDisableNext() -> Bool {
-        let isModeInvalid = selectedMode == nil || selectedMode!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        let isProcessingBG = backgroundRemover.isProcessing
-        let isProcessingCanvas = canvasViewModel.isProcessing
-        let isGalleryInputInvalid = selectedMode == "Gallery" && currentPage == .mainInput && (selectedItem == nil || finalProcessedImage == nil)
-        let isDrawingInputInvalid = selectedMode == "Draw" && currentPage == .mainInput && isProcessingCanvas
-        let isFinalImageInvalid = currentPage == .finalImage && finalProcessedImage == nil
+        guard currentIndex > 0 else { return }
         
-        switch currentPage {
-        case .selectMode:
-            return isModeInvalid
-        case .mainInput:
-            if selectedMode == "Gallery" {
-                return isProcessingBG || isGalleryInputInvalid
-            } else { // Draw Mode
-                return isDrawingInputInvalid
-            }
-        case .finalImage:
-            return isFinalImageInvalid // Disable Done if no final image
+        withAnimation { currentIndex -= 1 }
+        
+        if currentInputPage == .finalImage {
+            tagSelectedMode = nil
+            selectedBeneficialTags.removeAll()
+        }
+        else if currentInputPage == .mainInput {
+            finalProcessedImage = nil
+            if inputSelectedMode == "Gallery" { backgroundRemover.partialReset() }
+        }
+        else if currentInputPage == .selectMode { // Kembali ke .selectMode (indeks 0)
+            // (Reset state jika ada)
         }
     }
-    
+
     var shouldHideProgressBar: Bool {
-        return selectedMode == "Draw" && currentPage == .mainInput
+        return inputSelectedMode == "Draw" && currentInputPage == .mainInput
     }
+    
+    func constructBufferedLogData() -> GardenFullDataBuffer? {
+        guard let imageToSave = finalProcessedImage else {
+            print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
+            return nil
+        }
+        
+        let happy = self.isHappy
+        let beneficial = self.isBeneficial
+        let tags = self.beneficialTags
+        
+        return GardenFullDataBuffer(image: imageToSave, isHappy: happy, isBeneficial: beneficial, tags: tags)
+    }
+    
+    private func saveLog() {
+        
+        guard let bufferedLogData = bufferedLogData else {
+            print("Error: 'bufferedLogData' nil saat mencoba menyimpan.")
+            return
+        }
+        
+        logRepo.createLogWithImage(
+            bufferedLogData.image,
+            isHappy: bufferedLogData.isHappy,
+            isBeneficial: bufferedLogData.isBeneficial,
+            tags: bufferedLogData.tags
+        )
+        
+        UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
+    }
+    
+    func setAlertonGardenFull(to value: Bool) {
+        isShowGardenFullAlert = value
+    }
+    
+    private func fetchBeneficialTags() {
+            let fetched = parentValueTagRepo.fetchAllParentValueTags().first?.valueTag?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if !fetched.isEmpty {
+                self.beneficialTagsString = fetched
+            } else {
+                // Provide a sensible default so TagSelectionPageView has content even if Core Data is empty
+                print("LOG: No ParentValueTag found in Core Data. Using default beneficial tags.")
+                self.beneficialTagsString = "Sehat;Pintar;Kuat;Cepat;Baru;Lama"
+            }
+        }
 }

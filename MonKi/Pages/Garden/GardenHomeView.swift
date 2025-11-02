@@ -11,6 +11,11 @@ struct GardenHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var viewModel: GardenViewModel
+    var bufferDataFromLogFull: GardenFullDataBuffer?
+    
+    init(bufferDataFromLogFull: GardenFullDataBuffer?) {
+        self.bufferDataFromLogFull = bufferDataFromLogFull
+    }
     
     var body: some View {
         ZStack {
@@ -23,9 +28,14 @@ struct GardenHomeView: View {
             
             VStack {
                 HStack {
-                    homeButton
-                    Spacer()
-                    collectibleButton
+                    if !viewModel.isShovelMode {
+                        homeButton
+                        Spacer()
+                        collectibleButton
+                    } else {
+                        cancelButton
+                        Spacer()
+                    }
                 }
                 .padding(.top, 70)
                 
@@ -35,9 +45,13 @@ struct GardenHomeView: View {
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 57)
+            
+            popUpView
+        
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
+            viewModel.validateShovelMode(bufferData: bufferDataFromLogFull)
             viewModel.fetchLogData()
         }
     }
@@ -75,19 +89,30 @@ struct GardenHomeView: View {
     
     @ViewBuilder
     func fieldCardViewBuilder(for log: MsLog?, type: FieldState) -> some View {
-        //TODO: Gnti ke ImageStorage.loadImage(from: String) kalau inputLog udh
         let image: UIImage? = {
             if let imagePath = log?.imagePath {
-                return UIImage(named: imagePath)
+                return ImageStorage.loadImage(from: imagePath)
             } else {
                 return nil
             }
         }()
-        FieldCardView(type: type, logImage: image) {
+        
+        FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
             viewModel.navigateTo(route: .childLog(.logInput), context: navigationManager)
         } onCTAButtonTapped: {
-            print("CTA button tapped")
-            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager)
+            print("CTA button tapped") 
+            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, bufferData: bufferDataFromLogFull, logImage: image)
+        }
+    }
+    
+    @ViewBuilder
+    var popUpView: some View {
+        if let alert = viewModel.alertConfirmationType {
+            PopUpView(type: alert) {
+                withAnimation {
+                    viewModel.enableShovelModeAlert(toType: nil)
+                }
+            }
         }
     }
     
@@ -149,6 +174,32 @@ struct GardenHomeView: View {
             image: "house.fill",
             action: {
                 viewModel.navigateToHome(context: navigationManager)
+            },
+            cornerRadius: 24,
+            width: 64,
+            type: .normal
+        )
+    }
+    
+    var cancelButton: some View {
+        CustomButton(
+            backgroundColor: ColorPalette.yellow600,
+            foregroundColor: ColorPalette.yellow400,
+            textColor: ColorPalette.yellow50,
+            font: .system(size: 20, weight: .black, design: .rounded),
+            image: "xmark",
+            action: {
+                // Show confirmation popup to exit shovel mode
+                // Prefer the buffered image; if missing, fall back to a placeholder asset
+                let fallback = UIImage(named: "icecream_placeholder")
+                let imageToUse = bufferDataFromLogFull?.image ?? fallback
+                guard let imageToUse else { return }
+                let alertType: GardenShovelModality = .exit(image: imageToUse) {
+                    withAnimation { viewModel.isShovelMode = false }
+                    // Dismiss the popup after confirming
+                    viewModel.enableShovelModeAlert(toType: nil)
+                }
+                viewModel.enableShovelModeAlert(toType: alertType)
             },
             cornerRadius: 24,
             width: 64,
