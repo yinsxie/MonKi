@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ParentReviewSuccessView: View {
     
@@ -91,7 +92,7 @@ struct ParentReviewSuccessView: View {
     func simulateSend() {
         Task {
             sendState = .sending
-            try? await Task.sleep(for: .seconds(5))
+            try? await Task.sleep(for: .seconds(3))
             withAnimation(.spring()) {
                 sendState = .sent
             }
@@ -102,10 +103,13 @@ struct ParentReviewSuccessView: View {
 struct StatusTagView: View {
     let state: ParentReviewSuccessView.SendState
     
+    @State private var dots: Int = 1
+    @State private var timerCancellable: AnyCancellable?
+    
     var body: some View {
         Group {
             if state == .sending {
-                Text("Sedang mengirim air ke anak...")
+                Text("Sedang mengirim air ke anak" + String(repeating: ".", count: dots))
             } else {
                 HStack(spacing: 4) {
                     Text("Berhasil terkirim")
@@ -120,9 +124,43 @@ struct StatusTagView: View {
         .foregroundColor(ColorPalette.blue700)
         .cornerRadius(8)
         .animation(.easeInOut, value: state)
+        
+        .onAppear {
+            if state == .sending {
+                startDotAnimation()
+            }
+        }
+        
+        .onDisappear {
+            stopDotAnimation()
+        }
+        
+        .onChange(of: state) {
+            if state == .sending {
+                startDotAnimation()
+            } else {
+                stopDotAnimation()
+            }
+        }
+    }
+        
+    func startDotAnimation() {
+        stopDotAnimation()
+        
+        timerCancellable = Timer.publish(every: 0.5, on: .main, in: .common)
+            .autoconnect()
+            .sink { _ in
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    self.dots = (self.dots % 3) + 1
+                }
+            }
+    }
+    
+    func stopDotAnimation() {
+        timerCancellable?.cancel()
+        timerCancellable = nil
     }
 }
-
 #Preview {
     ParentReviewSuccessView()
 }
