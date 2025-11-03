@@ -18,23 +18,18 @@ jobs:
       - name: Run SwiftLint
         run: swiftlint
 
-  test:
+    test:
     name: Run Tests
     needs: lint
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: "15.0"
-
-      - name: Debug Environment
-        run: |
-          echo "Xcode path:"
-          xcode-select -p
-          echo "\nXcode version:"
-          xcodebuild -version
 
       - name: Run Tests
         run: |
@@ -47,4 +42,4 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
-        working-directory: MonKi
+        working-directory: .
