@@ -26,6 +26,8 @@ struct CustomButton: View {
     let type: ButtonType
     let isDisabled: Bool
     
+    @State private var isPressed: Bool = false
+    
     init(
         text: String? = nil,
         backgroundColor: Color,
@@ -83,43 +85,87 @@ struct CustomButton: View {
     }
     
     var body: some View {
-        Button(action: {
-            SoundManager.shared.play(.buttonClick)
-            action()}) {
-            HStack(spacing: 8) {
-                if let image = image {
-                    Image(systemName: image)
-                        .font(font)
-                        .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor :textColor)
-                }
-                
-                if let text = text, !text.isEmpty {
-                    Text(text)
-                        .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor : textColor)
-                        .font(font)
-                }
-                
-                if let imageRight = imageRight {
-                    Image(systemName: imageRight)
-                        .font(font)
-                        .foregroundStyle(textColor)
-                }
+        let label = HStack(spacing: 8) {
+            if let image = image {
+                Image(systemName: image)
+                    .font(font)
+                    .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor : textColor)
             }
-            .frame(maxWidth: .infinity)
             
+            if let text = text, !text.isEmpty {
+                Text(text)
+                    .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor : textColor)
+                    .font(font)
+            }
+            
+            if let imageRight = imageRight {
+                Image(systemName: imageRight)
+                    .font(font)
+                    .foregroundStyle(textColor)
+            }
         }
-        .buttonStyle(CustomButtonStyle(
-        backgroundColor: isDisabled ? ButtonColorSet.disabled.backgroundColor : backgroundColor,
-        foregroundColor: isDisabled ? ButtonColorSet.disabled.foregroundColor :foregroundColor,
-            cornerRadius: cornerRadius,
-            shape: type == .normal ? .rectangle : .borderedRectangle
+            .frame(maxWidth: .infinity)
+        
+        // Re-implemented ZStack from CustomButtonStyle
+        ZStack {
+            let currentBackgroundColor = isDisabled ? ButtonColorSet.disabled.backgroundColor : backgroundColor
+            let currentForegroundColor = isDisabled ? ButtonColorSet.disabled.foregroundColor : foregroundColor
+            let yOffset: CGFloat = 8
             
-        ))
+            buttonShape(color: currentBackgroundColor, foregroundColor: currentForegroundColor)
+            
+            buttonShape(color: currentForegroundColor, foregroundColor: currentForegroundColor)
+                .offset(y: isPressed ? 0 : -yOffset)
+            
+            label
+                .foregroundStyle(currentBackgroundColor)
+                .offset(y: -yOffset)
+                .offset(y: isPressed ? yOffset : 0)
+        }
         .frame(maxWidth: width)
         .frame(height: 60)
         .padding(.horizontal, 2.5)
         .padding(.top, 2.5)
         .disabled(isDisabled)
+        .gesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if isDisabled { return }
+                    isPressed = true
+                }
+                .onEnded { _ in
+                    if isDisabled { return }
+                    withAnimation(.default) {
+                        isPressed = false
+                    }
+                    
+                    SoundManager.shared.play(.buttonClick)
+                    action()
+                }
+        )
+    }
+    
+    @ViewBuilder
+    private func buttonShape(color: Color, foregroundColor: Color) -> some View {
+        let currentBackgroundColor = isDisabled ? ButtonColorSet.disabled.backgroundColor : self.backgroundColor
+        
+        switch self.type {
+        case .normal:
+            RoundedRectangle(cornerRadius: self.cornerRadius)
+                .fill(color)
+        case .bordered:
+            RoundedRectangle(cornerRadius: self.cornerRadius)
+                .fill(color)
+                .overlay(
+                    RoundedRectangle(cornerRadius: self.cornerRadius)
+                        .stroke(currentBackgroundColor, lineWidth: 2.5)
+                )
+                .background(
+                    RoundedRectangle(cornerRadius: self.cornerRadius + 2.5)
+                        .fill(foregroundColor)
+                )
+                .padding(.horizontal, 2.5)
+        }
     }
 }
 
