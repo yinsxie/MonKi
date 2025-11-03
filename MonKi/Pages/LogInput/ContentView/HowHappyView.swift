@@ -12,7 +12,7 @@ struct HowHappyView: View {
     @ObservedObject var viewModel: ChildLogViewModel
     
     var body: some View {
-        VStack(alignment: .center, spacing: 0){
+        VStack(alignment: .center, spacing: 0) {
             // MARK: - Bagian Atas: Teks
             Text("Perasaanmu tentang barang itu gimana?")
                 .font(Font.title2Emphasized)
@@ -25,7 +25,7 @@ struct HowHappyView: View {
             Image("MonkiInputPlaceholder")
                 .resizable()
                 .scaledToFit()
-                .frame(height: 200, alignment: .top)
+                .frame(height: 180, alignment: .top)
                 .padding(.bottom, 40)
             
             // MARK: - Pilihan Emote
@@ -49,13 +49,14 @@ struct HowHappyView: View {
             .frame(height: 160, alignment: .top)
             .frame(maxWidth: .infinity)
             .animation(.easeInOut, value: selectedMode)
+            .padding(.horizontal)
             
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
-        .padding(.horizontal, 24)
+//        .padding(.horizontal, 24)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 AudioManager.shared.play("HowHappy")
