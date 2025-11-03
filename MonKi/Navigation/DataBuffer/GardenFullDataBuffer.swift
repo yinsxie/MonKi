@@ -12,5 +12,6 @@ struct GardenFullDataBuffer: Hashable {
     var isHappy: Bool
     var isBeneficial: Bool
     var tags: [String]
+    var happyLevel: Int?
 }
     

@@ -128,7 +128,7 @@ private extension GardenViewModel {
     func onShovelFieldTapped(_ log: MsLog, buffer: GardenFullDataBuffer? = nil, logImage: UIImage? = nil) {
         if let buffer = buffer, let logImage = logImage {
             let commitType = GardenShovelModality.commit(image: logImage) {
-                self.logRepo.logReplaced(replacedLog: log, newImage: buffer.image, isHappy: buffer.isHappy, isBeneficial: buffer.isHappy, tags: buffer.tags)
+                self.logRepo.logReplaced(replacedLog: log, newImage: buffer.image, isHappy: buffer.isHappy,happyLevel: buffer.happyLevel ,isBeneficial: buffer.isHappy, tags: buffer.tags)
                 
                 self.enableShovelModeAlert(toType: nil)
                 DispatchQueue.main.async {

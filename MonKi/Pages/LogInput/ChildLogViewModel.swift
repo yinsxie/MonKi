@@ -345,6 +345,7 @@ final class ChildLogViewModel: ObservableObject {
         logRepo.createLogWithImage(
             bufferedLogData.image,
             isHappy: bufferedLogData.isHappy,
+            happyLevel: bufferedLogData.happyLevel,
             isBeneficial: bufferedLogData.isBeneficial,
             tags: bufferedLogData.tags
         )
