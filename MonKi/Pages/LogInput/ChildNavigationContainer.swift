@@ -14,7 +14,6 @@ struct ChildLogNavigationContainer: View {
     @StateObject private var viewModel: ChildLogViewModel
 
     init() {
-        let repository = LogRepository()
         _viewModel = StateObject(wrappedValue: ChildLogViewModel())
     }
 

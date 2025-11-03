@@ -83,10 +83,10 @@ custom_rules:
     severity: warning
     # Warns if a class declaration is missing explicit access control modifier
   
-  trailing_comma_in_arguments:
-    name: "Trailing Comma in Function/View Arguments"
-    regex: ',[ \t]*\n[ \t]*\)'
-    message: "Remove trailing comma before closing parenthesis."
+  trailing_comma:
+    name: "Trailing Comma"
+    regex: ',[ \t\r\n]*(?=\)|\])'
+    message: "Remove trailing comma."
     severity: error
-    included: # optional, but helps focus detection
+    included:
       - ".*\\.swift"

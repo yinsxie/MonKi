@@ -10,9 +10,9 @@ import UIKit
 
 protocol LogRepositoryProtocol {
     
-    func createLogWithImage(_ uiImage: UIImage, isHappy: Bool, happyLevel: Int? ,isBeneficial: Bool, tags: [String])
+    func createLogWithImage(_ uiImage: UIImage, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String])
     func fetchLogs() -> [MsLog]
-    func childRelogged(withId id: UUID, isHappy: Bool, happyLevel: Int? , isBeneficial: Bool, tags: [String])
+    func childRelogged(withId id: UUID, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String])
     
     func logApprovedByParent(withId id: UUID)
     func logRejectedByParent(withId id: UUID)
@@ -29,7 +29,7 @@ final class LogRepository: LogRepositoryProtocol {
         self.context = context
     }
     
-    func createLogWithImage(_ uiImage: UIImage, isHappy: Bool,happyLevel: Int? , isBeneficial: Bool, tags: [String]) {
+    func createLogWithImage(_ uiImage: UIImage, isHappy: Bool,happyLevel: Int?, isBeneficial: Bool, tags: [String]) {
         
         guard let imagePath = ImageStorage.saveImage(uiImage) else {
             print("Failed to save image")
@@ -49,7 +49,7 @@ final class LogRepository: LogRepositoryProtocol {
         }
     }
     
-    func childRelogged(withId id: UUID, isHappy: Bool, happyLevel: Int? , isBeneficial: Bool, tags: [String]) {
+    func childRelogged(withId id: UUID, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String]) {
         guard let log = fetchLogById(id: id) else {
             return
         }
@@ -85,7 +85,7 @@ final class LogRepository: LogRepositoryProtocol {
     
     func logReplaced(replacedLog log: MsLog, newImage: UIImage, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String]) {
         deleteLog(log: log)
-        createLogWithImage(newImage, isHappy: isHappy,happyLevel: happyLevel ,isBeneficial: isBeneficial, tags: tags)
+        createLogWithImage(newImage, isHappy: isHappy, happyLevel: happyLevel, isBeneficial: isBeneficial, tags: tags)
     }
 }
 
