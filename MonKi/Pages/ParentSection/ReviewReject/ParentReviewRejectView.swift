@@ -73,7 +73,7 @@ struct ParentReviewRejectView: View {
                 colorSet: .primary,
                 font: .calloutEmphasized,
                 action: {
-                    navigationManager.goTo(.reLog(log: log))
+                    navigationManager.replaceTop(with: .reLog(log: log))
                 },
                 cornerRadius: 24,
                 width: 120,

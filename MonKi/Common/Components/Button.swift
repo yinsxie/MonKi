@@ -115,8 +115,8 @@ struct CustomButton: View {
             shape: type == .normal ? .rectangle : .borderedRectangle
             
         ))
-        .frame(width: width, height: 60)
-        .contentShape(Rectangle()) // TODO: nanya aret fungsinya, line dari aret
+        .frame(maxWidth: width)
+        .frame(height: 60)
         .padding(.horizontal, 2.5)
         .padding(.top, 2.5)
         .disabled(isDisabled)

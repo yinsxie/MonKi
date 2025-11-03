@@ -26,7 +26,7 @@ struct SelectModePage: View {
                     text: "Draw",
                     image: "MonkiDraw",
                     isSelected: selectedMode == "Draw",
-                    width: .infinity
+//                    width: .infinity
                 ) {
                     selectedMode = "Draw"
                     AudioManager.shared.stop() // stop narasi sebelumnya
@@ -37,7 +37,7 @@ struct SelectModePage: View {
                     text: "Gallery",
                     image: "MonkiPhoto",
                     isSelected: selectedMode == "Gallery",
-                    width: .infinity
+//                    width: .infinity
                 ) {
                     selectedMode = "Gallery"
                     AudioManager.shared.stop()

@@ -39,10 +39,11 @@ struct ReLogNavigationContainer: View {
                     print("ReLog finished, closing.")
                     // defaultCloseAction() is the built-in function to close the view
 //                    defaultCloseAction()
-                    navigationManager.popToRoot()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
-                    }
+                    navigationManager.popLast()
+//                    navigationManager.popToRoot()
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+//                        navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
+//                    }
                     // You might also need to pop from your custom navigationManager
                     // if defaultCloseAction() doesn't do it.
                     // navigationManager.popLast()
