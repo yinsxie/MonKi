@@ -18,7 +18,7 @@ jobs:
       - name: Run SwiftLint
         run: swiftlint
 
-    test:
+  test:
     name: Run Tests
     needs: lint
     runs-on: macos-14
