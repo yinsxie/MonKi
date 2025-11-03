@@ -12,7 +12,7 @@ struct ChildInputCard: View {
     let image: String
     let isSelected: Bool
     let cornerRadius: CGFloat
-    let width: CGFloat
+    let padding: CGFloat
     let action: () -> Void
     
     init(
@@ -20,14 +20,14 @@ struct ChildInputCard: View {
         image: String,
         isSelected: Bool,
         cornerRadius: CGFloat = 20,
-        width: CGFloat = 160,
+        padding: CGFloat = 16,
         action: @escaping () -> Void
     ) {
         self.text = text
         self.image = image
         self.isSelected = isSelected
         self.cornerRadius = cornerRadius
-        self.width = width
+        self.padding = padding
         self.action = action
     }
     
@@ -53,7 +53,7 @@ struct ChildInputCard: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(16)
+            .padding(padding)
         }
         .buttonStyle(CustomButtonStyle(
             backgroundColor: colorSet.backgroundColor,
@@ -61,10 +61,6 @@ struct ChildInputCard: View {
             cornerRadius: cornerRadius,
             shape: type
         ))
-        .frame(
-            width: width,
-            height: UIScreen.main.bounds.height * 0.3
-        )
-        .frame(maxWidth: width == .infinity ? .infinity : nil)
+        .frame(maxWidth: .infinity, maxHeight: UIScreen.main.bounds.height * 0.3)
     }
 }

@@ -33,7 +33,7 @@ struct HowHappyView: View {
                 ChildInputCard(
                     image: "EmoteLove",
                     isSelected: selectedMode == "Happy",
-                    width: .infinity
+                    padding: 40
                 ) {
                     selectedMode = "Happy"
                 }
@@ -41,7 +41,7 @@ struct HowHappyView: View {
                 ChildInputCard(
                     image: "EmoteBiasa",
                     isSelected: selectedMode == "Biasa",
-                    width: .infinity
+                    padding: 40
                 ) {
                     selectedMode = "Biasa"
                 }
