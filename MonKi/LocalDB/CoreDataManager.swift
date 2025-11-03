@@ -53,7 +53,10 @@ final class CoreDataManager: ObservableObject {
         print("Seeding initial data...")
         
         // Initial Image, same across all logs
-        let imagePath = ImageStorage.saveImage(UIImage(named: "icecream_placeholder")!)
+        guard let img = UIImage(named: "icecream_placeholder") else {
+            return
+        }
+        let imagePath = ImageStorage.saveImage(img)
 
         // Log 1: Needs Review (state = "created")
         let log1 = MsLog(context: context)

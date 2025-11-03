@@ -8,6 +8,7 @@ opt_in_rules:
   - force_unwrapping          # Warn/error on usage of force unwrap (!) to avoid runtime crashes
   - force_cast                # Warn/error on force casting (as!) to prevent potential crashes
   - force_try                 # Warn/error on force try (try!) to encourage safe error handling
+  - trailing_comma
 
 excluded:
   - Carthage                  # Ignore files in Carthage directory (3rd party dependencies)
@@ -54,7 +55,7 @@ function_body_length:
   warning: 50                 # Warn if function body is longer than 50 lines
   error: 100                  # Error if function body exceeds 100 lines (split function)
 
-force_unwrapping::
+force_unwrapping:
   severity: error             # Treat force unwrap (!) usage as an error
 
 force_cast:
@@ -62,6 +63,10 @@ force_cast:
 
 force_try:
   severity: error             # Treat force try (try!) usage as an error
+
+trailing_comma:
+  mandatory_comma: false   # disallow trailing commas
+  severity: error
 
 custom_rules:
   if_statement_string_comparison:
@@ -77,4 +82,11 @@ custom_rules:
     message: "Class is complex, better explicitly declare access control (e.g., public, private, internal)."
     severity: warning
     # Warns if a class declaration is missing explicit access control modifier
-
+  
+  trailing_comma_in_arguments:
+    name: "Trailing Comma in Function/View Arguments"
+    regex: ',[ \t]*\n[ \t]*\)'
+    message: "Remove trailing comma before closing parenthesis."
+    severity: error
+    included: # optional, but helps focus detection
+      - ".*\\.swift"

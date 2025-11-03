@@ -66,10 +66,12 @@ final class BackgroundRemoverViewModel: ObservableObject {
         await MainActor.run { isProcessing = true }
         
         do {
-            let result = try await processor.process(originalImage!)
-            await MainActor.run {
-                self.resultImage = result
-                self.isProcessing = false
+            if let originalImage = originalImage {
+                let result = try await processor.process(originalImage)
+                await MainActor.run {
+                    self.resultImage = result
+                    self.isProcessing = false
+                }
             }
         } catch {
             await showError("processing_error: \(error.localizedDescription)")
