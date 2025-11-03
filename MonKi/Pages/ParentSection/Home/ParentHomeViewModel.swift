@@ -47,32 +47,34 @@ final class ParentHomeViewModel: ObservableObject {
     }
     
     func approveLog(log: MsLog) {
-            guard let logId = log.id else {
-                print("Error: Log ID is nil. Cannot approve.")
-                return
-            }
-            print("Approving log: \(logId)")
-            logRepository.logApprovedByParent(withId: logId)
-            
-            // Remove the log from the published array to update the UI
-            DispatchQueue.main.async {
-                self.logsForParent.removeAll { $0.id == logId }
-            }
+        guard let logId = log.id else {
+            print("Error: Log ID is nil. Cannot approve.")
+            return
         }
+        print("Approving log: \(logId)")
+        logRepository.logApprovedByParent(withId: logId)
         
-        func rejectLog(log: MsLog) {
-            guard let logId = log.id else {
-                print("Error: Log ID is nil. Cannot reject.")
-                return
-            }
-            print("Rejecting log: \(logId)")
-            setBufferLog(log: log)
-            logRepository.logRejectedByParent(withId: logId)
-            
-            DispatchQueue.main.async {
+        // Remove the log from the published array to update the UI
+        DispatchQueue.main.async {
+            withAnimation {
                 self.logsForParent.removeAll { $0.id == logId }
             }
         }
+    }
+    
+    func rejectLog(log: MsLog) {
+        guard let logId = log.id else {
+            print("Error: Log ID is nil. Cannot reject.")
+            return
+        }
+        print("Rejecting log: \(logId)")
+        setBufferLog(log: log)
+        logRepository.logRejectedByParent(withId: logId)
+        
+        DispatchQueue.main.async {
+            self.logsForParent.removeAll { $0.id == logId }
+        }
+    }
     
     func navigateToReflectionStory(context: NavigationManager, forLog log: MsLog?) {
         if let log = log {

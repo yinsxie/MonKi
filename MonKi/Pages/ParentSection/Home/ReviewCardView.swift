@@ -13,7 +13,6 @@ struct ReviewCardView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     
     var onReject: () -> Void = {}
-    var onApprove: () -> Void = {}
     
     private func parse(tagsString: String?) -> [String] {
         guard let tagsString = tagsString, !tagsString.isEmpty else {
@@ -40,7 +39,7 @@ struct ReviewCardView: View {
             VStack(spacing: 0) {
                 ZStack(alignment: .bottomTrailing) {
                     HStack {
-
+                        
                         if let imagePath = log.imagePath, let uiImage = ImageStorage.loadImage(from: imagePath) {
                             Image(uiImage: uiImage)
                                 .resizable()
@@ -48,7 +47,7 @@ struct ReviewCardView: View {
                                 .frame(width: 100, height: 100)
                                 .offset(y: 3)
                         }
-                                                
+                        
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Anak bilang,\nini berguna untuk...")
                                 .font(.subheadlineEmphasized)
@@ -100,8 +99,10 @@ struct ReviewCardView: View {
                         colorSet: .primary,
                         font: .headlineEmphasized,
                         action: {
-                            onApprove()
-                            navigationManager.goTo(.parentHome(.reviewSuccess))
+                            navigationManager.goTo(
+                                .parentHome(.reviewSuccess(log: log)
+                                )
+                            )
                         },
                         cornerRadius: 24,
                         type: .normal

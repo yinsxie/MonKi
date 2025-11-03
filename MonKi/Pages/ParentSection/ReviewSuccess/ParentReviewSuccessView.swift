@@ -11,6 +11,9 @@ import Combine
 struct ParentReviewSuccessView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var viewModel: ParentHomeViewModel
+    
+    let logToApprove: MsLog
     
     enum SendState {
         case sending
@@ -18,6 +21,7 @@ struct ParentReviewSuccessView: View {
     }
     
     @State private var sendState: SendState = .sending
+    @State private var approvalTask: Task<Void, Error>?
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -65,7 +69,20 @@ struct ParentReviewSuccessView: View {
                 
                 Spacer()
                 
-                if sendState == .sent {
+                if sendState == .sending {
+                    CustomButton(
+                        text: "Batalin Aksi Terima",
+                        colorSet: .destructive,
+                        font: .calloutEmphasized,
+                        action: {
+                            cancelApproval()
+                        },
+                        cornerRadius: 24,
+                        width: 180,
+                        type: .normal
+                    )
+                    .transition(.opacity.animation(.spring(response: 0.4, dampingFraction: 0.8)))
+                } else if sendState == .sent {
                     CustomButton(
                         text: "Kembali ke Beranda",
                         colorSet: .normal,
@@ -77,7 +94,7 @@ struct ParentReviewSuccessView: View {
                         width: 180,
                         type: .normal
                     )
-                    .transition(.opacity.animation(.easeIn))
+                    .transition(.opacity.animation(.spring(response: 0.4, dampingFraction: 0.8)))
                 }
             }
             .padding(.top, 100)
@@ -85,18 +102,37 @@ struct ParentReviewSuccessView: View {
         }
         .ignoresSafeArea(edges: .bottom)
         .onAppear {
-            simulateSend()
+            startApprovalProcess()
+        }
+        .onDisappear {
+            approvalTask?.cancel()
         }
     }
     
-    func simulateSend() {
-        Task {
+    func startApprovalProcess() {
+        approvalTask = Task {
             sendState = .sending
-            try? await Task.sleep(for: .seconds(3))
-            withAnimation(.spring()) {
-                sendState = .sent
+            do {
+                try await Task.sleep(for: .seconds(3))
+                
+                viewModel.approveLog(log: logToApprove)
+                
+                withAnimation(.spring()) {
+                    sendState = .sent
+                }
+                
+            } catch is CancellationError {
+                print("Approval cancelled by user.")
+            } catch {
+                print("An error occurred: \(error.localizedDescription)")
+                navigationManager.popLast()
             }
         }
+    }
+    
+    func cancelApproval() {
+        approvalTask?.cancel()
+        navigationManager.popLast()
     }
 }
 
@@ -143,7 +179,7 @@ struct StatusTagView: View {
             }
         }
     }
-        
+    
     func startDotAnimation() {
         stopDotAnimation()
         
@@ -160,7 +196,4 @@ struct StatusTagView: View {
         timerCancellable?.cancel()
         timerCancellable = nil
     }
-}
-#Preview {
-    ParentReviewSuccessView()
 }
