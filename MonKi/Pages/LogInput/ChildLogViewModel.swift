@@ -204,7 +204,8 @@ final class ChildLogViewModel: ObservableObject {
             
             bufferedLogData = constructBufferedLogData()
             if !isGardenFull {
-                saveLog()
+                
+//                saveLog()
                 defaultAction()
             } else {
                 isShowGardenFullAlert = true
