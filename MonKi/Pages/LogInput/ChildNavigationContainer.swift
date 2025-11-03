@@ -38,7 +38,7 @@ struct ChildLogNavigationContainer: View {
                 content: {
                     ChildLogRouter(viewModel: viewModel)
                         .environmentObject(viewModel.canvasViewModel)
-                },
+                }
             )
             // MARK: - Photo Picker Setup
             .photosPicker(
