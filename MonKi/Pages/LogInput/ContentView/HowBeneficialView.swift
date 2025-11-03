@@ -40,5 +40,6 @@ struct HowBeneficialView: View {
         .onDisappear {
             AudioManager.shared.stop()
         }
+        .clipped()
     }
 }
