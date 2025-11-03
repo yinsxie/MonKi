@@ -29,7 +29,7 @@ struct ChildLogNavigationContainer: View {
                     navigationManager.popLast()
                 },
                 customNextAction: { defaultCloseAction in
-                    viewModel.handleNextAction(defaultAction: defaultCloseAction)
+                    viewModel.handleNextAction(context: navigationManager, defaultAction: defaultCloseAction)
                 },
                 customBackAction: {
                     viewModel.handleBackAction()
