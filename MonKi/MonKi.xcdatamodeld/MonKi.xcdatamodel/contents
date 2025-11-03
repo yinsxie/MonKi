@@ -3,6 +3,7 @@
     <entity name="MsLog" representedClassName="MsLog" syncable="YES" codeGenerationType="class">
         <attribute name="beneficialTags" optional="YES" attributeType="String"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="happyLevel" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="imagePath" optional="YES" attributeType="String"/>
         <attribute name="isBeneficial" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>

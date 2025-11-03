@@ -130,6 +130,8 @@ final class ReLogViewModel: ObservableObject {
         logRepository.childRelogged(
             withId: logId,
             isHappy: happy,
+            // MARK: CHANGE THIS
+            happyLevel: 0,
             isBeneficial: beneficial,
             tags: selectedLabels
         )
