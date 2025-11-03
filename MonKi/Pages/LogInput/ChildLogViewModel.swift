@@ -197,7 +197,7 @@ final class ChildLogViewModel: ObservableObject {
     }
     
     // MARK: - Navigation Logic
-    func handleNextAction(defaultAction: @escaping () -> Void) {
+    func handleNextAction(context: NavigationManager, defaultAction: @escaping () -> Void) {
         guard currentIndex < totalPageCount - 1 else {
             
             let isGardenFull = UserDefaultsManager.shared.isFieldMaxedOut()
@@ -205,7 +205,7 @@ final class ChildLogViewModel: ObservableObject {
             bufferedLogData = constructBufferedLogData()
             if !isGardenFull {
                 saveLog()
-                defaultAction()
+                context.goTo(.childLog(.getSeed(image: bufferedLogData?.image)))
             } else {
                 isShowGardenFullAlert = true
             }

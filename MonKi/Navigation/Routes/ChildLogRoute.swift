@@ -8,6 +8,7 @@ import SwiftUI
 
 enum ChildLogRoute: Hashable {
     case logInput
+    case getSeed(image: UIImage?)
 }
 
 extension ChildLogRoute {
@@ -17,7 +18,8 @@ extension ChildLogRoute {
         switch self {
         case .logInput:
             ChildLogNavigationContainer()
-                .navigationBarBackButtonHidden(true)
+        case .getSeed(let logImage):
+            GetSeedView(logImage: logImage)
         }
     }
 }
