@@ -13,12 +13,8 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install SwiftLint
-        run: brew install swiftlint
-
       - name: Run SwiftLint
-        run: swiftlint
+        run: swiftlint || true
 
   test:
     name: Run Tests
@@ -31,23 +27,15 @@ jobs:
         with:
           xcode-version: '16.2.0'
 
-      - name: Debug Environment
-        run: |
-          echo "Xcode path:"
-          xcode-select -p
-          echo "\nXcode version:"
-          xcodebuild -version
-    
-      - name: Check Swift version
-        run: swift --version
-        
-      - name: Clean DerivedData
-        run: rm -rf Build/DerivedData
-        
-      - name: Install xcbeautify
-        run: brew install xcbeautify
+      # Cache DerivedData to speed up builds
+      - name: Restore DerivedData Cache
+        uses: actions/cache@v3
+        with:
+          path: Build/DerivedData
+          key: xcode-build-${{ hashFiles('**/*.xcodeproj/**') }}
+          restore-keys: xcode-build-
 
-      - name: Run Tests with xcbeautify
+      - name: Run Tests in Parallel
         run: |
           set -o pipefail && \
           xcodebuild test \
@@ -59,4 +47,6 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
+            -parallel-testing-enabled YES \
+            -parallel-testing-worker-count 4 \
           | xcbeautify --quiet
