@@ -17,13 +17,22 @@ private struct DisplayTagItem: Identifiable, Hashable {
 struct TagSelectionPageView: View {
     
     let tagTexts: [String]
-    @State private var displayedTags = [DisplayTagItem]()
+    @State private var displayedTags: [DisplayTagItem]
     @Binding var selectedTags: Set<BeneficialTag>
     private let maxSelection = 2
     
     init(tagTexts: [String], selectedTags: Binding<Set<BeneficialTag>>) {
         self.tagTexts = tagTexts
         self._selectedTags = selectedTags
+        
+        var initialTags: [DisplayTagItem] = []
+        let allShapes = BeneficialTag.allCases
+        
+        for (text, tag) in zip(tagTexts, allShapes) {
+            initialTags.append(DisplayTagItem(text: text, tag: tag))
+        }
+                
+        self._displayedTags = State(initialValue: initialTags)
     }
     
     var body: some View {
@@ -36,15 +45,15 @@ struct TagSelectionPageView: View {
             conditionallyCreateTagView(for: .triangle, offset: .init(width: 25, height: 210))
         }
         .frame(height: 400)
-        .onAppear {
-            setupDisplayedTags()
-        }
-        .onChange(of: tagTexts) { _, _ in
-             setupDisplayedTags()
+//        .onAppear {
+//            setupDisplayedTags()
+//        }
+        .onChange(of: tagTexts) { _, newTexts in
+            setupDisplayedTags(from: newTexts)
         }
     }
     
-    private func setupDisplayedTags() {
+    private func setupDisplayedTags(from texts: [String]) {
         displayedTags = []
         let allShapes = BeneficialTag.allCases
         
@@ -84,7 +93,7 @@ struct TagSelectionPageView: View {
         } else if selectedTags.count < maxSelection {
             SoundManager.shared.play(.tagClick)
             selectedTags.insert(tag)
-        } else{
+        } else {
             SoundManager.shared.play(.popUredo)
         }
     }
