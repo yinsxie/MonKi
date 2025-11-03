@@ -7,11 +7,9 @@
 
 import SwiftUI
 
-typealias ReviewAction = (MsLog) -> Void
-
 enum ParentRoute: Hashable {
     case home
-    case reviewSuccess
+    case reviewSuccess(log: MsLog)
     case reflectionGuideStory(log: MsLog)
     case reviewReject(log: MsLog)
 }
@@ -25,8 +23,8 @@ extension ParentRoute {
         case .home:
             ParentHomeView()
                 .navigationBarBackButtonHidden(true)
-        case .reviewSuccess:
-            ParentReviewSuccessView()
+        case .reviewSuccess(let log):
+            ParentReviewSuccessView(logToApprove: log)
                 .navigationBarBackButtonHidden(true)
         case .reflectionGuideStory(let log):
             ReflectionGuideStoryView(log: log)
