@@ -188,7 +188,7 @@ struct ParentReviewDetailView: View {
                         font: .calloutEmphasized,
                         action: {
                             viewModel.approveLog()
-                            navigationManager.replaceTop(with: .parentHome(.reviewSuccess))
+                            navigationManager.replaceTop(with: .parentHome(.reviewSuccess(log: log)))
                         },
                         cornerRadius: 24,
                         width: 135,

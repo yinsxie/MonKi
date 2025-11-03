@@ -53,6 +53,4 @@ enum GardenShovelModality: PopUpModalityProtocol {
     var onSecondaryButtonTap: (() -> Void)? {
         return nil
     }
-    
-    
 }
