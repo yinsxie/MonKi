@@ -5,17 +5,23 @@
 //  Created by William on 30/10/25.
 //
 
+import UIKit
+
 enum ParentSectionModalType: PopUpModalityProtocol {
     case onRejectButtonTapped(onPrimaryTap: () -> Void = {}, onSecondaryTap: () -> Void = {})
     case onStoryViewCancelButtonTapped(onPrimaryTap: () -> Void = {}, onSecondaryTap: () -> Void = {})
     
-    var imageIcon: ImageModalityIcon {
+    var imageIcon: ImageModalityIcon? {
         switch self {
         case .onRejectButtonTapped, .onStoryViewCancelButtonTapped:
             return .monkiThinking
         }
     }
 
+    var imageDirect: UIImage? {
+        return nil
+    }
+    
     var title: String {
         switch self {
         case .onRejectButtonTapped:

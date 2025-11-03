@@ -33,7 +33,7 @@ struct ReflectionGuideStoryView: View {
                     .id(viewModel.currentPageIndex)
             }
             
-            if let imagePath = log.imagePath, let uiImage = UIImage(named: imagePath) {
+            if let imagePath = log.imagePath, let uiImage = ImageStorage.loadImage(from: imagePath) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
@@ -125,7 +125,7 @@ struct ReflectionGuideStoryView: View {
             imageRight: "arrow.right",
             action: {
                 viewModel.rejectLog()
-                navigationManager.pop(times: 2)
+                navigationManager.replaceTop(with:.parentHome(.reviewReject(log: log)))
             },
             cornerRadius: 24,
             width: 189,
@@ -179,9 +179,8 @@ struct ReflectionGuideStoryView: View {
                     withAnimation {
                         viewModel.setShowModalityOnStoryViewCancelButtonTapped(to: false)
                         viewModel.rejectLog()
-                        //Kata aret: ke home
-                        navigationManager.popToRoot()
                     }
+                    navigationManager.replaceTop(with:.parentHome(.reviewReject(log: log)))
                 }
             )
         ){

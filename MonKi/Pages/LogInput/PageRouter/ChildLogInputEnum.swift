@@ -14,7 +14,7 @@ enum ChildLogPageEnum: Int, CaseIterable {
 }
 
 enum ChildLogTagEnum: Int, CaseIterable {
-    case howHappy = 3
-    case happyIllust = 4
-    case howBeneficial = 5
+    case howHappy
+//    case happyIllust
+    case howBeneficial
 }

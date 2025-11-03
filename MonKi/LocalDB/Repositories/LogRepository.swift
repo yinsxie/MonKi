@@ -18,6 +18,7 @@ protocol LogRepositoryProtocol {
     func logRejectedByParent(withId id: UUID)
     func logDone(withId id: UUID)
     func logArchieved(withId id: UUID)
+    func logReplaced(replacedLog log: MsLog, newImage: UIImage, isHappy: Bool, isBeneficial: Bool, tags: [String])
 }
 
 final class LogRepository: LogRepositoryProtocol {
@@ -60,6 +61,7 @@ final class LogRepository: LogRepositoryProtocol {
         
         do {
             try context.save()
+            updateLogState(withId: id, newState: .created)
         } catch {
             print("Failed to update log state: \(error.localizedDescription)")
         }
@@ -70,7 +72,7 @@ final class LogRepository: LogRepositoryProtocol {
     }
     
     func logRejectedByParent(withId id: UUID) {
-        updateLogState(withId: id, newState: .rejected)
+        updateLogState(withId: id, newState: .declined)
     }
     
     func logDone(withId id: UUID) {
@@ -79,6 +81,11 @@ final class LogRepository: LogRepositoryProtocol {
     
     func logArchieved(withId id: UUID) {
         updateLogState(withId: id, newState: .archived)
+    }
+    
+    func logReplaced(replacedLog log: MsLog, newImage: UIImage, isHappy: Bool, isBeneficial: Bool, tags: [String]) {
+        deleteLog(log: log)
+        createLogWithImage(newImage, isHappy: isHappy, isBeneficial: isBeneficial, tags: tags)
     }
 }
 
@@ -132,4 +139,15 @@ private extension LogRepository {
         }
         
     }
+    
+    func deleteLog(log: MsLog) {
+        context.delete(log)
+        
+        do {
+            try context.save()
+        } catch {
+            print("Failed to delete log: \(error.localizedDescription)")
+        }
+    }
+
 }

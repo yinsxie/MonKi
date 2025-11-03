@@ -37,8 +37,8 @@ struct ChildLogRouter: View {
                 switch tagPage {
                 case .howHappy:
                     HowHappyView(selectedMode: $viewModel.tagSelectedMode, viewModel: viewModel)
-                case .happyIllust:
-                    FinalImagePage(processedImage: nil)
+//                case .happyIllust:
+//                    FinalImagePage(processedImage: nil)
                 case .howBeneficial:
                     HowBeneficialView(viewModel: viewModel)
                 }

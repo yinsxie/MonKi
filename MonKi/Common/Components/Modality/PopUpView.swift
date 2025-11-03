@@ -42,7 +42,7 @@ struct PopUpView: View {
                     colorSet: .primary,
                     action: type.onPrimaryButtonTap ?? {},
                     cornerRadius: 24,
-                    type: .normal,
+                    type: .normal
                 )
             }
             
@@ -52,7 +52,7 @@ struct PopUpView: View {
                     colorSet: .cancel,
                     action: type.onSecondaryButtonTap ?? {},
                     cornerRadius: 24,
-                    type: .normal,
+                    type: .normal
                 )
             }
         }
@@ -60,11 +60,17 @@ struct PopUpView: View {
     
     var popUpHeader: some View {
         VStack(spacing: 10) {
-            Image(type.imageIcon.imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 186)
-            
+            if let imageIcon = type.imageIcon?.imageName {
+                Image(imageIcon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 186)
+            } else if let imageDirect = type.imageDirect {
+                Image(uiImage: imageDirect)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 186)
+            }
             Text(type.title)
                 .font(.title3Emphasized)
                 .multilineTextAlignment(.center)

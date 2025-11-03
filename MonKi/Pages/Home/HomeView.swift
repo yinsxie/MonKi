@@ -25,8 +25,7 @@ struct HomeView: View {
                 }
                 
                 Button {
-
-                    navigationManager.goTo(.childGarden(.home))
+                    navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
                 } label: {
                     Text("Nav to children garden")
                 }
@@ -36,6 +35,12 @@ struct HomeView: View {
                     )
                 } label: {
                     Text("Nav to parent home")
+                }
+                
+                Button {
+                    navigationManager.goTo(.parentValue)
+                } label: {
+                    Text("Parent values")
                 }
                 
             }
@@ -52,6 +57,11 @@ struct HomeView: View {
                 case .parentHome(let parentRoute):
                     parentRoute.delegateView()
                         .navigationBarBackButtonHidden(true)
+                case .reLog(let log):
+                    ReLogNavigationContainer(logToEdit: log)
+                        .navigationBarBackButtonHidden(true)
+                case .parentValue:
+                    ParentValueTagView()
                 }
             }
         }
