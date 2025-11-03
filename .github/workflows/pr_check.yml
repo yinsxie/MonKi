@@ -13,8 +13,10 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
+
       - name: Install SwiftLint
         run: brew install swiftlint
+
       - name: Run SwiftLint
         run: swiftlint
 
@@ -31,10 +33,21 @@ jobs:
         with:
           xcode-version: "15.0"
 
+      - name: Debug Directory Structure
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Contents:"
+          ls -R .
+
       - name: Run Tests
         run: |
+          # Automatically find your .xcodeproj file
+          PROJECT_PATH=$(find . -name "*.xcodeproj" | head -n 1)
+          echo "Found project at: $PROJECT_PATH"
+
           xcodebuild test \
-            -project MonKi.xcodeproj \
+            -project "$PROJECT_PATH" \
             -scheme MonKi \
             -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.0' \
             -derivedDataPath Build/DerivedData \
@@ -42,4 +55,3 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
-        working-directory: .
