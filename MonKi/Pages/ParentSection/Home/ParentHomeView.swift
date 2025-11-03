@@ -142,8 +142,7 @@ struct ParentHomeView: View {
                                                     viewModel.setBufferLog(log: log)
                                                     viewModel.toggleModalityOnRejection(to: true)
                                                 }
-                                            },
-                                            onApprove: {
+                                            }, onApprove: {
                                                 withAnimation {
                                                     viewModel.approveLog(log: log)
                                                 }
