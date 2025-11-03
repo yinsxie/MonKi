@@ -25,8 +25,7 @@ struct SelectModePage: View {
                 ChildInputCard(
                     text: "Draw",
                     image: "MonkiDraw",
-                    isSelected: selectedMode == "Draw",
-//                    width: .infinity
+                    isSelected: selectedMode == "Draw"
                 ) {
                     selectedMode = "Draw"
                     AudioManager.shared.stop() // stop narasi sebelumnya
@@ -36,8 +35,7 @@ struct SelectModePage: View {
                 ChildInputCard(
                     text: "Gallery",
                     image: "MonkiPhoto",
-                    isSelected: selectedMode == "Gallery",
-//                    width: .infinity
+                    isSelected: selectedMode == "Gallery"
                 ) {
                     selectedMode = "Gallery"
                     AudioManager.shared.stop()
