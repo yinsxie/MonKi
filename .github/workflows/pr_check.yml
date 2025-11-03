@@ -41,7 +41,7 @@ jobs:
           xcodebuild test \
             -project MonKi.xcodeproj \
             -scheme MonKi \
-            -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.0' \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.0.1' \
             -derivedDataPath Build/DerivedData \
             ONLY_ACTIVE_ARCH=YES \
             CODE_SIGN_IDENTITY="" \
