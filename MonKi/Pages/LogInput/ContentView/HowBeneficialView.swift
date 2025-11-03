@@ -14,10 +14,10 @@ struct HowBeneficialView: View {
         VStack {
             
             // MARK: - Bagian Atas: Teks
-            Text("Perasaanmu tentang barang itu gimana?")
+            Text("Menurut kamu, itu berguna buat apa?")
                 .font(Font.title2Emphasized)
                 .multilineTextAlignment(.center)
-//                .padding(.bottom, 40)
+                .padding(.horizontal, 40)
             
             // MARK: - Bagian Tengah: Card
             TagSelectionPageView(

@@ -57,13 +57,9 @@ struct HowHappyView: View {
         .padding(.vertical, 140)
         .padding(.horizontal, 24)
         .onAppear {
-            AudioManager.shared.stop()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 AudioManager.shared.play("HowHappy")
             }
-        }
-        .onDisappear {
-            AudioManager.shared.stop()
         }
     }
 }

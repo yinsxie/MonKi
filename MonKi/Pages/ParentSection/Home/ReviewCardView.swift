@@ -73,12 +73,12 @@ struct ReviewCardView: View {
                     .padding(.top, 16)
                     
                     if log.isHappy == true {
-                        Image("loveEmote")
+                        Image("EmoteLove")
                             .resizable()
                             .frame(width: 72, height: 72)
                             .offset(x: 12, y: 10)
                     } else {
-                        Image("smileEmote")
+                        Image("EmoteBiasa")
                             .resizable()
                             .frame(width: 72, height: 72)
                             .offset(x: 12, y: 10)

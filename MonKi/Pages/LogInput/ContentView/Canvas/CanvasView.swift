@@ -63,6 +63,9 @@ struct CanvasView: View {
             .ignoresSafeArea()
             .padding(.vertical, 100)
         }
+        .onAppear {
+            AudioManager.shared.stop()
+        }
         .ignoresSafeArea()
     }
 }
