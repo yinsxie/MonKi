@@ -12,118 +12,119 @@ import Combine
 final class ParentValueTagViewModel: ObservableObject {
     
     // MARK: - Properties
+    @Published var allValues: [String] = []
+    @Published var selectedValues: Set<String> = []
+    @Published var isShowingAddValueSheet = false
+    @Published var customValueText: String = ""
     
-    /// The list of individual tags for the UI (e.g., "Sehat", "Pintar").
-    @Published var tags: [String] = []
-    
-    /// The text for the new tag input field.
-    @Published var newTagText: String = ""
-    
-    /// The repository for database access.
-    private let repo: ParentValueTagRepositoryProtocol
-    
-    /// A reference to the single Core Data object we are editing.
-    private var parentTagObject: ParentValueTag?
-    
-    // <<< ADDED >>>
-    /// A static list of all possible suggested tags.
-    private let allSuggestedTags: [String] = [
-        "Sehat", "Pintar"
+    private let staticValues: [String] = [
+        "Belajar", "Disiplin", "Rajin", "Mandiri", "Hemat", "Baca",
+        "Kreatif", "Hobi", "Berbagi", "Kuat", "Sehat", "Pintar",
+        "Peduli"
     ]
     
-    // <<< ADDED >>>
-    /// A computed property that shows only suggestions
-    /// that haven't been added to the `tags` list yet.
-    var availableSuggestions: [String] {
-        // Use a Set for efficient (O(1)) lookup
-        let addedTagsSet = Set(tags)
-        // Filter the main list
-        return allSuggestedTags.filter { !addedTagsSet.contains($0) }
+    let minSelection = 1
+    let maxSelection = 6
+    let maxCustomValueChars = 10
+    
+    // MARK: - Computed Properties
+    var isContinueButtonEnabled: Bool {
+        (minSelection...maxSelection).contains(selectedValues.count)
     }
     
-    // MARK: - Initialization
+    func isSelected(_ value: String) -> Bool {
+        selectedValues.contains(value)
+    }
     
+    var isAddButtonDisabled: Bool {
+        let trimmedText = customValueText.trimmingCharacters(in: .whitespaces)
+        return trimmedText.isEmpty || allValues.contains(trimmedText)
+    }
+    
+    var customValueCharacterCount: Int {
+        customValueText.count
+    }
+    
+    // MARK: - Core Data Properties
+    private let repo: ParentValueTagRepositoryProtocol
+    private var parentTagObject: ParentValueTag?
+    
+    // MARK: - Initialization
     init(repo: ParentValueTagRepositoryProtocol = ParentValueTagRepository()) {
         self.repo = repo
-        // We call loadTags() when the view appears, not in init,
-        // to ensure it reloads if the user navigates away and comes back.
     }
     
     // MARK: - Core Functions
     
-    /// Loads the tags from Core Data and populates the `tags` array.
     func loadTags() {
-        // Fetch all tag objects (we assume there's only one).
         let tagObjects = repo.fetchAllParentValueTags()
         
+        let previouslySavedTags: [String]
+        
         if let firstTagObject = tagObjects.first {
-            // Store the object so we can update it later.
             self.parentTagObject = firstTagObject
-            
-            // Get the raw string (e.g., "Sehat;Pintar") and split it.
             let rawTags = firstTagObject.valueTag ?? ""
-            self.tags = IOHelper.expandTags(rawTags).filter { !$0.isEmpty }
+            previouslySavedTags = IOHelper.expandTags(rawTags).filter { !$0.isEmpty }
             
         } else {
-            // No tags found in Core Data.
             self.parentTagObject = nil
-            self.tags = []
+            previouslySavedTags = []
         }
+        
+        // populate the selected values
+        self.selectedValues = Set(previouslySavedTags)
+    
+        // populate all values, find any custom tags that are not in the static list
+        let staticSet = Set(staticValues)
+        let customTags = previouslySavedTags.filter { !staticSet.contains($0) }
+        
+        self.allValues = staticValues + customTags
     }
     
-    /// Adds a new tag from the `newTagText` property.
-    func addNewTag() {
-        let trimmedTag = newTagText.trimmingCharacters(in: .whitespacesAndNewlines)
+    func toggleSelection(for value: String) {
+        if selectedValues.contains(value) {
+            selectedValues.remove(value)
+        } else {
+            guard selectedValues.count < maxSelection else { return }
+            selectedValues.insert(value)
+        }
         
-        // Always clear the text field
-        defer { newTagText = "" }
+        persistTags()
+    }
+    
+    func addCustomValue() {
+        let trimmedText = customValueText.trimmingCharacters(in: .whitespaces)
         
-        // Guard against empty or duplicate tags
-        guard !trimmedTag.isEmpty, !tags.contains(trimmedTag) else {
+        guard !trimmedText.isEmpty, !allValues.contains(trimmedText) else {
             return
         }
         
-        // Add to the local array and save.
-        self.tags.append(trimmedTag)
-        persistTags()
-    }
-    
-    // <<< ADDED >>>
-    /// Adds a tag from the suggestion list.
-    func addTagFromSuggestion(_ tag: String) {
-        // Guard against duplicates (shouldn't happen if `availableSuggestions`
-        // is used, but good for safety).
-        guard !tags.contains(tag) else {
-            return
+        allValues.append(trimmedText)
+        
+        if selectedValues.count < maxSelection {
+            selectedValues.insert(trimmedText)
         }
         
-        // Add to the local array and save.
-        self.tags.append(tag)
         persistTags()
+        
+        customValueText = ""
+        isShowingAddValueSheet = false
     }
     
-    /// Deletes one or more tags from the list.
-    func deleteTag(at offsets: IndexSet) {
-        self.tags.remove(atOffsets: offsets)
-        persistTags()
+    func limitCustomValueText() {
+        if customValueText.count > maxCustomValueChars {
+            customValueText = String(customValueText.prefix(maxCustomValueChars))
+        }
     }
     
     // MARK: - Private Helper
-    
-    /// Saves the current `tags` array back to Core Data.
     private func persistTags() {
-        // Join the array back into a semicolon-separated string.
-        let combinedString = IOHelper.combineTag(self.tags)
+        let combinedString = IOHelper.combineTag(Array(self.selectedValues))
         
         if let tagToUpdate = self.parentTagObject {
-            // An object already exists, so update it.
             repo.updateParentValueTag(tag: tagToUpdate, newName: combinedString)
         } else {
-            // This is the first time saving. Create a new object.
             repo.addParentValueTag(name: combinedString)
-            
-            // After adding, we must reload to get the new object
-            // so future saves become updates, not new additions.
             loadTags()
         }
     }
