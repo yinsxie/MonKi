@@ -20,6 +20,8 @@ struct CustomButton: View {
     let font: Font
     let image: String?
     let imageRight: String?
+    let imageHeight: CGFloat?
+    let imageRightHeight: CGFloat?
     let action: () -> Void
     let cornerRadius: CGFloat
     let width: CGFloat
@@ -36,6 +38,8 @@ struct CustomButton: View {
         font: Font = .headlineEmphasized,
         image: String? = nil,
         imageRight: String? = nil,
+        imageHeight: CGFloat? = nil,
+        imageRightHeight: CGFloat? = nil,
         action: @escaping () -> Void,
         cornerRadius: CGFloat = 12,
         width: CGFloat = .infinity,
@@ -49,6 +53,8 @@ struct CustomButton: View {
         self.font = font
         self.image = image
         self.imageRight = imageRight
+        self.imageHeight = imageHeight
+        self.imageRightHeight = imageRightHeight
         self.action = action
         self.cornerRadius = cornerRadius
         self.width = width
@@ -62,6 +68,8 @@ struct CustomButton: View {
         font: Font = .headlineEmphasized,
         image: String? = nil,
         imageRight: String? = nil,
+        imageHeight: CGFloat? = nil,
+        imageRightHeight: CGFloat? = nil,
         action: @escaping () -> Void,
         cornerRadius: CGFloat = 12,
         width: CGFloat = .infinity,
@@ -76,6 +84,8 @@ struct CustomButton: View {
             font: font,
             image: image,
             imageRight: imageRight,
+            imageHeight: imageHeight,
+            imageRightHeight: imageRightHeight,
             action: action,
             cornerRadius: cornerRadius,
             width: width,
@@ -87,9 +97,16 @@ struct CustomButton: View {
     var body: some View {
         let label = HStack(spacing: 8) {
             if let image = image {
-                Image(systemName: image)
-                    .font(font)
-                    .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor : textColor)
+                if let imageHeight = imageHeight {
+                    Image(image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: imageHeight)
+                } else {
+                    Image(systemName: image)
+                        .font(font)
+                        .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor : textColor)
+                }
             }
             
             if let text = text, !text.isEmpty {
@@ -99,12 +116,20 @@ struct CustomButton: View {
             }
             
             if let imageRight = imageRight {
-                Image(systemName: imageRight)
-                    .font(font)
-                    .foregroundStyle(textColor)
+                if let imageRightHeight = imageRightHeight {
+                    Image(imageRight)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: imageRightHeight)
+                } else {
+                    Image(systemName: imageRight)
+                        .font(font)
+                        .foregroundStyle(textColor)
+                }
             }
         }
-            .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         
         // Re-implemented ZStack from CustomButtonStyle
         ZStack {

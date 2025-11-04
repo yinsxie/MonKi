@@ -170,8 +170,8 @@ struct GardenHomeView: View {
             backgroundColor: ColorPalette.yellow600,
             foregroundColor: ColorPalette.yellow400,
             textColor: ColorPalette.yellow50,
-            font: .system(size: 20, weight: .black, design: .rounded),
-            image: "house.fill",
+            image: "kidsButton",
+            imageHeight: 60,
             action: {
                 viewModel.navigateToHome(context: navigationManager)
             },
