@@ -16,13 +16,28 @@ final class ReLogViewModel: ObservableObject {
     
     // MARK: - State
     // These properties will be bound to the UI
-    @Published var tagSelectedMode: String?
+    @Published var happyLevel: Int
+    @Published var hasSlide: Bool = false
     @Published var selectedBeneficialTags = Set<BeneficialTag>()
+    var sliderImage: UIImage
     
     // MARK: - Injected Properties
     private let logId: UUID
     private let logRepository: LogRepositoryProtocol
     var parentValueTagRepo: ParentValueTagRepositoryProtocol
+    
+    var monkiImageName: String {
+            switch self.happyLevel {
+            case 0:
+                return "monki_default"
+            case 1:
+                return "monki_happy"
+            case 2:
+                return "monki_veryhappy"
+            default:
+                return "monki_default"
+            }
+        }
     
     // MARK: - Tag Data 
     @Published var beneficialTagsString: String = ""
@@ -55,7 +70,11 @@ final class ReLogViewModel: ObservableObject {
         
         // 1. Load 'isHappy' state
         // We map the Bool back to the String expected by the UI ("Happy" or "Biasa")
-        self.tagSelectedMode = logToEdit.isHappy ? "Happy" : "Biasa"
+//        self.tagSelectedMode = logToEdit.isHappy ? "Happy" : "Biasa"
+        
+        self.happyLevel = Int(logToEdit.happyLevel)
+        
+        self.sliderImage = UIImage(named: logToEdit.imagePath ?? "icecream_placeholder") ?? UIImage(systemName: "face.smiling.fill") ?? UIImage()
         
         // 2. Load 'beneficialTags' state
         fetchBeneficialTags()
@@ -99,8 +118,8 @@ final class ReLogViewModel: ObservableObject {
         
         switch page {
         case .howHappy:
-            // Can't continue unless a mood is selected
-            return tagSelectedMode == nil
+            // either change or not, child can be continue
+            return false
         case .howBeneficial:
             // This is the last page, "Next" (Done) is always enabled
             return false
@@ -113,7 +132,8 @@ final class ReLogViewModel: ObservableObject {
         // --- Prepare Data for Repository ---
         
         // 1. Convert 'tagSelectedMode' string back to 'isHappy' Bool
-        let happy = (tagSelectedMode == "Happy")
+        let happy = true //TODO: delete param at another ticket
+        let happyLvl = self.happyLevel
         
         // 2. Convert 'Set<BeneficialTag>' back to '[String]'
         let allLabels = self.beneficialTagLabels
@@ -131,7 +151,7 @@ final class ReLogViewModel: ObservableObject {
             withId: logId,
             isHappy: happy,
             // MARK: CHANGE THIS
-            happyLevel: 0,
+            happyLevel: happyLvl,
             isBeneficial: beneficial,
             tags: selectedLabels
         )
