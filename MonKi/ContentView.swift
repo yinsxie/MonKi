@@ -20,8 +20,8 @@ struct ContentView: View {
                 SplashScreenView()
             } else if isNewUser {
                 NavigationStack {
-                    ParentalGateView(
-                        viewModel: ParentalGateViewModel(
+                    ParentalGateSettingView(
+                        viewModel: ParentalGateSettingViewModel(
                             onFinished: {
                                 withAnimation {
                                     self.isNewUser = false
