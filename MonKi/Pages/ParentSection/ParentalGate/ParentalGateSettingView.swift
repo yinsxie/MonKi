@@ -23,7 +23,7 @@ struct ParentalGateSettingView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 140)
-                    .offset(y: -20)
+                    .offset(x: -24, y: -20)
                 
                 Spacer()
                 
@@ -31,43 +31,39 @@ struct ParentalGateSettingView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 140)
-                    .offset(y: -4)
+                    .offset(x: 24, y: -4)
             }
             
             VStack(spacing: 24) {
-
-                Text("Buat PIN untuk akses Parents")
+                
+                Text("Bikin kode rahasia Parents")
                     .font(Font.title2Emphasized)
                     .foregroundStyle(ColorPalette.neutral950)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
                 // Subjudul
                 Text("Kode 4 angka ini perlu biar halaman Parents cuma bisa dibuka Mama/Papa aja")
-                    .font(.subheadline)
+                    .font(Font.bodyMedium)
                     .foregroundStyle(ColorPalette.neutral400)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
                 
                 // Input PIN
                 pinInputView
-                    .padding(.horizontal, 24)
                     .padding(.bottom, 16)
                 
                 // Input Hint
                 hintInputView
-                    .padding(.horizontal, 24)
                 
                 Spacer()
                 
                 // Tombol Navigasi Bawah
                 bottomButtonsView
-                    .padding(.horizontal, 24)
                     .padding(.bottom)
             }
             .onAppear {
                 isPinFieldFocused = true
             }
-        }}
+        }.padding(.horizontal, 24)
+    }
     
     // MARK: - Helper Views
     private var pinInputView: some View {
