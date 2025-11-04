@@ -153,9 +153,20 @@ struct HomeView: View {
     // MARK: - Fixed Controls
     var topNav: some View {
         HStack {
-            navButton(imageName: "person.2.fill") {
-                navigationManager.goTo(.parentHome(.home))
-            }
+            CustomButton(
+                backgroundColor: ColorPalette.yellow600,
+                foregroundColor: ColorPalette.yellow400,
+                textColor: ColorPalette.yellow50,
+                image: "parentButton",
+                imageHeight: 60,
+                action: {
+                    navigationManager.goTo(.parentHome(.home))
+                },
+                cornerRadius: 24,
+                width: 64,
+                type: .normal
+            )
+            
             Spacer()
             navButton(imageName: "star.fill") {
                 navigationManager.goTo(.parentValue)
