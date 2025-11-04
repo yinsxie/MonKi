@@ -48,7 +48,7 @@ struct ContentView: View {
         self.isNewUser = UserDefaultsManager.shared.getIsNewUser() ?? true
         
         self.isLoadingAuth = false
-        
+        UserDefaultsManager.shared.initDevUserDefaults()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             withAnimation {
                 isSplashShown = false
