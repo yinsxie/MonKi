@@ -77,6 +77,7 @@ struct ChildLogNavigationView<Content: View>: View {
                         if currentIndex > 0 {
                             CustomButton(
                                 colorSet: .previous,
+                                font: .system(size: 36, weight: .black, design: .rounded),
                                 image: "arrow.left",
                                 action: {
                                     withAnimation {
@@ -92,6 +93,7 @@ struct ChildLogNavigationView<Content: View>: View {
                         
                         CustomButton(
                             colorSet: .primary,
+                            font: .system(size: 36, weight: .black, design: .rounded),
                             image: "arrow.right",
                             action: {
                                 withAnimation {
