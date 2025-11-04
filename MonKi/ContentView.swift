@@ -11,11 +11,28 @@ struct ContentView: View {
     
     @State private var isSplashShown: Bool = true
     @StateObject var navigationManager = NavigationManager()
+    @State private var isNewUser: Bool = true
+    @State private var isLoadingAuth: Bool = true
     
     var body: some View {
         VStack {
-            if isSplashShown {
+            if isSplashShown || isLoadingAuth {
                 SplashScreenView()
+            } else if isNewUser {
+                NavigationStack {
+                    ParentalGateView(
+                        viewModel: ParentalGateViewModel(
+                            onFinished: {
+                                withAnimation {
+                                    self.isNewUser = false
+                                }
+                            }
+                        )
+                    )
+                }
+                .environmentObject(navigationManager)
+                .transition(.opacity.animation(.easeInOut))
+                
             } else {
                 HomeView()
                     .environmentObject(navigationManager)
@@ -23,11 +40,18 @@ struct ContentView: View {
         }
         .onAppear {
             //MARK: DEV purposes only
-            UserDefaultsManager.shared.initDevUserDefaults()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                withAnimation {
-                    isSplashShown = false
-                }
+            setupAppFlow()
+        }
+    }
+    
+    private func setupAppFlow() {
+        self.isNewUser = UserDefaultsManager.shared.getIsNewUser() ?? true
+        
+        self.isLoadingAuth = false
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation {
+                isSplashShown = false
             }
         }
     }

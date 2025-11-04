@@ -101,7 +101,7 @@ struct CustomButton: View {
             if let imageRight = imageRight {
                 Image(systemName: imageRight)
                     .font(font)
-                    .foregroundStyle(textColor)
+                    .foregroundStyle(isDisabled ? ButtonColorSet.disabled.textColor : textColor)
             }
         }
             .frame(maxWidth: .infinity)
