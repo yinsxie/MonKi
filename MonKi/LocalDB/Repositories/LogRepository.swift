@@ -57,6 +57,7 @@ final class LogRepository: LogRepositoryProtocol {
         log.isHappy = isHappy
         log.isBeneficial = isBeneficial
         log.beneficialTags = IOHelper.combineTag(tags)
+        log.happyLevel = Int16(happyLevel ?? 0)
         log.updatedAt = Date()
         
         do {
