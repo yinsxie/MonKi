@@ -23,7 +23,7 @@ struct SelectModePage: View {
             // MARK: - Bagian Tengah: Card
             HStack(alignment: .top, spacing: 8) {
                 ChildInputCard(
-                    text: "Draw",
+                    text: "Gambar",
                     image: "MonkiDraw",
                     isSelected: selectedMode == "Draw"
                 ) {
@@ -33,7 +33,7 @@ struct SelectModePage: View {
                 }
                 
                 ChildInputCard(
-                    text: "Gallery",
+                    text: "Pilih Foto",
                     image: "MonkiPhoto",
                     isSelected: selectedMode == "Gallery"
                 ) {
