@@ -1,5 +1,5 @@
 //
-//  ParentalGateView.swift
+//  ParentalGateSettingView.swift
 //  MonKi
 //
 //  Created by Yonathan Handoyo on 04/11/25.
@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-struct ParentalGateView: View {
+struct ParentalGateSettingView: View {
     
     // MARK: - State Properties
-    @ObservedObject var viewModel: ParentalGateViewModel
+    @ObservedObject var viewModel: ParentalGateSettingViewModel
     @FocusState private var isPinFieldFocused: Bool
     
     // MARK: - Body

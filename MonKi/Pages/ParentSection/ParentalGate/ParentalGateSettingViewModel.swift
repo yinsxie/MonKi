@@ -1,5 +1,5 @@
 //
-//  ParentalGateViewModel.swift
+//  ParentalGateSettingViewModel.swift
 //  MonKi
 //
 //  Created by Yonathan Handoyo on 04/11/25.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-final class ParentalGateViewModel: ObservableObject {
+final class ParentalGateSettingViewModel: ObservableObject {
     
     // MARK: - State Properties
     @Published var pin: String = ""
