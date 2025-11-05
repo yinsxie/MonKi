@@ -41,14 +41,14 @@ struct ParentHomeView: View {
                                     backgroundColor: ColorPalette.yellow600,
                                     foregroundColor: ColorPalette.yellow400,
                                     textColor: ColorPalette.yellow50,
-                                    font: .system(size: 20, weight: .black, design: .rounded),
-                                    image: "house.fill",
+                                    image: "kidsButton",
+                                    imageHeight: 60,
                                     action: didTapHomeButton,
                                     cornerRadius: 24,
                                     width: 64,
                                     type: .normal
                                 )
-                                .frame(height: 70)
+                                
                                 Spacer()
                             }
                             .padding(.horizontal, 24)
@@ -205,5 +205,7 @@ struct ParentHomeView: View {
 struct ParentHomeView_Previews: PreviewProvider {
     static var previews: some View {
         ParentHomeView()
+            .environmentObject(ParentHomeViewModel())
+            .environmentObject(NavigationManager())
     }
 }

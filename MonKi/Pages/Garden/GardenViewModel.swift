@@ -35,16 +35,9 @@ final class GardenViewModel: ObservableObject {
     }
     
     func onFieldTapped(forFieldType type: FieldState, context: NavigationManager) {
-        switch type {
-        case .empty:
-            context.goTo(.childLog(.logInput))
-        default:
-            return
-        }
-        
     }
     
-    func handleCTAButtonTapped(forLog log: MsLog?, withType type: FieldState, context: NavigationManager, bufferData: GardenFullDataBuffer? = nil, logImage: UIImage? = nil) {
+    func handleCTAButtonTapped(forLog log: MsLog?, withType type: FieldState, context: NavigationManager, logImage: UIImage? = nil) {
         if let log = log {
             switch type {
             case .approved:
@@ -53,11 +46,6 @@ final class GardenViewModel: ObservableObject {
                 onDoneFieldTapped(log, context: context)
             case .declined:
                 onDeclinedFieldTapped(log, context: context)
-            case .created:
-                onShovelFieldTapped(log, buffer: bufferData, logImage: logImage)
-                DispatchQueue.main.async {
-                    self.fetchLogData()
-                }
             default:
                 return
             }
@@ -65,7 +53,6 @@ final class GardenViewModel: ObservableObject {
     }
     
     func pushReplaceToCollectibleView(context: NavigationManager) {
-        context.replaceTopAnimate(with: .childGarden(.collectible))
     }
     
     func fetchLogData() {
@@ -79,9 +66,6 @@ final class GardenViewModel: ObservableObject {
         alertConfirmationType = type
     }
         
-    func validateShovelMode(bufferData: GardenFullDataBuffer?) {
-        isShovelMode = bufferData != nil
-    }
 }
 
 private extension GardenViewModel {
@@ -98,7 +82,6 @@ private extension GardenViewModel {
         bufferImageFromLogForEvent(log) { success in
             guard success else { return }
             
-            context.goTo(.childGarden(.watering))
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 if let logId = log.id {
                     self.logRepo.logDone(withId: logId)
@@ -111,7 +94,6 @@ private extension GardenViewModel {
         bufferImageFromLogForEvent(log) { success in
             guard success else { return }
             
-            context.goTo(.childGarden(.harvesting))
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 if let logId = log.id {
                     UserDefaultsManager.shared.decrementCurrentFilledField(by: 1)
@@ -122,23 +104,6 @@ private extension GardenViewModel {
     }
     
     func onDeclinedFieldTapped(_ log: MsLog, context: NavigationManager) {
-        context.goTo(.reLog(log: log))
     }
     
-    func onShovelFieldTapped(_ log: MsLog, buffer: GardenFullDataBuffer? = nil, logImage: UIImage? = nil) {
-        if let buffer = buffer, let logImage = logImage {
-            let commitType = GardenShovelModality.commit(image: logImage) {
-                self.logRepo.logReplaced(replacedLog: log, newImage: buffer.image, isHappy: buffer.isHappy,happyLevel: buffer.happyLevel ,isBeneficial: buffer.isHappy, tags: buffer.tags)
-                
-                self.enableShovelModeAlert(toType: nil)
-                DispatchQueue.main.async {
-                    withAnimation {
-                        self.isShovelMode = false
-                        self.fetchLogData()
-                    }
-                }
-            }
-            enableShovelModeAlert(toType: commitType)
-        }
-    }
 }

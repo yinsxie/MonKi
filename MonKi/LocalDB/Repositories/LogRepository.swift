@@ -8,6 +8,17 @@
 import CoreData
 import UIKit
 
+
+// logWaitingListToDo
+// id
+// logId
+// title
+// isChecked
+// createdAt
+// updatedAt
+
+// predicate, where logid = logid
+
 protocol LogRepositoryProtocol {
     
     func createLogWithImage(_ uiImage: UIImage, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String])
@@ -57,6 +68,7 @@ final class LogRepository: LogRepositoryProtocol {
         log.isHappy = isHappy
         log.isBeneficial = isBeneficial
         log.beneficialTags = IOHelper.combineTag(tags)
+        log.happyLevel = Int16(happyLevel ?? 0)
         log.updatedAt = Date()
         
         do {

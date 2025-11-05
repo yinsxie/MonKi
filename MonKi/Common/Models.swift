@@ -5,6 +5,11 @@
 //  Created by William on 27/10/25.
 //
 
+
+// case logOnly
+// case logApproved
+// case logWaiting
+// case Declined
 enum ChildrenLogState {
     case created
     case approved

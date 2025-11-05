@@ -10,49 +10,59 @@ import SwiftUI
 struct GardenHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var viewModel: GardenViewModel
-    var bufferDataFromLogFull: GardenFullDataBuffer?
-    
-    init(bufferDataFromLogFull: GardenFullDataBuffer?) {
-        self.bufferDataFromLogFull = bufferDataFromLogFull
-    }
+    @StateObject private var viewModel = GardenViewModel()
     
     var body: some View {
-        ZStack {
-            Image(GardenImageAsset.gardenBackground.imageName)
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-            
-            fieldView
-            
-            VStack {
-                HStack {
-                    if !viewModel.isShovelMode {
+        NavigationStack(path: $navigationManager.navigationPath) {
+            ZStack {
+                Image(GardenImageAsset.gardenBackground.imageName)
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                
+                fieldView
+                
+                VStack {
+                    HStack {
                         homeButton
                         Spacer()
                         collectibleButton
-                    } else {
-                        cancelButton
-                        Spacer()
                     }
+                    .padding(.top, 70)
+                    
+                    Spacer()
+                    //MARK: Uncomment to enable left and right
+                    footerButtonView
                 }
-                .padding(.top, 70)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 57)
                 
-                Spacer()
-                //MARK: Uncomment to enable left and right
-//                footerButtonView
-            }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 57)
+                popUpView
             
-            popUpView
-        
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onAppear {
-            viewModel.validateShovelMode(bufferData: bufferDataFromLogFull)
-            viewModel.fetchLogData()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onAppear {
+                viewModel.fetchLogData()
+            }
+            .navigationDestination(for: MainRoute.self) { route in
+                switch route {
+                case .log:
+                    ChildLogNavigationContainer()
+                        .navigationBarBackButtonHidden(true)
+                case .collectible:
+                    CollectiblesHomeView()
+                        .navigationBarBackButtonHidden(true)
+                case .relog(let log):
+                    ReLogNavigationContainer(logToEdit: log)
+                        .navigationBarBackButtonHidden(true)
+                case .parentValue:
+                    ParentValueTagView()
+                        .navigationBarBackButtonHidden(true)
+                case .parentGate:
+                    ParentalGateView(viewModel: ParentalGateViewModel(navigationManager: navigationManager, onSuccess: {}))
+                        .navigationBarBackButtonHidden(true)
+                }
+            }
         }
     }
     
@@ -72,7 +82,7 @@ struct GardenHomeView: View {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
                 
                 ForEach(activeLogs, id: \.self) { log in
-                    let fieldState = FieldState(state: log.state ?? "")
+                    let fieldState = FieldState(state: log.state ?? "x")
                     fieldCardViewBuilder(for: log, type: fieldState)
                 }
                 
@@ -98,10 +108,9 @@ struct GardenHomeView: View {
         }()
         
         FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
-            viewModel.navigateTo(route: .childLog(.logInput), context: navigationManager)
         } onCTAButtonTapped: {
             print("CTA button tapped") 
-            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, bufferData: bufferDataFromLogFull, logImage: image)
+            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, logImage: image)
         }
     }
     
@@ -157,7 +166,8 @@ struct GardenHomeView: View {
             font: .system(size: 20, weight: .black, design: .rounded),
             image: "book.pages.fill",
             action: {
-                viewModel.navigateTo(route: .childGarden(.collectible), context: navigationManager)
+                navigationManager.goTo(.collectible)
+                print("Pindah ke collectible")
             },
             cornerRadius: 24,
             width: 64,
@@ -170,10 +180,10 @@ struct GardenHomeView: View {
             backgroundColor: ColorPalette.yellow600,
             foregroundColor: ColorPalette.yellow400,
             textColor: ColorPalette.yellow50,
-            font: .system(size: 20, weight: .black, design: .rounded),
-            image: "house.fill",
+            image: "kidsButton",
+            imageHeight: 60,
             action: {
-                viewModel.navigateToHome(context: navigationManager)
+                
             },
             cornerRadius: 24,
             width: 64,
@@ -181,34 +191,9 @@ struct GardenHomeView: View {
         )
     }
     
-    var cancelButton: some View {
-        CustomButton(
-            backgroundColor: ColorPalette.yellow600,
-            foregroundColor: ColorPalette.yellow400,
-            textColor: ColorPalette.yellow50,
-            font: .system(size: 20, weight: .black, design: .rounded),
-            image: "xmark",
-            action: {
-                // Show confirmation popup to exit shovel mode
-                // Prefer the buffered image; if missing, fall back to a placeholder asset
-                let fallback = UIImage(named: "icecream_placeholder")
-                let imageToUse = bufferDataFromLogFull?.image ?? fallback
-                guard let imageToUse else { return }
-                let alertType: GardenShovelModality = .exit(image: imageToUse) {
-                    withAnimation { viewModel.isShovelMode = false }
-                    // Dismiss the popup after confirming
-                    viewModel.enableShovelModeAlert(toType: nil)
-                }
-                viewModel.enableShovelModeAlert(toType: alertType)
-            },
-            cornerRadius: 24,
-            width: 64,
-            type: .normal
-        )
-    }
 }
 
 #Preview {
-    HomeView()
+    GardenHomeView()
         .environmentObject(NavigationManager())
 }

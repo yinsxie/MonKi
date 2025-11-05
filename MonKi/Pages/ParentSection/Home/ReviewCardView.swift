@@ -99,10 +99,6 @@ struct ReviewCardView: View {
                         colorSet: .primary,
                         font: .headlineEmphasized,
                         action: {
-                            navigationManager.goTo(
-                                .parentHome(.reviewSuccess(log: log)
-                                )
-                            )
                         },
                         cornerRadius: 24,
                         type: .normal

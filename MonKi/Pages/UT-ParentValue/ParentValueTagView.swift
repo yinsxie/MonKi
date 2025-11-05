@@ -17,13 +17,13 @@ struct ParentValueTagView: View {
             VStack(spacing: 30) {
                 // MARK: - Header
                 HStack(alignment: .top) {
-                    Image("mamaMonki")
+                    Image("MamaMonki")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 112)
                         .padding(.top, 17)
                     Spacer()
-                    Image("papaMonki")
+                    Image("PapaMonki")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 90)

@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct HowHappyView: View {
-    @Binding var selectedMode: String?
     @ObservedObject var viewModel: ChildLogViewModel
-    
+
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             // MARK: - Bagian Atas: Teks
@@ -22,33 +21,17 @@ struct HowHappyView: View {
                 .padding(.bottom, 40)
             
             // MARK: - Gambar Monki
-            Image("MonkiInputPlaceholder")
+            Image(viewModel.monkiImageName)
                 .resizable()
                 .scaledToFit()
-                .frame(height: 180, alignment: .top)
+//                .frame(height: 180, alignment: .top)
                 .padding(.bottom, 40)
             
-            // MARK: - Pilihan Emote
-            HStack(alignment: .top, spacing: 8) {
-                ChildInputCard(
-                    image: "EmoteLove",
-                    isSelected: selectedMode == "Happy",
-                    padding: 40
-                ) {
-                    selectedMode = "Happy"
-                }
-                
-                ChildInputCard(
-                    image: "EmoteBiasa",
-                    isSelected: selectedMode == "Biasa",
-                    padding: 40
-                ) {
-                    selectedMode = "Biasa"
-                }
-            }
-            .frame(height: 160, alignment: .top)
-            .frame(maxWidth: .infinity)
-            .animation(.easeInOut, value: selectedMode)
+            // MARK: - Pilihan Emote (Slider)
+            CustomSlider(
+                value: $viewModel.happyLevel,
+                image: viewModel.sliderImage
+            )
             .padding(.horizontal)
             
             Spacer()

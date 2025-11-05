@@ -102,27 +102,6 @@ struct HomeView: View {
                 )
             }
             .ignoresSafeArea(edges: .bottom)
-            .navigationDestination(for: MainRoute.self) { route in
-                switch route {
-                case .childLog(let childLogRoute):
-                    childLogRoute.delegateView()
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(childlogViewModel)
-                case .childGarden(let childGardenRoute):
-                    childGardenRoute.delegateView()
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(gardenViewModel)
-                case .parentHome(let parentRoute):
-                    parentRoute.delegateView()
-                        .environmentObject(parentViewModel)
-                        .navigationBarBackButtonHidden(true)
-                case .reLog(let log):
-                    ReLogNavigationContainer(logToEdit: log)
-                        .navigationBarBackButtonHidden(true)
-                case .parentValue:
-                    ParentValueTagView()
-                }
-            }
         }
     }
     
@@ -153,9 +132,19 @@ struct HomeView: View {
     // MARK: - Fixed Controls
     var topNav: some View {
         HStack {
-            navButton(imageName: "person.2.fill") {
-                navigationManager.goTo(.parentHome(.home))
-            }
+            CustomButton(
+                backgroundColor: ColorPalette.yellow600,
+                foregroundColor: ColorPalette.yellow400,
+                textColor: ColorPalette.yellow50,
+                image: "parentButton",
+                imageHeight: 60,
+                action: {
+                },
+                cornerRadius: 24,
+                width: 64,
+                type: .normal
+            )
+            
             Spacer()
             navButton(imageName: "star.fill") {
                 navigationManager.goTo(.parentValue)
@@ -194,9 +183,7 @@ struct HomeView: View {
     var centerCardButton: some View {
         Button {
             if currentView == .logging {
-                navigationManager.goTo(.childLog(.logInput))
             } else {
-                navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
             }
         } label: {
             ZStack {

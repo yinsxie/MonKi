@@ -24,7 +24,7 @@ final class CoreDataManager: ObservableObject {
             if let error = error {
                 fatalError("Core Data Failed \(error.localizedDescription)")
             }
-//            self.seedInitialData(context: self.viewContext)
+            self.seedInitialData(context: self.viewContext)
         }
     }
     
@@ -65,7 +65,7 @@ final class CoreDataManager: ObservableObject {
         log1.isHappy = true
         log1.isBeneficial = true
         log1.beneficialTags = "snack;sweet" // Your IOHelper combines tags
-        log1.state = ChildrenLogState.created.stringValue
+        log1.state = ChildrenLogState.archived.stringValue
         log1.createdAt = Date()
         log1.updatedAt = Date()
 
@@ -76,7 +76,7 @@ final class CoreDataManager: ObservableObject {
         log2.isHappy = true
         log2.isBeneficial = false
         log2.beneficialTags = "toy;expensive"
-        log2.state = ChildrenLogState.done.stringValue
+        log2.state = ChildrenLogState.archived.stringValue
         log2.createdAt = Date()
         log2.updatedAt = Date()
         
@@ -87,7 +87,7 @@ final class CoreDataManager: ObservableObject {
         log3.isHappy = false
         log3.isBeneficial = true
         log3.beneficialTags = "book;education"
-        log3.state = ChildrenLogState.declined.stringValue
+        log3.state = ChildrenLogState.archived.stringValue
         log3.createdAt = Date()
         log3.updatedAt = Date()
         
@@ -97,7 +97,7 @@ final class CoreDataManager: ObservableObject {
         log4.isHappy = false
         log4.isBeneficial = true
         log4.beneficialTags = "book;education"
-        log4.state = ChildrenLogState.approved.stringValue
+        log4.state = ChildrenLogState.archived.stringValue
         log4.createdAt = Date()
         log4.updatedAt = Date()
 
@@ -109,6 +109,6 @@ final class CoreDataManager: ObservableObject {
             print("Failed to save seed data: \(error.localizedDescription)")
         }
         
-        UserDefaultsManager.shared.incrementCurrentFilledField(by: 4)
+        UserDefaultsManager.shared.incrementCurrentFilledField(by: 0)
     }
 }

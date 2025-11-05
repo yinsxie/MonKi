@@ -78,13 +78,11 @@ final class ParentHomeViewModel: ObservableObject {
     
     func navigateToReflectionStory(context: NavigationManager, forLog log: MsLog?) {
         if let log = log {
-            context.goTo(.parentHome(.reflectionGuideStory(log: log)))
         }
     }
     
     func navigateToRejectView(context: NavigationManager, forLog log: MsLog?) {
         if let log = log {
-            context.goTo(.parentHome(.reviewReject(log: log)))
         }
     }
 }
