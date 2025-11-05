@@ -91,9 +91,6 @@ struct GetSeedView: View {
                     action: {
                         navigationManager.popToRoot()
                         
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            navigationManager.goTo(.childGarden(.home(logToBePlanted: nil)))
-                        }
                     },
                     type: .normal
                 )

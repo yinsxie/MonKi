@@ -100,9 +100,6 @@ struct ChildLogNavigationContainer: View {
             withAnimation {
                 viewModel.setAlertonGardenFull(to: false)
                 navigationManager.popToRoot()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    navigationManager.goTo(.childGarden(.home(logToBePlanted: viewModel.bufferedLogData)))
-                }
             }
         })) {
             viewModel.setAlertonGardenFull(to: false)

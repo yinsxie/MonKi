@@ -34,7 +34,7 @@ struct ContentView: View {
                 .transition(.opacity.animation(.easeInOut))
                 
             } else {
-                HomeView()
+                GardenHomeView()
                     .environmentObject(navigationManager)
             }
         }

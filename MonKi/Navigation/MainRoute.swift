@@ -5,11 +5,16 @@
 //  Created by William on 28/10/25.
 //
 
+// Main Route
+// - Relog
+// - Log
+// - Parent Gate
+// - Parent Value
+// - Collectible
 enum MainRoute: Hashable {
-    case parentHome(ParentRoute)
-    case childLog(ChildLogRoute)
-    case childGarden(ChildGardenRoute)
-    case reLog(log: MsLog)
+    case relog(log: MsLog)
+    case log
+    case parentGate
     case parentValue
-    case parentalGate
+    case collectible
 }
