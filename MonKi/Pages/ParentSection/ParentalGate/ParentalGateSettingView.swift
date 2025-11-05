@@ -75,8 +75,9 @@ struct ParentalGateSettingView: View {
                 .foregroundColor(.clear)
                 .opacity(0.01)
                 .onChange(of: viewModel.pin) { _, newValue in
-                    if newValue.count > 4 {
+                    if newValue.count == 4 {
                         viewModel.pin = String(newValue.prefix(4))
+                        isPinFieldFocused = false
                     }
                 }
             
@@ -118,6 +119,7 @@ struct ParentalGateSettingView: View {
                 .foregroundColor(.primary)
             
             TextField("contoh: tahun lahir saya", text: $viewModel.hint)
+                .submitLabel(.done)
                 .padding()
                 .background(Color(.systemBackground))
                 .cornerRadius(16)
