@@ -39,6 +39,7 @@ struct CustomSlider: View {
                 Capsule()
                     .fill(ColorPalette.yellow100)
                     .frame(height: trackHeight)
+                    .padding(.horizontal, 50)
                 
                 // MARK: - Dots (3 circles) di dalam track
                 HStack {
@@ -49,6 +50,7 @@ struct CustomSlider: View {
                     Circle().fill(ColorPalette.yellow500).frame(width: trackHeight * 0.5)
                 }
                 .padding(.horizontal, 8)
+                .padding(.horizontal, 50)
                 .frame(height: trackHeight)
                 
                 // MARK: - Thumb Image (selalu di atas)
