@@ -9,7 +9,6 @@ import SwiftUI
 
 /// This is a copy of 'HowHappyView', but adapted for 'ReLogViewModel'.
 struct ReLogHowHappyView: View {
-    @Binding var selectedMode: String?
     @ObservedObject var viewModel: ReLogViewModel // <-- Changed
     
     var body: some View {
@@ -24,40 +23,25 @@ struct ReLogHowHappyView: View {
                 .padding(.bottom, 40)
             
             // MARK: - Gambar Monki
-            Image("MonkiInputPlaceholder")
+            Image(viewModel.monkiImageName)
                 .resizable()
                 .scaledToFit()
-                .frame(height: 200, alignment: .top)
+//                .frame(height: 200, alignment: .top)
                 .padding(.bottom, 40)
             
             // MARK: - Pilihan Emote
-            HStack(alignment: .top, spacing: 8) {
-                ChildInputCard(
-                    image: "EmoteLove",
-                    isSelected: selectedMode == "Happy",
-                    padding: 40
-                ) {
-                    selectedMode = "Happy"
-                }
-                
-                ChildInputCard(
-                    image: "EmoteBiasa",
-                    isSelected: selectedMode == "Biasa",
-                    padding: 40
-                ) {
-                    selectedMode = "Biasa"
-                }
-            }
-            .frame(height: 160, alignment: .top)
-            .frame(maxWidth: .infinity)
-            .animation(.easeInOut, value: selectedMode)
+            CustomSlider(
+                value: $viewModel.happyLevel,
+                image: viewModel.sliderImage
+            )
+            .padding(.horizontal)
             
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground).edgesIgnoringSafeArea(.all))
         .padding(.vertical, 140)
-        .padding(.horizontal, 24)
+//        .padding(.horizontal, 24)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 AudioManager.shared.play("HowHappy")

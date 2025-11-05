@@ -36,7 +36,7 @@ struct ChildLogRouter: View {
             } else if let tagPage = viewModel.currentTagPage {
                 switch tagPage {
                 case .howHappy:
-                    HowHappyView(selectedMode: $viewModel.tagSelectedMode, viewModel: viewModel)
+                    HowHappyView(viewModel: viewModel)
 //                case .happyIllust:
 //                    FinalImagePage(processedImage: nil)
                 case .howBeneficial:

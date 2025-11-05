@@ -37,7 +37,7 @@ final class CanvasViewModel: ObservableObject {
     @Published var processedImage: UIImage?
     @Published var isProcessing: Bool = false
     
-    //MARK: Navigation Flow State (Block
+    // MARK: Navigation Flow State (Block
     @Published var isExistDrawing: Bool = false
     
     // MARK: - Dependencies
@@ -49,7 +49,7 @@ final class CanvasViewModel: ObservableObject {
     func toggleColoredPencil(to pencil: ColoredPencilAsset) {
         self.isEraserEnabled = false
         self.selectedPencil = pencil
-        self.canvasToolSelected = nil // Deselect tool icon
+        self.canvasToolSelected = nil
     }
     
     func toggleEraser() {
@@ -71,29 +71,34 @@ final class CanvasViewModel: ObservableObject {
         self.takeSnapshot = true
     }
     
-    func processDrawing(snapshot: UIImage) {
-            print("CanvasViewModel: Received snapshot, starting processing...")
+    func processDrawing(snapshot: UIImage?) {
+        guard let snapshot = snapshot else {
             Task {
-                do {
-                    let result = try await composer.processDrawing(snapshot)
-    //                let result = try await processor.process(snapshot)
-                    await MainActor.run {
-                        print("CanvasViewModel: Processing complete.")
-                        self.processedImage = result // Store the result
-
-                        print(">>> CanvasViewModel: Setting isProcessing = false. Current value: \(self.isProcessing)")
-                        self.isProcessing = false // Hide loading indicator
-                        self.onDrawingProcessed?(result)
-                    }
-                } catch {
-                    await MainActor.run {
-                        print("CanvasViewModel: Error processing drawing - \(error.localizedDescription)")
-                        print(">>> CanvasViewModel (ERROR): Setting isProcessing = false. Current value: \(self.isProcessing)")
-                        self.isProcessing = false
-                        self.processedImage = nil
-                        self.onDrawingProcessed?(nil)
-                    }
+                await MainActor.run {
+                    self.isProcessing = false
+                    self.onDrawingProcessed?(nil)
+                }
+            }
+            return
+        }
+        
+        Task {
+            do {
+                let result = try await composer.processDrawing(snapshot)
+                
+                await MainActor.run {
+                    self.processedImage = result
+                    
+                    self.isProcessing = false
+                    self.onDrawingProcessed?(result)
+                }
+            } catch {
+                await MainActor.run {
+                    self.isProcessing = false
+                    self.processedImage = nil
+                    self.onDrawingProcessed?(nil)
                 }
             }
         }
     }
+}

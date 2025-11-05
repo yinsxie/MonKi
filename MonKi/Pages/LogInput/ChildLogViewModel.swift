@@ -18,7 +18,8 @@ final class ChildLogViewModel: ObservableObject {
     // MARK: - Navigation & State
     @Published var currentIndex: Int = 0
     @Published var inputSelectedMode: String?
-    @Published var tagSelectedMode: String?
+    @Published var hasSlide: Bool = false
+    @Published var happyLevel: Int = 0
     @Published var isGalleryPermissionGranted: Bool = false
     @Published var showingPermissionAlert: Bool = false
     @Published var isShowGardenFullAlert: Bool = false
@@ -41,7 +42,7 @@ final class ChildLogViewModel: ObservableObject {
                     }
                 } else if let tagPage = currentTagPage {
                     switch tagPage {
-                    case .howHappy: return tagSelectedMode == nil
+                    case .howHappy: return !hasSlide
 //                    case .happyIllust: return false
                     case .howBeneficial: return false
                     }
@@ -97,9 +98,30 @@ final class ChildLogViewModel: ObservableObject {
         return ChildLogTagEnum(rawValue: tagIndex)
     }
     
-    var isHappy: Bool {
-        return tagSelectedMode == "Happy"
-    }
+    var monkiImageName: String {
+            switch self.happyLevel {
+            case 0:
+                return "monki_default"
+            case 1:
+                return "monki_happy"
+            case 2:
+                return "monki_veryhappy"
+            default:
+                return "monki_default"
+            }
+        }
+    
+    var sliderImage: UIImage {
+            if let image = finalProcessedImage {
+                return image
+            } else {
+                return UIImage(named: "IceCreamIcon") ?? UIImage(systemName: "face.smiling.fill") ?? UIImage()
+            }
+        }
+    
+//    var isHappy: Bool {
+//        return tagSelectedMode == "Happy"
+//    }
     
     var isBeneficial: Bool {
         return !selectedBeneficialTags.isEmpty
@@ -133,6 +155,17 @@ final class ChildLogViewModel: ObservableObject {
                 self.handleDrawingProcessed(image: image)
             }
         }
+        
+        self.$happyLevel
+                    .dropFirst()
+                    .receive(on: RunLoop.main)
+                    .sink { [weak self] _ in
+                        // Setiap kali 'happyLevel' berubah,
+                        // atur 'hasSlide' menjadi true.
+                        print("happyLevel changed, setting hasSlide = true")
+                        self?.hasSlide = true
+                    }
+                    .store(in: &cancellables)
         
         fetchBeneficialTags()
     }
@@ -264,12 +297,11 @@ final class ChildLogViewModel: ObservableObject {
         
         private func handleTagFlowNext(for page: ChildLogTagEnum) {
             switch page {
-            case .howHappy:
-                guard tagSelectedMode != nil else {
-                    print("howHappy guard failed (seharusnya ditangani shouldDisableNext)")
-                    return
-                }
-                print("Data 'isHappy' disimpan sementara: \(isHappy)")
+            case .howHappy: break
+//                guard tagSelectedMode != nil else {
+//                    print("howHappy guard failed (seharusnya ditangani shouldDisableNext)")
+//                    return
+//                }
 //            case .happyIllust:
 //                print("Halaman ilustrasi, lanjut saja.")
             case .howBeneficial:
@@ -308,7 +340,7 @@ final class ChildLogViewModel: ObservableObject {
         withAnimation { currentIndex -= 1 }
         
         if currentInputPage == .finalImage {
-            tagSelectedMode = nil
+            hasSlide = false
             selectedBeneficialTags.removeAll()
         } else if currentInputPage == .mainInput {
             finalProcessedImage = nil
@@ -328,11 +360,13 @@ final class ChildLogViewModel: ObservableObject {
             return nil
         }
         
-        let happy = self.isHappy
+//        let happy = self.isHappy
+        let happyLevel = self.happyLevel
         let beneficial = self.isBeneficial
         let tags = self.beneficialTags
         
-        return GardenFullDataBuffer(image: imageToSave, isHappy: happy, isBeneficial: beneficial, tags: tags)
+        //TODO: delete isHappy variable on TGV 86
+        return GardenFullDataBuffer(image: imageToSave, isHappy: true, isBeneficial: beneficial, tags: tags, happyLevel: happyLevel)
     }
     
     private func saveLog() {

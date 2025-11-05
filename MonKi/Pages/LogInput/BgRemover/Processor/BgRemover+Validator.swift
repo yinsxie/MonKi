@@ -21,7 +21,7 @@ struct BackgroundRemoverValidator {
 
     private func estimateCoverage(_ pixelBuffer: CVPixelBuffer) -> Float {
         let width = CVPixelBufferGetWidth(pixelBuffer)
- let height = CVPixelBufferGetHeight(pixelBuffer)
+        let height = CVPixelBufferGetHeight(pixelBuffer)
         let total = width * height
 
         CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)

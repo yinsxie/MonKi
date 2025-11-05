@@ -92,14 +92,13 @@ struct ParentReviewRejectView: View {
             backgroundColor: ColorPalette.yellow600,
             foregroundColor: ColorPalette.yellow400,
             textColor: ColorPalette.yellow50,
-            font: .system(size: 20, weight: .black, design: .rounded),
-            image: "house.fill",
+            image: "parentButton",
+            imageHeight: 60,
             action: navigationManager.popToFlowRoot,
             cornerRadius: 24,
             width: 64,
             type: .normal
         )
-        .frame(height: 70)
     }
     
 }
