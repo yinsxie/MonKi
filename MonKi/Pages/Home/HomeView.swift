@@ -121,6 +121,16 @@ struct HomeView: View {
                         .navigationBarBackButtonHidden(true)
                 case .parentValue:
                     ParentValueTagView()
+                case .parentalGate:
+                    ParentalGateView(
+                        viewModel: ParentalGateViewModel(
+                            navigationManager: navigationManager,
+                            onSuccess: {
+                                navigationManager.replaceTop(with: .parentHome(.home))
+                            }
+                        )
+                    )
+                    .navigationBarBackButtonHidden(true)
                 }
             }
         }
@@ -154,7 +164,8 @@ struct HomeView: View {
     var topNav: some View {
         HStack {
             navButton(imageName: "person.2.fill") {
-                navigationManager.goTo(.parentHome(.home))
+//                navigationManager.goTo(.parentHome(.home))
+                navigationManager.goTo(.parentalGate)
             }
             Spacer()
             navButton(imageName: "star.fill") {
