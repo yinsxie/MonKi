@@ -24,7 +24,7 @@ struct ParentalGateView: View {
                 
                 Spacer()
                 
-                Image("MamaMonki")
+                Image("MamaMonkiLock")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 140)

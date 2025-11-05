@@ -19,7 +19,7 @@ struct ParentalGateSettingView: View {
         
         VStack(alignment: .leading) {
             HStack {
-                Image("PapaMonki")
+                Image("PapaMonkiLock")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 140)
@@ -27,7 +27,7 @@ struct ParentalGateSettingView: View {
                 
                 Spacer()
                 
-                Image("MamaMonki")
+                Image("MamaMonkiLock")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 140)
