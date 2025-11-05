@@ -121,6 +121,16 @@ struct HomeView: View {
                         .navigationBarBackButtonHidden(true)
                 case .parentValue:
                     ParentValueTagView()
+                case .parentalGate:
+                    ParentalGateView(
+                        viewModel: ParentalGateViewModel(
+                            navigationManager: navigationManager,
+                            onSuccess: {
+                                navigationManager.replaceTop(with: .parentHome(.home))
+                            }
+                        )
+                    )
+                    .navigationBarBackButtonHidden(true)
                 }
             }
         }
