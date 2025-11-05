@@ -18,8 +18,7 @@ struct ReLogRouter: View {
                 case .howHappy:
                     // Wire up the new view to the new ViewModel
                     ReLogHowHappyView(
-                        selectedMode: $viewModel.tagSelectedMode,
-                        viewModel: viewModel
+                       viewModel: viewModel
                     )
                     
                 case .howBeneficial:
