@@ -54,7 +54,7 @@ struct ReviewCardView: View {
                                 .foregroundColor(ColorPalette.orange900)
                                 .fixedSize(horizontal: false, vertical: true)
                             
-                            FlowLayout(spacing: 4) {
+                            FlowLayout(alignment: .leading, spacing: 4) {
                                 ForEach(beneficialTags, id: \.self) { tag in
                                     Text(tag)
                                         .font(.caption2Semibold)
