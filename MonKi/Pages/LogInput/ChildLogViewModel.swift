@@ -22,7 +22,8 @@ final class ChildLogViewModel: ObservableObject {
     @Published var happyLevel: Int = 0
     @Published var isGalleryPermissionGranted: Bool = false
     @Published var showingPermissionAlert: Bool = false
-    @Published var isShowGardenFullAlert: Bool = false
+    //    @Published var isShowGardenFullAlert: Bool = false
+    @Published var activePopup: LogInputModality? = nil
     
     var isNextDisabled: Bool {
         if let inputPage = currentInputPage {
@@ -235,6 +236,17 @@ final class ChildLogViewModel: ObservableObject {
             let isGardenFull = UserDefaultsManager.shared.isFieldMaxedOut()
             
             saveLog()
+            self.activePopup = .withParent(
+                onPrimaryTap: {
+                    print("With Parent: Yes")
+                    context.popLast()
+                    context.goTo(.parentGate)
+                },
+                onSecondaryTap: {
+                    print("With Parent: No")
+                    context.popToRoot()
+                }
+            )
             return
         }
         
@@ -290,12 +302,6 @@ final class ChildLogViewModel: ObservableObject {
     private func handleTagFlowNext(for page: ChildLogTagEnum) {
         switch page {
         case .howHappy: break
-            //                guard tagSelectedMode != nil else {
-            //                    print("howHappy guard failed (seharusnya ditangani shouldDisableNext)")
-            //                    return
-            //                }
-            //            case .happyIllust:
-            //                print("Halaman ilustrasi, lanjut saja.")
         case .howBeneficial:
             break
         }
@@ -348,24 +354,29 @@ final class ChildLogViewModel: ObservableObject {
     
     private func saveLog() {
         
-        guard let imageToSave = finalProcessedImage else {
-            print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
-            return
-        }
-        
-        logRepo.createLogWithImage(
-            imageToSave,
-            isHappy: true,
-            happyLevel: self.happyLevel,
-            isBeneficial: self.isBeneficial,
-            tags: self.beneficialTags
-        )
-        
-        UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
+//        guard let imageToSave = finalProcessedImage else {
+//            print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
+//            return
+//        }
+//        
+//        logRepo.createLogWithImage(
+//            imageToSave,
+//            isHappy: true,
+//            happyLevel: self.happyLevel,
+//            isBeneficial: self.isBeneficial,
+//            tags: self.beneficialTags
+//        )
+//        
+//        UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
     }
     
-    func setAlertonGardenFull(to value: Bool) {
-        isShowGardenFullAlert = value
+    // MARK: ini buat di app store, jadi saya simpan dulu
+    //    func setAlertonGardenFull(to value: Bool) {
+    //        isShowGardenFullAlert = value
+    //    }
+    
+    func dismissActivePopup() {
+        activePopup = nil
     }
     
     private func fetchBeneficialTags() {

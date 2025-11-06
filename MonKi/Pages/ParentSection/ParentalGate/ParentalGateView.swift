@@ -11,6 +11,7 @@ struct ParentalGateView: View {
     
     // MARK: - State Properties
     @ObservedObject var viewModel: ParentalGateViewModel
+    @Environment(\.dismiss) private var dismiss
     @FocusState private var isPinFieldFocused: Bool
     @State private var localShakeAttempts: Int = 0
     
@@ -31,7 +32,7 @@ struct ParentalGateView: View {
                     .offset(x: 24, y: -15)
             }.padding(.top)
             
-            VStack(spacing: 24) {
+            VStack(spacing: 16) {
                 
                 Text("Masuk ke Halaman Parents")
                     .font(Font.title2Emphasized)
@@ -105,7 +106,7 @@ struct ParentalGateView: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(viewModel.isPinInvalid ? Color.red.opacity(0.2) : (isFilled ? ColorPalette.blue50 : Color(.systemBackground)))
                 .frame(height: 72)
-                .shadow(color: .black.opacity(0.2), radius: 4)
+                .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 0)
             
             if index < viewModel.pin.count {
                 let charIndex = viewModel.pin.index(viewModel.pin.startIndex, offsetBy: index)
@@ -124,7 +125,7 @@ struct ParentalGateView: View {
             image: "xmark",
             action: {
                 withAnimation {
-                    viewModel.handleBack()
+                    dismiss()
                 }
             },
             cornerRadius: 24,

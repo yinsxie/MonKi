@@ -11,6 +11,7 @@ struct ContentView: View {
     
     @State private var isSplashShown: Bool = true
     @StateObject var navigationManager = NavigationManager()
+    @StateObject private var gateManager = ParentalGateManager()
     @State private var isNewUser: Bool = true
     @State private var isLoadingAuth: Bool = true
     
@@ -36,6 +37,7 @@ struct ContentView: View {
             } else {
                 GardenHomeView()
                     .environmentObject(navigationManager)
+                    .environmentObject(gateManager)
             }
         }
         .onAppear {

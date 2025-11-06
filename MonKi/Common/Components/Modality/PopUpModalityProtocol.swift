@@ -9,12 +9,15 @@ import UIKit
 
 enum ImageModalityIcon {
     case monkiThinking
+    case monkiGirlThinking
     
     var imageName: String {
         //TODO: add this asset
         switch self {
         case .monkiThinking:
             return "MonkiThinking"
+        case .monkiGirlThinking:
+            return "MonkiGirlThinking"
         }
     }
 }

@@ -10,7 +10,9 @@ import SwiftUI
 struct GardenHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var gateManager: ParentalGateManager
     @StateObject private var viewModel = GardenViewModel()
+    @StateObject var childlogViewModel = ChildLogViewModel()
     
     var body: some View {
         NavigationStack(path: $navigationManager.navigationPath) {
@@ -24,7 +26,7 @@ struct GardenHomeView: View {
                 
                 VStack {
                     HStack {
-                        homeButton
+                        parentButton
                         Spacer()
                         collectibleButton
                     }
@@ -38,7 +40,7 @@ struct GardenHomeView: View {
                 .padding(.bottom, 57)
                 
                 popUpView
-            
+                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onAppear {
@@ -49,6 +51,7 @@ struct GardenHomeView: View {
                 case .log:
                     ChildLogNavigationContainer()
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(childlogViewModel)
                 case .collectible:
                     CollectiblesHomeView()
                         .navigationBarBackButtonHidden(true)
@@ -64,6 +67,23 @@ struct GardenHomeView: View {
                 }
             }
         }
+        .fullScreenCover(item: $gateManager.gateDestination) { destination in
+            ParentalGateView(
+                viewModel: ParentalGateViewModel(
+                    navigationManager: navigationManager,
+                    onSuccess: {
+                        gateManager.gateDestination = nil
+                        switch destination {
+                        case .parentSettings:
+                            navigationManager.goTo(.parentValue)
+//                        case .reviewLogOnFirstLog:
+//                        case .reviewLogFromGarden:
+//                        case .checklistUpdate:
+                        }
+                    }
+                )
+            )
+        }
     }
     
     @ViewBuilder
@@ -74,7 +94,7 @@ struct GardenHomeView: View {
             // Filter out archived logs before both rendering and counting
             let activeLogs = viewModel.logs.filter {
                 if let state = $0.state {
-                    return ChildrenLogState(state: state) != .archived
+//                    return LogState(state: state) != .archived
                 }
                 return false
             }
@@ -108,10 +128,16 @@ struct GardenHomeView: View {
         }()
         
         FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
+            viewModel.onFieldTapped(
+                forLog: log,
+                forFieldType: type,
+                context: navigationManager
+            )
         } onCTAButtonTapped: {
-            print("CTA button tapped") 
+            print("CTA button tapped")
             viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, logImage: image)
         }
+        
     }
     
     @ViewBuilder
@@ -154,7 +180,7 @@ struct GardenHomeView: View {
                 width: 64,
                 type: .normal
             )
-
+            
         }
     }
     
@@ -175,7 +201,7 @@ struct GardenHomeView: View {
         )
     }
     
-    var homeButton: some View {
+    var parentButton: some View {
         CustomButton(
             backgroundColor: ColorPalette.yellow600,
             foregroundColor: ColorPalette.yellow400,
@@ -183,7 +209,7 @@ struct GardenHomeView: View {
             image: "parentButton",
             imageHeight: 60,
             action: {
-                navigationManager.goTo(.parentValue)
+                gateManager.gateDestination = .parentSettings
             },
             cornerRadius: 24,
             width: 64,
@@ -196,4 +222,5 @@ struct GardenHomeView: View {
 #Preview {
     GardenHomeView()
         .environmentObject(NavigationManager())
+        .environmentObject(ParentalGateManager())
 }

@@ -189,58 +189,58 @@ struct ReflectionGuideStoryView: View {
         .zIndex(1)
     }
 }
-
-#Preview {
-    
-    // 1. Mock NavigationManager
-    let mockNavManager = NavigationManager()
-    
-    // --- 2. Legacy In-Memory Core Data Setup (iOS 9 compatible) ---
-    
-    // Load the "MonKi" model
-    // 2. Make SURE your model file is named "MonKi.xcdatamodeld"
-    guard let modelURL = Bundle.main.url(forResource: "MonKi", withExtension: "momd") else {
-        fatalError("Failed to find data model file 'MonKi.momd'.")
-    }
-    
-    // Load the model
-    guard let model = NSManagedObjectModel(contentsOf: modelURL) else {
-        fatalError("Failed to load model from \(modelURL).")
-    }
-    
-    // Create the store coordinator
-    let coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
-    
-    // Add an in-memory store (the old way)
-    do {
-        try coordinator.addPersistentStore(
-            ofType: NSInMemoryStoreType, // This is the key part
-            configurationName: nil,
-            at: nil,
-            options: nil
-        )
-    } catch {
-        fatalError("Failed to create in-memory store: \(error)")
-    }
-    
-    // Create the context
-    let previewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-    previewContext.persistentStoreCoordinator = coordinator
-    // --- End of legacy setup ---
-    
-    // 3. Create a realistic mock log
-    let mockLog = MsLog(context: previewContext)
-    mockLog.id = UUID()
-    mockLog.imagePath = "icecream_placeholder"
-    mockLog.isHappy = true
-    mockLog.isBeneficial = false
-    mockLog.beneficialTags = "toy;expensive"
-    mockLog.state = "created"
-    mockLog.createdAt = Date()
-    mockLog.updatedAt = Date()
-    
-    // 4. Return your view
-    return ReflectionGuideStoryView(log: mockLog)
-        .environmentObject(mockNavManager)
-        .environment(\.managedObjectContext, previewContext)
-}
+//
+//#Preview {
+//    
+//    // 1. Mock NavigationManager
+//    let mockNavManager = NavigationManager()
+//    
+//    // --- 2. Legacy In-Memory Core Data Setup (iOS 9 compatible) ---
+//    
+//    // Load the "MonKi" model
+//    // 2. Make SURE your model file is named "MonKi.xcdatamodeld"
+//    guard let modelURL = Bundle.main.url(forResource: "MonKi", withExtension: "momd") else {
+//        fatalError("Failed to find data model file 'MonKi.momd'.")
+//    }
+//    
+//    // Load the model
+//    guard let model = NSManagedObjectModel(contentsOf: modelURL) else {
+//        fatalError("Failed to load model from \(modelURL).")
+//    }
+//    
+//    // Create the store coordinator
+//    let coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
+//    
+//    // Add an in-memory store (the old way)
+//    do {
+//        try coordinator.addPersistentStore(
+//            ofType: NSInMemoryStoreType, // This is the key part
+//            configurationName: nil,
+//            at: nil,
+//            options: nil
+//        )
+//    } catch {
+//        fatalError("Failed to create in-memory store: \(error)")
+//    }
+//    
+//    // Create the context
+//    let previewContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+//    previewContext.persistentStoreCoordinator = coordinator
+//    // --- End of legacy setup ---
+//    
+//    // 3. Create a realistic mock log
+//    let mockLog = MsLog(context: previewContext)
+//    mockLog.id = UUID()
+//    mockLog.imagePath = "icecream_placeholder"
+//    mockLog.isHappy = true
+//    mockLog.isBeneficial = false
+//    mockLog.beneficialTags = "toy;expensive"
+//    mockLog.state = "created"
+//    mockLog.createdAt = Date()
+//    mockLog.updatedAt = Date()
+//    
+//    // 4. Return your view
+//    return ReflectionGuideStoryView(log: mockLog)
+//        .environmentObject(mockNavManager)
+//        .environment(\.managedObjectContext, previewContext)
+//}

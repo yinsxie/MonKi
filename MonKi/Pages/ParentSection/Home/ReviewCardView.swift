@@ -71,17 +71,17 @@ struct ReviewCardView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     
-                    if log.isHappy == true {
-                        Image("EmoteLove")
-                            .resizable()
-                            .frame(width: 72, height: 72)
-                            .offset(x: 12, y: 10)
-                    } else {
-                        Image("EmoteBiasa")
-                            .resizable()
-                            .frame(width: 72, height: 72)
-                            .offset(x: 12, y: 10)
-                    }
+//                    if log.isHappy == true {
+//                        Image("EmoteLove")
+//                            .resizable()
+//                            .frame(width: 72, height: 72)
+//                            .offset(x: 12, y: 10)
+//                    } else {
+//                        Image("EmoteBiasa")
+//                            .resizable()
+//                            .frame(width: 72, height: 72)
+//                            .offset(x: 12, y: 10)
+//                    }
                 }
                 
                 HStack(alignment: .center, spacing: 8) {

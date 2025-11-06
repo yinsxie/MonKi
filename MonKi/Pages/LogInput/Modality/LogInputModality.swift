@@ -10,11 +10,14 @@ import UIKit
 enum LogInputModality: PopUpModalityProtocol {
     
     case gardenFull(onPrimaryTap: () -> Void = {})
+    case withParent(onPrimaryTap: () -> Void = {}, onSecondaryTap: () -> Void = {})
     
     var imageIcon: ImageModalityIcon? {
         switch self {
         case .gardenFull:
             return .monkiThinking
+        case .withParent:
+            return .monkiGirlThinking
         }
     }
     
@@ -26,12 +29,16 @@ enum LogInputModality: PopUpModalityProtocol {
         switch self {
         case .gardenFull:
             return "Kebunmu sudah penuh!"
+        case .withParent:
+            return "Orang tuamu lagi disampingmu?"
         }
     }
     
     var subtitle: String? {
         switch self {
         case .gardenFull:
+            return nil
+        case .withParent:
             return nil
         }
     }
@@ -40,6 +47,8 @@ enum LogInputModality: PopUpModalityProtocol {
         switch self {
         case .gardenFull:
             return "Ingin Buang"
+        case .withParent:
+            return "Iya"
         }
     }
     
@@ -47,12 +56,16 @@ enum LogInputModality: PopUpModalityProtocol {
         switch self {
         case .gardenFull:
             return nil
+        case .withParent:
+            return "Tidak"
         }
     }
     
     var onPrimaryButtonTap: (() -> Void)? {
         switch self {
         case .gardenFull(let onPrimaryTap):
+            return onPrimaryTap
+        case .withParent(let onPrimaryTap, _):
             return onPrimaryTap
         }
     }
@@ -61,8 +74,9 @@ enum LogInputModality: PopUpModalityProtocol {
         switch self {
         case .gardenFull:
             return nil
+            
+        case .withParent(_, let onSecondaryTap):
+            return onSecondaryTap
         }
     }
-    
-    
 }

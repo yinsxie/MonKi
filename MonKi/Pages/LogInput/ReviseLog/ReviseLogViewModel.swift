@@ -147,16 +147,16 @@ final class ReLogViewModel: ObservableObject {
         
         // --- Call Repository ---
         // We call the repository function, we don't edit the object directly.
-        logRepository.childRelogged(
-            withId: logId,
-            isHappy: happy,
-            // MARK: CHANGE THIS
-            happyLevel: happyLvl,
-            isBeneficial: beneficial,
-            tags: selectedLabels
-        )
-        
-        print("ReLog: Save complete for log \(logId).")
+//        logRepository.childRelogged(
+//            withId: logId,
+//            isHappy: happy,
+//            // MARK: CHANGE THIS
+//            happyLevel: happyLvl,
+//            isBeneficial: beneficial,
+//            tags: selectedLabels
+//        )
+//        
+//        print("ReLog: Save complete for log \(logId).")
     }
     
     private func fetchBeneficialTags() {

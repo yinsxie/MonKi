@@ -13,7 +13,7 @@ struct FieldCardView: View {
     var logImage: UIImage?
     var isShovelMode: Bool?
     
-    var onEmptyFieldTapped: (() -> Void)?
+    var onFieldTapped: (() -> Void)?
     var onCTAButtonTapped: (() -> Void)?
     
     let emptyFieldSize: CGFloat = 141.0
@@ -38,13 +38,13 @@ struct FieldCardView: View {
         type: FieldState,
         logImage: UIImage? = UIImage(named: ColoredPencilAsset.canvasViewBlackPencil.imageName),
         isShovelMode: Bool? = false,
-        onEmptyFieldTapped: (() -> Void)? = nil,
+        onFieldTapped: (() -> Void)? = nil,
         onCTAButtonTapped: (() -> Void)? = nil
     ) {
         self.type = type
         self.logImage = logImage
         self.isShovelMode = isShovelMode
-        self.onEmptyFieldTapped = onEmptyFieldTapped
+        self.onFieldTapped = onFieldTapped
         self.onCTAButtonTapped = onCTAButtonTapped
         
         switch type {
@@ -104,13 +104,12 @@ struct FieldCardView: View {
             Image(GardenImageAsset.gardenEmptyField.imageName)
                 .resizable()
                 .frame(width: emptyFieldSize, height: emptyFieldSize)
-                .onTapGesture {
-                    if type == .empty {
-                        onEmptyFieldTapped?()
-                    }
-                }
         )
         .frame(width: widthAndPotField, height: heightField)
+        .onTapGesture {
+            //MARK: ini sementara aja since garden akan berubah
+                onFieldTapped?()
+        }
     }
 }
 
