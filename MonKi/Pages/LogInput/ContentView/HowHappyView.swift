@@ -45,5 +45,8 @@ struct HowHappyView: View {
                 AudioManager.shared.play("HowHappy")
             }
         }
+        .onDisappear {
+            AudioManager.shared.stop()
+        }
     }
 }
