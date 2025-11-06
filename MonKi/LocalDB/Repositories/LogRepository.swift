@@ -8,6 +8,17 @@
 import CoreData
 import UIKit
 
+
+// logWaitingListToDo
+// id
+// logId
+// title
+// isChecked
+// createdAt
+// updatedAt
+
+// predicate, where logid = logid
+
 protocol LogRepositoryProtocol {
     
     func createLogWithImage(_ uiImage: UIImage, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String])

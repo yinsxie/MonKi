@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+struct AddValueModalConfig: TextFieldModalProtocol {
+    var title: String = "Belum ketemu yang pas? Tulis satu kata yang mewakili nilai keluargamu"
+    var placeholder: String = "contoh: Kreatif"
+    var maxCharacters: Int
+    var cancelButtonTitle: String = "Kembali"
+    var saveButtonTitle: String = "Simpan"
+    
+    init(maxCharacters: Int) {
+        self.maxCharacters = maxCharacters
+    }
+}
+
 struct ParentValueTagView: View {
     
     @StateObject private var viewModel = ParentValueTagViewModel()
@@ -15,7 +27,6 @@ struct ParentValueTagView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 30) {
-                // MARK: - Header
                 HStack(alignment: .top) {
                     Image("MamaMonki")
                         .resizable()
@@ -63,14 +74,33 @@ struct ParentValueTagView: View {
             footerButtons()
                 .padding(.horizontal, 24)
                 .padding(.bottom, 64)
+            
+            if viewModel.isShowingAddValueSheet {
+                let modalConfig = AddValueModalConfig(
+                    maxCharacters: viewModel.maxCustomValueChars
+                )
+                TextFieldModalView(
+                    type: modalConfig,
+                    text: $viewModel.customValueText,
+                    isSaveButtonDisabled: viewModel.isAddButtonDisabled,
+                    onCancel: {
+                        viewModel.customValueText = "" // Reset text saat batal
+                        viewModel.isShowingAddValueSheet = false
+                    },
+                    onSave: {
+                        viewModel.addCustomValue()
+                    },
+                    onTextChange: {
+                        viewModel.limitCustomValueText()
+                    }
+                )
+            }
         }
         .navigationBarHidden(true)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isShowingAddValueSheet)
         .ignoresSafeArea(edges: [.top, .bottom])
         .onAppear {
             viewModel.loadTags()
-        }
-        .sheet(isPresented: $viewModel.isShowingAddValueSheet) {
-            addValueSheet()
         }
     }
     
