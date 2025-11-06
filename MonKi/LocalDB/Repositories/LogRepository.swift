@@ -118,6 +118,7 @@ private extension LogRepository {
         let log = MsLog(context: context)
         
         log.id = UUID()
+        log.happyLevel = Int16(happyLevel)
         log.beneficialTags = IOHelper.combineTag(tags)
         log.state = state.stringValue
         log.imagePath = imagePath
