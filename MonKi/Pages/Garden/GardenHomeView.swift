@@ -99,26 +99,38 @@ struct GardenHomeView: View {
                 return false
             }
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
+            LazyVGrid(columns: [GridItem(.fixed(110), spacing: 13), GridItem(.fixed(110))], spacing: 60) {
                 
-                ForEach(activeLogs, id: \.self) { log in
-                    let fieldState = FieldState(state: log.state ?? "x")
-                    fieldCardViewBuilder(for: log, type: fieldState)
-                }
-                
-                // Now count fillers based on filtered logs
-                if activeLogs.count < 4 {
-                    ForEach(0..<(4 - activeLogs.count), id: \.self) { _ in
-                        fieldCardViewBuilder(for: nil, type: .empty)
+                ForEach(0..<4, id: \.self) { (index: Int) in
+                                    
+                    if index < activeLogs.count {
+                        let log = activeLogs[index]
+                        let fieldState = FieldState(state: log.state ?? "x")
+                        
+                        fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
+                    } else {
+                        fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
                     }
                 }
+                
+//                ForEach(activeLogs, id: \.self) { log in
+//                    let fieldState = FieldState(state: log.state ?? "x")
+//                    fieldCardViewBuilder(for: log, type: fieldState)
+//                }
+//                
+//                // Now count fillers based on filtered logs
+//                if activeLogs.count < 4 {
+//                    ForEach(0..<(4 - activeLogs.count), id: \.self) { _ in
+//                        fieldCardViewBuilder(for: nil, type: .empty)
+//                    }
+//                }
             }
             .offset(y: 40)
         }
     }
     
     @ViewBuilder
-    func fieldCardViewBuilder(for log: MsLog?, type: FieldState) -> some View {
+    func fieldCardViewBuilder(for log: MsLog?, type: FieldState, positionIndex: Int) -> some View {
         let image: UIImage? = {
             if let imagePath = log?.imagePath {
                 return ImageStorage.loadImage(from: imagePath)
@@ -127,7 +139,14 @@ struct GardenHomeView: View {
             }
         }()
         
-        FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
+        let colorForEmptyState: Color? = {
+            if type == .empty {
+                return getEmptyColor(for: positionIndex)
+            }
+            return nil
+        }()
+        
+        FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode, emptyStateColor: colorForEmptyState) {
             viewModel.onFieldTapped(
                 forLog: log,
                 forFieldType: type,
@@ -138,6 +157,21 @@ struct GardenHomeView: View {
             viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, logImage: image)
         }
         
+    }
+    
+    private func getEmptyColor(for position: Int) -> Color {
+        switch position {
+        case 0:
+            return Color(hex: "#AD7151")
+        case 1:
+            return Color(hex: "#8D5739")
+        case 2:
+            return Color(hex: "#7C4C32")
+        case 3:
+            return Color(hex: "#965C40")
+        default:
+            return Color(hex: "#AD7151")
+        }
     }
     
     @ViewBuilder

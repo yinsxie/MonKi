@@ -12,6 +12,7 @@ struct FieldCardView: View {
     var type: FieldState
     var logImage: UIImage?
     var isShovelMode: Bool?
+    var emptyStateColor: Color?
     
     var onFieldTapped: (() -> Void)?
     var onCTAButtonTapped: (() -> Void)?
@@ -38,12 +39,14 @@ struct FieldCardView: View {
         type: FieldState,
         logImage: UIImage? = UIImage(named: ColoredPencilAsset.canvasViewBlackPencil.imageName),
         isShovelMode: Bool? = false,
+        emptyStateColor: Color? = nil,
         onFieldTapped: (() -> Void)? = nil,
         onCTAButtonTapped: (() -> Void)? = nil
     ) {
         self.type = type
         self.logImage = logImage
         self.isShovelMode = isShovelMode
+        self.emptyStateColor = emptyStateColor
         self.onFieldTapped = onFieldTapped
         self.onCTAButtonTapped = onCTAButtonTapped
         
@@ -101,14 +104,36 @@ struct FieldCardView: View {
             }
         }
         .background(
-            Image(GardenImageAsset.gardenEmptyField.imageName)
-                .resizable()
-                .frame(width: emptyFieldSize, height: emptyFieldSize)
+            emptyStateBackgroundView
         )
         .frame(width: widthAndPotField, height: heightField)
         .onTapGesture {
             //MARK: ini sementara aja since garden akan berubah
                 onFieldTapped?()
+        }
+    }
+    
+    @ViewBuilder
+        private var emptyStateBackgroundView: some View {
+        if type == .empty {
+            ZStack {
+                Image(GardenImageAsset.emptyFieldBase.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: emptyFieldSize, height: emptyFieldSize)
+                    .foregroundStyle(emptyStateColor ?? Color(hex: "#AD7151")
+)
+                
+                Image(GardenImageAsset.emptyFieldOverlay.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: emptyFieldSize, height: emptyFieldSize)
+            }
+            
+        } else {
+            Image(GardenImageAsset.gardenEmptyField.imageName)
+                .resizable()
+                .frame(width: emptyFieldSize, height: emptyFieldSize)
         }
     }
 }
