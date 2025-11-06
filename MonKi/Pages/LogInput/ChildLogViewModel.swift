@@ -243,7 +243,9 @@ final class ChildLogViewModel: ObservableObject {
             self.activePopup = .withParent(
                 onPrimaryTap: {
                     print("With Parent: Yes")
-                    gateManager.gateDestination = .reviewLogFromGarden(log: newLog)
+                    context.popToRoot()
+                    // TODO: setup gatemanager gate destination to verdict page
+//                    gateManager.gateDestination =
 //                    context.popLast()
 //                    context.goTo(.parentGate)
                 },
