@@ -154,6 +154,7 @@ struct GardenHomeView: View {
             viewModel.onFieldTapped(
                 forLog: log,
                 forFieldType: type,
+                gateManager: gateManager,
                 context: navigationManager
             )
         } onCTAButtonTapped: {

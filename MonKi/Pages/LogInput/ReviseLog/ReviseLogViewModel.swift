@@ -146,7 +146,7 @@ final class ReLogViewModel: ObservableObject {
         let beneficial = !selectedLabels.isEmpty
         
         
-        // TODO: kerja verdict dulu boss
+        // TODO: kerja page verdict dulu boss
 //        logRepository.logContinued(forLog: logId, happyLevel: happyLvl, tags: selectedLabels, withVerdict: <#T##ParentLogVerdict#>)
         
         // --- Call Repository ---

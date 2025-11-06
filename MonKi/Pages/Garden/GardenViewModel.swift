@@ -39,13 +39,13 @@ final class GardenViewModel: ObservableObject {
         context.popLast()
     }
     
-    func onFieldTapped(forLog log: MsLog?, forFieldType type: FieldState, context: NavigationManager) {
+    func onFieldTapped(forLog log: MsLog?, forFieldType type: FieldState, gateManager: ParentalGateManager, context: NavigationManager) {
         switch type {
         case .empty:
             context.goTo(.log)
         case .created:
             guard let logToEdit = log else { return }
-            context.goTo(.relog(log: logToEdit))
+            gateManager.gateDestination = .reviewLogFromGarden(log: logToEdit)
         default:
             return
         }
