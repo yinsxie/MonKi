@@ -14,6 +14,12 @@ struct GardenHomeView: View {
     @StateObject private var viewModel = GardenViewModel()
     @StateObject var childlogViewModel = ChildLogViewModel()
     
+    @FetchRequest(
+        entity: MsLog.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \MsLog.createdAt, ascending: true)],
+        predicate: NSPredicate(format: "state != %@", LogState.logDone.stringValue)
+    ) var gardenLogs: FetchedResults<MsLog>
+    
     var body: some View {
         NavigationStack(path: $navigationManager.navigationPath) {
             ZStack {
@@ -34,7 +40,7 @@ struct GardenHomeView: View {
                     
                     Spacer()
                     //MARK: Uncomment to enable left and right
-                    footerButtonView
+                    footerButtonView(totalLogs: gardenLogs.count)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 57)
@@ -43,9 +49,10 @@ struct GardenHomeView: View {
                 
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .onAppear {
-                viewModel.fetchLogData()
-            }
+            // not needed with @FetchRequest
+            //            .onAppear {
+            //                viewModel.fetchLogData()
+            //            }
             .navigationDestination(for: MainRoute.self) { route in
                 switch route {
                 case .log:
@@ -89,25 +96,41 @@ struct GardenHomeView: View {
     
     @ViewBuilder
     var fieldView: some View {
-        if viewModel.isLoading {
-            ProgressView()
-        } else {
-            LazyVGrid(columns: [GridItem(.fixed(110), spacing: 13), GridItem(.fixed(110))], spacing: 60) {
-                
-                ForEach(0..<4, id: \.self) { (index: Int) in
+        // no need manual loading with @FetchRequest
+        //        if viewModel.isLoading {
+        //            ProgressView()
+        //        } else {
+        
+        let pagedLogs = viewModel.getPagedLogs(from: gardenLogs)
+        
+        LazyVGrid(columns: [GridItem(.fixed(110), spacing: 13), GridItem(.fixed(110))], spacing: 60) {
+            
+            // hardcode version (before pagination)
+            //                ForEach(0..<4, id: \.self) { (index: Int) in
+            //
+            //                    if index < viewModel.logs.count {
+            //                        let log = viewModel.logs[index]
+            //                        let fieldState = FieldState(state: log.state ?? "x")
+            //
+            //                        fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
+            //                    } else {
+            //                        fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
+            //                    }
+            //                }
+            
+            ForEach(0..<viewModel.pageSize, id: \.self) { (index: Int) in
+                if index < pagedLogs.count {
+                    let log = pagedLogs[index]
+                    let fieldState = FieldState(state: log.state ?? "x")
                     
-                    if index < viewModel.logs.count {
-                        let log = viewModel.logs[index]
-                        let fieldState = FieldState(state: log.state ?? "x")
-                        
-                        fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
-                    } else {
-                        fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
-                    }
+                    fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
+                } else {
+                    fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
                 }
             }
-            .offset(y: 40)
         }
+        .offset(y: 40)
+        //        }
     }
     
     @ViewBuilder
@@ -166,37 +189,72 @@ struct GardenHomeView: View {
         }
     }
     
-    var footerButtonView: some View {
+    func footerButtonView(totalLogs: Int) -> some View {
         HStack {
-            CustomButton(
-                backgroundColor: ColorPalette.yellow600,
-                foregroundColor: ColorPalette.yellow400,
-                textColor: ColorPalette.yellow50,
-                font: .system(size: 20, weight: .black, design: .rounded),
-                image: "arrow.left",
-                action: {
-                },
-                cornerRadius: 24,
-                width: 64,
-                type: .normal
-            )
+            leftButton(totalLogs: totalLogs)
             
             Spacer()
             
-            CustomButton(
-                backgroundColor: ColorPalette.yellow600,
-                foregroundColor: ColorPalette.yellow400,
-                textColor: ColorPalette.yellow50,
-                font: .system(size: 20, weight: .black, design: .rounded),
-                image: "arrow.right",
-                action: {
-                },
-                cornerRadius: 24,
-                width: 64,
-                type: .normal
+            (
+                Text("\(viewModel.currIndex + 1)")
+                    .fontWeight(.bold)
+                +
+                Text(" dari \(viewModel.maxPage(totalLogs: totalLogs))")
             )
+            .font(.system(size: 24, weight: .regular, design: .rounded))
+            .foregroundStyle(.white)
+            .opacity(viewModel.maxPage(totalLogs: totalLogs) == 1 ? 0 : 1)
+            
+            Spacer()
+            
+            rightButton(totalLogs: totalLogs)
             
         }
+    }
+    
+    @ViewBuilder
+    func leftButton(totalLogs: Int) -> some View {
+        let isDisabled = viewModel.currIndex == 0
+        
+        CustomButton(
+            backgroundColor: ColorPalette.yellow600,
+            foregroundColor: ColorPalette.yellow400,
+            textColor: ColorPalette.yellow50,
+            font: .system(size: 20, weight: .black, design: .rounded),
+            image: "arrow.left",
+            action: {
+                withAnimation {
+                    viewModel.decrementPage()
+                }
+            },
+            cornerRadius: 24,
+            width: 64,
+            type: .normal
+        )
+        .opacity(isDisabled ? 0 : 1)
+    }
+    
+    @ViewBuilder
+    func rightButton(totalLogs: Int) -> some View {
+        let isDisabled = viewModel.currIndex == viewModel.maxPage(totalLogs: totalLogs) - 1
+        
+        CustomButton(
+            backgroundColor: ColorPalette.yellow600,
+            foregroundColor: ColorPalette.yellow400,
+            textColor: ColorPalette.yellow50,
+            font: .system(size: 20, weight: .black, design: .rounded),
+            image: "arrow.right",
+            action: {
+                withAnimation {
+                    viewModel.incrementPage(totalLogs: totalLogs)
+                }
+            },
+            cornerRadius: 24,
+            width: 64,
+            type: .normal
+        )
+        .opacity(isDisabled ? 0 : 1)
+        
     }
     
     var collectibleButton: some View {
