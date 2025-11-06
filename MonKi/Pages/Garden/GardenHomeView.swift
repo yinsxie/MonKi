@@ -77,7 +77,8 @@ struct GardenHomeView: View {
                         case .parentSettings:
                             navigationManager.goTo(.parentValue)
 //                        case .reviewLogOnFirstLog:
-//                        case .reviewLogFromGarden:
+                        case .reviewLogFromGarden(let log):
+                            navigationManager.goTo(.relog(log: log))
 //                        case .checklistUpdate:
                         }
                     }

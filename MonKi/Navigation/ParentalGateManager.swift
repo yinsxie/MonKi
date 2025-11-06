@@ -8,9 +8,9 @@
 import SwiftUI
 import Combine
 
-enum ProtectedDestination: Identifiable {
+enum ProtectedDestination: Identifiable, Hashable {
     case parentSettings
-//    case reviewLogFromGarden
+    case reviewLogFromGarden(log: MsLog)
 //    case reviewLogOnFirstLog
 //    case checklistUpdate
 
