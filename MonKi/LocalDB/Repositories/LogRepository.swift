@@ -95,12 +95,12 @@ final class LogRepository: LogRepositoryProtocol {
    
     func fetchGardenLogs() -> [MsLog] {
         let logs = fetchLogs()
-        return logs.filter { $0.state != LogState.logApproved.stringValue }
+        return logs.filter { $0.state != LogState.logDone.stringValue }
     }
     
     func fetchApprovedLog() -> [MsLog] {
         let logs = fetchLogs()
-        return logs.filter { $0.state == LogState.logApproved.stringValue }
+        return logs.filter { $0.state == LogState.logDone.stringValue }
     }
 }
 
