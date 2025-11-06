@@ -76,10 +76,10 @@ struct GardenHomeView: View {
                         switch destination {
                         case .parentSettings:
                             navigationManager.goTo(.parentValue)
-//                        case .reviewLogOnFirstLog:
+                            //                        case .reviewLogOnFirstLog:
                         case .reviewLogFromGarden(let log):
                             navigationManager.goTo(.relog(log: log))
-//                        case .checklistUpdate:
+                            //                        case .checklistUpdate:
                         }
                     }
                 )
@@ -92,20 +92,12 @@ struct GardenHomeView: View {
         if viewModel.isLoading {
             ProgressView()
         } else {
-            // Filter out archived logs before both rendering and counting
-            let activeLogs = viewModel.logs.filter {
-                if let state = $0.state {
-                    return LogState(state: state) != .logDone
-                }
-                return false
-            }
-            
             LazyVGrid(columns: [GridItem(.fixed(110), spacing: 13), GridItem(.fixed(110))], spacing: 60) {
                 
                 ForEach(0..<4, id: \.self) { (index: Int) in
-                                    
-                    if index < activeLogs.count {
-                        let log = activeLogs[index]
+                    
+                    if index < viewModel.logs.count {
+                        let log = viewModel.logs[index]
                         let fieldState = FieldState(state: log.state ?? "x")
                         
                         fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
@@ -113,18 +105,6 @@ struct GardenHomeView: View {
                         fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
                     }
                 }
-                
-//                ForEach(activeLogs, id: \.self) { log in
-//                    let fieldState = FieldState(state: log.state ?? "x")
-//                    fieldCardViewBuilder(for: log, type: fieldState)
-//                }
-//
-//                // Now count fillers based on filtered logs
-//                if activeLogs.count < 4 {
-//                    ForEach(0..<(4 - activeLogs.count), id: \.self) { _ in
-//                        fieldCardViewBuilder(for: nil, type: .empty)
-//                    }
-//                }
             }
             .offset(y: 40)
         }

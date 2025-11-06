@@ -26,7 +26,7 @@ struct FieldCardView: View {
         switch type {
         case .empty:
             return widthAndPotField
-        case .created, .declined, .approved:
+        case .created, .declined, .approved, .waiting:
             return 158.59
         case .done:
             return 181.71
@@ -141,9 +141,9 @@ struct FieldCardView: View {
 #Preview {
     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
         FieldCardView(type: .empty)
-        FieldCardView(type: .approved)
         FieldCardView(type: .created)
-        FieldCardView(type: .done)
+        FieldCardView(type: .waiting)
+        FieldCardView(type: .approved)
         
     }
     .padding(.top, 50)
