@@ -93,7 +93,7 @@ private extension GardenViewModel {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 if let logId = log.id {
-                    self.logRepo.logDone(withId: logId)
+//                    self.logRepo.logDone(withId: logId)
                 }
             }
         }
@@ -106,7 +106,7 @@ private extension GardenViewModel {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 if let logId = log.id {
                     UserDefaultsManager.shared.decrementCurrentFilledField(by: 1)
-                    self.logRepo.logArchieved(withId: logId)
+//                    self.logRepo.logArchieved(withId: logId)
                 }
             }
         }

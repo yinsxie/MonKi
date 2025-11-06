@@ -94,7 +94,7 @@ struct GardenHomeView: View {
             // Filter out archived logs before both rendering and counting
             let activeLogs = viewModel.logs.filter {
                 if let state = $0.state {
-                    return ChildrenLogState(state: state) != .archived
+//                    return LogState(state: state) != .archived
                 }
                 return false
             }
