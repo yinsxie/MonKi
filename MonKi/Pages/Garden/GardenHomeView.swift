@@ -10,6 +10,7 @@ import SwiftUI
 struct GardenHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var gateManager: ParentalGateManager
     @StateObject private var viewModel = GardenViewModel()
     
     var body: some View {
@@ -24,7 +25,7 @@ struct GardenHomeView: View {
                 
                 VStack {
                     HStack {
-                        homeButton
+                        parentButton
                         Spacer()
                         collectibleButton
                     }
@@ -38,7 +39,7 @@ struct GardenHomeView: View {
                 .padding(.bottom, 57)
                 
                 popUpView
-            
+                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onAppear {
@@ -63,6 +64,23 @@ struct GardenHomeView: View {
                         .navigationBarBackButtonHidden(true)
                 }
             }
+        }
+        .fullScreenCover(item: $gateManager.gateDestination) { destination in
+            ParentalGateView(
+                viewModel: ParentalGateViewModel(
+                    navigationManager: navigationManager,
+                    onSuccess: {
+                        gateManager.gateDestination = nil
+                        switch destination {
+                        case .parentSettings:
+                            navigationManager.goTo(.parentValue)
+//                        case .reviewLogOnFirstLog:
+//                        case .reviewLogFromGarden:
+//                        case .checklistUpdate:
+                        }
+                    }
+                )
+            )
         }
     }
     
@@ -109,7 +127,7 @@ struct GardenHomeView: View {
         
         FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
         } onCTAButtonTapped: {
-            print("CTA button tapped") 
+            print("CTA button tapped")
             viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, logImage: image)
         }
     }
@@ -154,7 +172,7 @@ struct GardenHomeView: View {
                 width: 64,
                 type: .normal
             )
-
+            
         }
     }
     
@@ -175,15 +193,15 @@ struct GardenHomeView: View {
         )
     }
     
-    var homeButton: some View {
+    var parentButton: some View {
         CustomButton(
             backgroundColor: ColorPalette.yellow600,
             foregroundColor: ColorPalette.yellow400,
             textColor: ColorPalette.yellow50,
-            image: "kidsButton",
+            image: "parentButton",
             imageHeight: 60,
             action: {
-                
+                gateManager.gateDestination = .parentSettings
             },
             cornerRadius: 24,
             width: 64,
@@ -196,4 +214,5 @@ struct GardenHomeView: View {
 #Preview {
     GardenHomeView()
         .environmentObject(NavigationManager())
+        .environmentObject(ParentalGateManager())
 }
