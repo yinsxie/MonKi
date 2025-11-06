@@ -34,7 +34,16 @@ final class GardenViewModel: ObservableObject {
         context.popLast()
     }
     
-    func onFieldTapped(forFieldType type: FieldState, context: NavigationManager) {
+    func onFieldTapped(forLog log: MsLog?, forFieldType type: FieldState, context: NavigationManager) {
+        switch type {
+        case .empty:
+            context.goTo(.log)
+        case .created:
+            guard let logToEdit = log else { return }
+            context.goTo(.relog(log: logToEdit))
+        default:
+            return
+        }
     }
     
     func handleCTAButtonTapped(forLog log: MsLog?, withType type: FieldState, context: NavigationManager, logImage: UIImage? = nil) {
