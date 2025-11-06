@@ -11,6 +11,7 @@ struct GardenHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
     @StateObject private var viewModel = GardenViewModel()
+    @StateObject var childlogViewModel = ChildLogViewModel()
     
     var body: some View {
         NavigationStack(path: $navigationManager.navigationPath) {
@@ -38,7 +39,7 @@ struct GardenHomeView: View {
                 .padding(.bottom, 57)
                 
                 popUpView
-            
+                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onAppear {
@@ -49,6 +50,7 @@ struct GardenHomeView: View {
                 case .log:
                     ChildLogNavigationContainer()
                         .navigationBarBackButtonHidden(true)
+                        .environmentObject(childlogViewModel)
                 case .collectible:
                     CollectiblesHomeView()
                         .navigationBarBackButtonHidden(true)
@@ -108,10 +110,16 @@ struct GardenHomeView: View {
         }()
         
         FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
+            viewModel.onFieldTapped(
+                forLog: log,
+                forFieldType: type,
+                context: navigationManager
+            )
         } onCTAButtonTapped: {
-            print("CTA button tapped") 
+            print("CTA button tapped")
             viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, logImage: image)
         }
+        
     }
     
     @ViewBuilder
@@ -154,7 +162,7 @@ struct GardenHomeView: View {
                 width: 64,
                 type: .normal
             )
-
+            
         }
     }
     

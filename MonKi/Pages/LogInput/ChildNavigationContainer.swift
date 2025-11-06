@@ -87,22 +87,29 @@ struct ChildLogNavigationContainer: View {
                  )
             }
             
-            if viewModel.isShowGardenFullAlert {
-                popUpView
+//            if viewModel.isShowGardenFullAlert {
+//                popUpView
+//            }
+            if let popupType = viewModel.activePopup {
+                PopUpView(type: popupType) {
+                    withAnimation {
+                        viewModel.dismissActivePopup()
+                    }
+                }
             }
         }
         
         // TODO: Add alert for Canvas processing errors if needed
     }
     
-    var popUpView: some View {
-        PopUpView(type: LogInputModality.gardenFull(onPrimaryTap: {
-            withAnimation {
-                viewModel.setAlertonGardenFull(to: false)
-                navigationManager.popToRoot()
-            }
-        })) {
-            viewModel.setAlertonGardenFull(to: false)
-        }
-    }
+//    var popUpView: some View {
+//        PopUpView(type: LogInputModality.gardenFull(onPrimaryTap: {
+//            withAnimation {
+//                viewModel.setAlertonGardenFull(to: false)
+//                navigationManager.popToRoot()
+//            }
+//        })) {
+//            viewModel.setAlertonGardenFull(to: false)
+//        }
+//    }
 }
