@@ -81,7 +81,6 @@ struct ChildLogNavigationContainer: View {
                         viewModel.selectedItem = nil
                         viewModel.previewImage = nil
                         viewModel.finalProcessedImage = UIImage()
-                        viewModel.backgroundRemover.partialReset()
                         viewModel.imageLoadError = nil
                     }
                  )
