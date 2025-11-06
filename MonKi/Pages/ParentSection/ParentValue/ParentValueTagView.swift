@@ -28,13 +28,13 @@ struct ParentValueTagView: View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 30) {
                 HStack(alignment: .top) {
-                    Image("MamaMonki")
+                    Image("mamaMonki")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 112)
                         .padding(.top, 17)
                     Spacer()
-                    Image("PapaMonki")
+                    Image("papaMonki")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 90)
