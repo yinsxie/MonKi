@@ -180,10 +180,10 @@ struct GardenHomeView: View {
             backgroundColor: ColorPalette.yellow600,
             foregroundColor: ColorPalette.yellow400,
             textColor: ColorPalette.yellow50,
-            image: "kidsButton",
+            image: "parentButton",
             imageHeight: 60,
             action: {
-                
+                navigationManager.goTo(.parentValue)
             },
             cornerRadius: 24,
             width: 64,
