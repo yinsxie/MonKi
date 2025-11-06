@@ -240,7 +240,7 @@ final class ChildLogViewModel: ObservableObject {
                 onPrimaryTap: {
                     print("With Parent: Yes")
                     context.popLast()
-                    context.goTo(.parentGate)
+//                    context.goTo(.helper(.))
                 },
                 onSecondaryTap: {
                     print("With Parent: No")

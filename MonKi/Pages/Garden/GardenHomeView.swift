@@ -15,75 +15,37 @@ struct GardenHomeView: View {
     @StateObject var childlogViewModel = ChildLogViewModel()
     
     var body: some View {
-        NavigationStack(path: $navigationManager.navigationPath) {
-            ZStack {
-                Image(GardenImageAsset.gardenBackground.imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-                
-                fieldView
-                
-                VStack {
-                    HStack {
-                        parentButton
-                        Spacer()
-                        collectibleButton
-                    }
-                    .padding(.top, 70)
-                    
+        ZStack {
+            Image(GardenImageAsset.gardenBackground.imageName)
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+            
+            fieldView
+            
+            VStack {
+                HStack {
+                    parentButton
                     Spacer()
-                    //MARK: Uncomment to enable left and right
-                    footerButtonView
+                    collectibleButton
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 57)
+                .padding(.top, 70)
                 
-                popUpView
-                
+                Spacer()
+                //MARK: Uncomment to enable left and right
+                footerButtonView
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .onAppear {
-                viewModel.fetchLogData()
-            }
-            .navigationDestination(for: MainRoute.self) { route in
-                switch route {
-                case .log:
-                    ChildLogNavigationContainer()
-                        .navigationBarBackButtonHidden(true)
-                        .environmentObject(childlogViewModel)
-                case .collectible:
-                    CollectiblesHomeView()
-                        .navigationBarBackButtonHidden(true)
-                case .relog(let log):
-                    ReLogNavigationContainer(logToEdit: log)
-                        .navigationBarBackButtonHidden(true)
-                case .parentValue:
-                    ParentValueTagView()
-                        .navigationBarBackButtonHidden(true)
-                case .parentGate:
-                    ParentalGateView(viewModel: ParentalGateViewModel(navigationManager: navigationManager, onSuccess: {}))
-                        .navigationBarBackButtonHidden(true)
-                }
-            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 57)
+            
+            popUpView
+            
         }
-        .fullScreenCover(item: $gateManager.gateDestination) { destination in
-            ParentalGateView(
-                viewModel: ParentalGateViewModel(
-                    navigationManager: navigationManager,
-                    onSuccess: {
-                        gateManager.gateDestination = nil
-                        switch destination {
-                        case .parentSettings:
-                            navigationManager.goTo(.parentValue)
-//                        case .reviewLogOnFirstLog:
-//                        case .reviewLogFromGarden:
-//                        case .checklistUpdate:
-                        }
-                    }
-                )
-            )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            viewModel.fetchLogData()
         }
+        
     }
     
     @ViewBuilder
@@ -94,7 +56,7 @@ struct GardenHomeView: View {
             // Filter out archived logs before both rendering and counting
             let activeLogs = viewModel.logs.filter {
                 if let state = $0.state {
-//                    return LogState(state: state) != .archived
+                    //                    return LogState(state: state) != .archived
                 }
                 return false
             }
@@ -192,7 +154,7 @@ struct GardenHomeView: View {
             font: .system(size: 20, weight: .black, design: .rounded),
             image: "book.pages.fill",
             action: {
-                navigationManager.goTo(.collectible)
+                navigationManager.goTo(.main(.collectible))
                 print("Pindah ke collectible")
             },
             cornerRadius: 24,

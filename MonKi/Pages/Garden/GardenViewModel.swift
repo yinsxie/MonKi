@@ -26,7 +26,7 @@ final class GardenViewModel: ObservableObject {
         context.popLast()
     }
     
-    func navigateTo(route: MainRoute, context: NavigationManager) {
+    func navigateTo(route: RootRoute, context: NavigationManager) {
         context.goTo(route)
     }
     
@@ -37,10 +37,10 @@ final class GardenViewModel: ObservableObject {
     func onFieldTapped(forLog log: MsLog?, forFieldType type: FieldState, context: NavigationManager) {
         switch type {
         case .empty:
-            context.goTo(.log)
+            context.goTo(.main(.log))
         case .created:
             guard let logToEdit = log else { return }
-            context.goTo(.relog(log: logToEdit))
+            context.goTo(.main(.relog(log: logToEdit)))
         default:
             return
         }
