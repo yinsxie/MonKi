@@ -187,40 +187,6 @@ struct ParentValueTagView: View {
             .animation(.easeInOut(duration: 0.2), value: isEnabled)
         }
     }
-    
-    @ViewBuilder
-    private func addValueSheet() -> some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Nilai Keluarga Baru")) {
-                    TextField("Contoh: Jujur", text: $viewModel.customValueText)
-                        .onChange(of: viewModel.customValueText) {
-                            viewModel.limitCustomValueText()
-                        }
-                    
-                    Text("\(viewModel.customValueCharacterCount) / \(viewModel.maxCustomValueChars) karakter")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                
-                Button("Tambahkan") {
-                    viewModel.addCustomValue()
-                }
-                .disabled(viewModel.isAddButtonDisabled)
-            }
-            .navigationTitle("Buat Nilai Baru")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Batal") {
-                        viewModel.isShowingAddValueSheet = false
-                        viewModel.customValueText = ""
-                    }
-                }
-            }
-        }
-    }
 }
 
 #Preview {
