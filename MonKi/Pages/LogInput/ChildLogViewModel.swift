@@ -348,20 +348,20 @@ final class ChildLogViewModel: ObservableObject {
     
     private func saveLog() {
         
-        guard let imageToSave = finalProcessedImage else {
-            print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
-            return
-        }
-        
-        logRepo.createLogWithImage(
-            imageToSave,
-            isHappy: true,
-            happyLevel: self.happyLevel,
-            isBeneficial: self.isBeneficial,
-            tags: self.beneficialTags
-        )
-        
-        UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
+//        guard let imageToSave = finalProcessedImage else {
+//            print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
+//            return
+//        }
+//        
+//        logRepo.createLogWithImage(
+//            imageToSave,
+//            isHappy: true,
+//            happyLevel: self.happyLevel,
+//            isBeneficial: self.isBeneficial,
+//            tags: self.beneficialTags
+//        )
+//        
+//        UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
     }
     
     func setAlertonGardenFull(to value: Bool) {

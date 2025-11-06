@@ -8,7 +8,6 @@
 import CoreData
 import UIKit
 
-
 // logWaitingListToDo
 // id
 // logId
@@ -20,16 +19,20 @@ import UIKit
 // predicate, where logid = logid
 
 protocol LogRepositoryProtocol {
+    func createLogOnly(_ uiImage: UIImage, happyLevel: Int, tags: [String])
     
-    func createLogWithImage(_ uiImage: UIImage, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String])
+    func logContinued(forLog log: MsLog, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict)
+    
+    func createFullLog(_ uiImage: UIImage, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict)
+   
+    func logHarvested(withId id: UUID)
+    
+    func logDeclined(withId id: UUID)
+    
+    func logDeletedAfterDeclined(withId id: UUID)
+    func logDeletedAfterDeclined(withLog log: MsLog)
+    
     func fetchLogs() -> [MsLog]
-    func childRelogged(withId id: UUID, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String])
-    
-    func logApprovedByParent(withId id: UUID)
-    func logRejectedByParent(withId id: UUID)
-    func logDone(withId id: UUID)
-    func logArchieved(withId id: UUID)
-    func logReplaced(replacedLog log: MsLog, newImage: UIImage, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String])
 }
 
 final class LogRepository: LogRepositoryProtocol {
@@ -40,14 +43,62 @@ final class LogRepository: LogRepositoryProtocol {
         self.context = context
     }
     
-    func createLogWithImage(_ uiImage: UIImage, isHappy: Bool,happyLevel: Int?, isBeneficial: Bool, tags: [String]) {
-        
+    func logHarvested(withId id: UUID) {
+        updateLogState(withId: id, newState: .logDone)
+    }
+    
+    func logDeclined(withId id: UUID) {
+        updateLogState(withId: id, newState: .logDeclined)
+    }
+    
+    func logDeletedAfterDeclined(withId id: UUID) {
+        guard let log = fetchLogById(id: id) else { return }
+        deleteLog(log: log)
+    }
+    
+    func logDeletedAfterDeclined(withLog log: MsLog) {
+        deleteLog(log: log)
+    }
+    
+    func createLogOnly(_ uiImage: UIImage, happyLevel: Int, tags: [String]) {
         guard let imagePath = ImageStorage.saveImage(uiImage) else {
             print("Failed to save image")
             return
         }
         
-        createLog(imagePath: imagePath, isHappy: isHappy, happyLevel: happyLevel, isBeneficial: isBeneficial, tags: tags)
+        createLog(imagePath: imagePath, withState: .logOnly, happyLevel: happyLevel, tags: tags, withVerdict: nil)
+    }
+    
+    func logContinued(forLog log: MsLog, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict) {
+        
+        log.happyLevel = Int16(happyLevel)
+        log.beneficialTags = IOHelper.combineTag(tags)
+        log.parentVerdict = verdict.value
+        
+        do {
+            try context.save()
+        } catch {
+            print("Failed to update log state: \(error.localizedDescription)")
+        }
+    }
+    
+    func createFullLog(_ uiImage: UIImage, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict) {
+        guard let imagePath = ImageStorage.saveImage(uiImage) else {
+            print("Failed to save image")
+            return
+        }
+        
+        var state: LogState = .logOnly
+        switch verdict {
+        case .approved:
+            state = .logApproved
+        case .conditional:
+            state = .logWaiting
+        case .declined:
+            state = .logDeclined
+        }
+        
+        createLog(imagePath: imagePath, withState: state, happyLevel: happyLevel, tags: tags, withVerdict: verdict)
     }
     
     func fetchLogs() -> [MsLog] {
@@ -59,62 +110,23 @@ final class LogRepository: LogRepositoryProtocol {
             return []
         }
     }
-    
-    func childRelogged(withId id: UUID, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String]) {
-        guard let log = fetchLogById(id: id) else {
-            return
-        }
-        
-        log.isHappy = isHappy
-        log.isBeneficial = isBeneficial
-        log.beneficialTags = IOHelper.combineTag(tags)
-        log.happyLevel = Int16(happyLevel ?? 0)
-        log.updatedAt = Date()
-        
-        do {
-            try context.save()
-            updateLogState(withId: id, newState: .created)
-        } catch {
-            print("Failed to update log state: \(error.localizedDescription)")
-        }
-    }
-    
-    func logApprovedByParent(withId id: UUID) {
-        updateLogState(withId: id, newState: .approved)
-    }
-    
-    func logRejectedByParent(withId id: UUID) {
-        updateLogState(withId: id, newState: .declined)
-    }
-    
-    func logDone(withId id: UUID) {
-        updateLogState(withId: id, newState: .done)
-    }
-    
-    func logArchieved(withId id: UUID) {
-        updateLogState(withId: id, newState: .archived)
-    }
-    
-    func logReplaced(replacedLog log: MsLog, newImage: UIImage, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String]) {
-        deleteLog(log: log)
-        createLogWithImage(newImage, isHappy: isHappy, happyLevel: happyLevel, isBeneficial: isBeneficial, tags: tags)
-    }
 }
 
 private extension LogRepository {
     
-    func createLog(imagePath: String, isHappy: Bool, happyLevel: Int?, isBeneficial: Bool, tags: [String]) {
+    func createLog(imagePath: String, withState state: LogState, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict?) {
         let log = MsLog(context: context)
         
         log.id = UUID()
         log.beneficialTags = IOHelper.combineTag(tags)
-        log.isBeneficial = isBeneficial
-        log.isHappy = isHappy
-        log.happyLevel = Int16(happyLevel ?? 0)
-        log.state = ChildrenLogState.created.stringValue
+        log.state = state.stringValue
         log.imagePath = imagePath
         log.createdAt = Date()
         log.updatedAt = Date()
+        
+        if let verdict = verdict?.value {
+            log.parentVerdict = verdict
+        }
         
         do {
             try context.save()
@@ -123,7 +135,7 @@ private extension LogRepository {
         }
     }
     
-    func updateLogState(withId id: UUID, newState: ChildrenLogState) {
+    func updateLogState(withId id: UUID, newState: LogState) {
         
         guard let log = fetchLogById(id: id) else {
             return

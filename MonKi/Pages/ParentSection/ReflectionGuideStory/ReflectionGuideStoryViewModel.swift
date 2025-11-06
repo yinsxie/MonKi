@@ -38,8 +38,8 @@ class ReflectionGuideStoryViewModel: ObservableObject {
     
     func rejectLog() {
         guard let logId = log.id else { return }
-        print("Rejected log: \(logId)")
-        logRepository.logRejectedByParent(withId: logId)
+//        print("Rejected log: \(logId)")
+//        logRepository.logRejectedByParent(withId: logId)
     }
     
     private func loadReflectionPages() {
