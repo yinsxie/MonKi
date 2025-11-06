@@ -94,7 +94,7 @@ struct GardenHomeView: View {
             // Filter out archived logs before both rendering and counting
             let activeLogs = viewModel.logs.filter {
                 if let state = $0.state {
-//                    return LogState(state: state) != .archived
+                    return LogState(state: state) != .logDone
                 }
                 return false
             }
@@ -117,7 +117,7 @@ struct GardenHomeView: View {
 //                    let fieldState = FieldState(state: log.state ?? "x")
 //                    fieldCardViewBuilder(for: log, type: fieldState)
 //                }
-//                
+//
 //                // Now count fillers based on filtered logs
 //                if activeLogs.count < 4 {
 //                    ForEach(0..<(4 - activeLogs.count), id: \.self) { _ in

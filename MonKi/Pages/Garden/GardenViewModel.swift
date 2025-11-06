@@ -67,7 +67,7 @@ final class GardenViewModel: ObservableObject {
     func fetchLogData() {
         logs = []
         isLoading = true
-        logs = logRepo.fetchLogs()
+        logs = logRepo.fetchDoneLog()
         isLoading = false
     }
     
