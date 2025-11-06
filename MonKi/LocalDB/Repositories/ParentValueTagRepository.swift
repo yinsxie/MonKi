@@ -17,7 +17,6 @@ protocol ParentValueTagRepositoryProtocol {
     
     func deleteParentValueTag(tag: ParentValueTag)
     func deleteParentValueTagById(id: UUID)
-    
 }
 
 final class ParentValueTagRepository: ParentValueTagRepositoryProtocol {

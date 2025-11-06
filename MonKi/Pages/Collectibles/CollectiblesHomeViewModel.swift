@@ -28,18 +28,15 @@ final class CollectiblesHomeViewModel: ObservableObject {
     }
     
     func getArchivedLogs() {
-//        listOfArhcivedLogs = logRepo.fetchLogs().filter {
-//            LogState(state: $0.state ?? "") == .archived
-//        }
-//        
-//        getPagedArchivedLogs(for: 0)
-//        
-//        if listOfArhcivedLogs.count > 0 && listOfArhcivedLogs.count % 4 == 0 {
-//            maxPage = Int(listOfArhcivedLogs.count/4)
-//            
-//        } else {
-//            maxPage = Int(listOfArhcivedLogs.count/4) + 1
-//        }
+        listOfArhcivedLogs = logRepo.fetchApprovedLog()
+        
+        getPagedArchivedLogs(for: 0)
+        
+        if listOfArhcivedLogs.count > 0 && listOfArhcivedLogs.count % 4 == 0 {
+            maxPage = Int(listOfArhcivedLogs.count/4)
+        } else {
+            maxPage = Int(listOfArhcivedLogs.count/4) + 1
+        }
     }
     
     func incrementPage() {
