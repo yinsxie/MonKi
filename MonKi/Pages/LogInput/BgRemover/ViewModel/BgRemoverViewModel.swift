@@ -37,14 +37,6 @@ final class BackgroundRemoverViewModel: ObservableObject {
         }
     }
     
-    func partialReset() {
-        Task { @MainActor in
-            originalImage = nil
-            alert = nil
-            isProcessing = false
-        }
-    }
-    
     func processSelectedImage(_ item: PhotosPickerItem?) async {
         guard let item = item,
               let data = try? await item.loadTransferable(type: Data.self),
