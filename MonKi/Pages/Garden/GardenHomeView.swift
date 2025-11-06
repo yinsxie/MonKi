@@ -77,7 +77,8 @@ struct GardenHomeView: View {
                         case .parentSettings:
                             navigationManager.goTo(.parentValue)
 //                        case .reviewLogOnFirstLog:
-//                        case .reviewLogFromGarden:
+                        case .reviewLogFromGarden(let log):
+                            navigationManager.goTo(.relog(log: log))
 //                        case .checklistUpdate:
                         }
                     }
@@ -94,7 +95,7 @@ struct GardenHomeView: View {
             // Filter out archived logs before both rendering and counting
             let activeLogs = viewModel.logs.filter {
                 if let state = $0.state {
-//                    return LogState(state: state) != .archived
+                    return LogState(state: state) != .logDone
                 }
                 return false
             }
