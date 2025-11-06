@@ -95,6 +95,9 @@ struct GardenWateringView: View {
                 }
             }
         }
+        .onDisappear {
+            AudioManager.shared.stop()
+        }
     }
 }
 
