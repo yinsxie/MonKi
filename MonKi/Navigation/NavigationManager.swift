@@ -29,7 +29,7 @@ final class NavigationManager: ObservableObject {
         let countToRemove = min(n, navigationPath.count)
         navigationPath.removeLast(countToRemove)
     }
-
+    
     func replaceTop(with route: MainRoute) {
         guard !navigationPath.isEmpty else {
             navigationPath.append(route)
@@ -43,7 +43,7 @@ final class NavigationManager: ObservableObject {
             navigationPath.append(route)
             return
         }
-
+        
         navigationPath.removeLast()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -54,7 +54,7 @@ final class NavigationManager: ObservableObject {
     }
     
     func popToFlowRoot() {
-            guard navigationPath.count > 1 else { return }
-            navigationPath.removeLast(navigationPath.count - 1)
-        }
+        guard navigationPath.count > 1 else { return }
+        navigationPath.removeLast(navigationPath.count - 1)
+    }
 }
