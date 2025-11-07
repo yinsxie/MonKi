@@ -147,7 +147,7 @@ struct HomeView: View {
             
             Spacer()
             navButton(imageName: "star.fill") {
-                navigationManager.goTo(.parentValue)
+                navigationManager.goTo(.main(.parentValue))
             }
         }
         .padding(.horizontal, 20)

@@ -248,6 +248,7 @@ final class ChildLogViewModel: ObservableObject {
 //                    gateManager.gateDestination =
 //                    context.popLast()
 //                    context.goTo(.parentGate)
+//                    context.goTo(.helper(.))
                 },
                 onSecondaryTap: {
                     print("With Parent: No")

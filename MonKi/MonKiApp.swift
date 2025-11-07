@@ -10,9 +10,14 @@ import SwiftUI
 @main
 struct MonKiApp: App {
 
+    @StateObject var navigationManager = NavigationManager()
+    @StateObject var parentalGateManager = ParentalGateManager()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationManagerView()
+                .environmentObject(navigationManager)
+                .environmentObject(parentalGateManager)
         }
     }
 }
