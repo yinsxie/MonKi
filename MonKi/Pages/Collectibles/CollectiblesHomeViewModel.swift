@@ -28,7 +28,7 @@ final class CollectiblesHomeViewModel: ObservableObject {
     }
     
     func getArchivedLogs() {
-        listOfArhcivedLogs = logRepo.fetchApprovedLog()
+        listOfArhcivedLogs = logRepo.fetchDoneLog()
         
         getPagedArchivedLogs(for: 0)
         
