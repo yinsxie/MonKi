@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+struct AddValueModalConfig: TextFieldModalProtocol {
+    var title: String = "Belum ketemu yang pas? Tulis satu kata yang mewakili nilai keluargamu"
+    var placeholder: String = "contoh: Kreatif"
+    var maxCharacters: Int
+    var cancelButtonTitle: String = "Kembali"
+    var saveButtonTitle: String = "Simpan"
+    
+    init(maxCharacters: Int) {
+        self.maxCharacters = maxCharacters
+    }
+}
+
 struct ParentValueTagView: View {
     
     @StateObject private var viewModel = ParentValueTagViewModel()
@@ -15,15 +27,14 @@ struct ParentValueTagView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 30) {
-                // MARK: - Header
                 HStack(alignment: .top) {
-                    Image("MamaMonki")
+                    Image("mamaMonki")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 112)
                         .padding(.top, 17)
                     Spacer()
-                    Image("PapaMonki")
+                    Image("papaMonki")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 90)
@@ -63,14 +74,33 @@ struct ParentValueTagView: View {
             footerButtons()
                 .padding(.horizontal, 24)
                 .padding(.bottom, 64)
+            
+            if viewModel.isShowingAddValueSheet {
+                let modalConfig = AddValueModalConfig(
+                    maxCharacters: viewModel.maxCustomValueChars
+                )
+                TextFieldModalView(
+                    type: modalConfig,
+                    text: $viewModel.customValueText,
+                    isSaveButtonDisabled: viewModel.isAddButtonDisabled,
+                    onCancel: {
+                        viewModel.customValueText = "" // Reset text saat batal
+                        viewModel.isShowingAddValueSheet = false
+                    },
+                    onSave: {
+                        viewModel.addCustomValue()
+                    },
+                    onTextChange: {
+                        viewModel.limitCustomValueText()
+                    }
+                )
+            }
         }
         .navigationBarHidden(true)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isShowingAddValueSheet)
         .ignoresSafeArea(edges: [.top, .bottom])
         .onAppear {
             viewModel.loadTags()
-        }
-        .sheet(isPresented: $viewModel.isShowingAddValueSheet) {
-            addValueSheet()
         }
     }
     
@@ -155,40 +185,6 @@ struct ParentValueTagView: View {
             )
             .disabled(!isEnabled)
             .animation(.easeInOut(duration: 0.2), value: isEnabled)
-        }
-    }
-    
-    @ViewBuilder
-    private func addValueSheet() -> some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Nilai Keluarga Baru")) {
-                    TextField("Contoh: Jujur", text: $viewModel.customValueText)
-                        .onChange(of: viewModel.customValueText) {
-                            viewModel.limitCustomValueText()
-                        }
-                    
-                    Text("\(viewModel.customValueCharacterCount) / \(viewModel.maxCustomValueChars) karakter")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                
-                Button("Tambahkan") {
-                    viewModel.addCustomValue()
-                }
-                .disabled(viewModel.isAddButtonDisabled)
-            }
-            .navigationTitle("Buat Nilai Baru")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Batal") {
-                        viewModel.isShowingAddValueSheet = false
-                        viewModel.customValueText = ""
-                    }
-                }
-            }
         }
     }
 }
