@@ -11,18 +11,22 @@ enum FieldState {
     case empty
     case created
     case approved
+    case waiting
     case declined
     case done
     
     init(state: String) {
+        
         switch state {
-        case "Created":
+        case "LogOnly":
             self = .created
-        case "Approved":
+        case "LogWaiting":
+            self = .waiting
+        case "LogApproved":
             self = .approved
-        case "Declined":
+        case "LogDeclined":
             self = .declined
-        case "Done":
+        case "LogDone":
             self = .done
         default:
             self = .empty
@@ -37,6 +41,8 @@ enum FieldState {
             return "Created"
         case .approved:
             return "Approved"
+        case .waiting:
+            return "Waiting"
         case .declined:
             return "Declined"
         case .done:
@@ -47,7 +53,7 @@ enum FieldState {
     //TODO: Kurang .declined, .needToTalk
     var fieldAsset: String? {
         switch self {
-        case .created, .approved:
+        case .created, .approved, .waiting:
             return "FieldSmall"
         case .done:
             return "FieldBig"

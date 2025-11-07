@@ -11,6 +11,7 @@ import CoreData
 
 struct ChildLogNavigationContainer: View {
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var parentGate: ParentalGateManager
     @StateObject private var viewModel: ChildLogViewModel
 
     init() {
@@ -28,7 +29,7 @@ struct ChildLogNavigationContainer: View {
                     navigationManager.popLast()
                 },
                 customNextAction: { defaultCloseAction in
-                    viewModel.handleNextAction(context: navigationManager, defaultAction: defaultCloseAction)
+                    viewModel.handleNextAction(context: navigationManager, gateManager: parentGate, defaultAction: defaultCloseAction)
                 },
                 customBackAction: {
                     viewModel.handleBackAction()

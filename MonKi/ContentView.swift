@@ -38,8 +38,10 @@ struct ContentView: View {
                 GardenHomeView()
                     .environmentObject(navigationManager)
                     .environmentObject(gateManager)
+                    .environment(\.managedObjectContext, CoreDataManager.shared.viewContext)
             }
         }
+        .environment(\.managedObjectContext, CoreDataManager.shared.viewContext)
         .onAppear {
             //MARK: DEV purposes only
             setupAppFlow()

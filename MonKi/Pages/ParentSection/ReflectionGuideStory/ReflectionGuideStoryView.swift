@@ -189,7 +189,7 @@ struct ReflectionGuideStoryView: View {
         .zIndex(1)
     }
 }
-//
+
 //#Preview {
 //    
 //    // 1. Mock NavigationManager

@@ -138,7 +138,6 @@ final class ChildLogViewModel: ObservableObject {
         return selectedLabels
     }
     
-    
     // MARK: - Initialization
     init(logRepo: LogRepositoryProtocol = LogRepository()) {
         self.logRepo = logRepo
@@ -230,17 +229,25 @@ final class ChildLogViewModel: ObservableObject {
     }
     
     // MARK: - Navigation Logic
-    func handleNextAction(context: NavigationManager, defaultAction: @escaping () -> Void) {
+    func handleNextAction(context: NavigationManager, gateManager: ParentalGateManager, defaultAction: @escaping () -> Void) {
         guard currentIndex < totalPageCount - 1 else {
             
             let isGardenFull = UserDefaultsManager.shared.isFieldMaxedOut()
             
-            saveLog()
+            // always save log regardless of with parent or not
+            guard let newLog = self.saveLog() else {
+                print("Error: Failed to save log. Cannot proceed.")
+                return
+            }
+            
             self.activePopup = .withParent(
                 onPrimaryTap: {
                     print("With Parent: Yes")
-                    context.popLast()
-                    context.goTo(.parentGate)
+                    context.popToRoot()
+                    // TODO: setup gatemanager gate destination to verdict page
+//                    gateManager.gateDestination =
+//                    context.popLast()
+//                    context.goTo(.parentGate)
                 },
                 onSecondaryTap: {
                     print("With Parent: No")
@@ -352,24 +359,30 @@ final class ChildLogViewModel: ObservableObject {
         return inputSelectedMode == "Draw" && currentInputPage == .mainInput
     }
     
-    private func saveLog() {
+    private func saveLog() -> MsLog? {
         
         guard let imageToSave = finalProcessedImage else {
             print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
-            return
+            return nil
         }
-        logRepo.createLogOnly(imageToSave, happyLevel: self.happyLevel, tags: self.beneficialTags)
+        
+        let newLog = logRepo.createLogOnly(
+            imageToSave,
+            happyLevel: self.happyLevel,
+            tags: self.beneficialTags
+        )
+//
+//        logRepo.createLogWithImage(
+//            imageToSave,
+//            isHappy: true,
+//            happyLevel: self.happyLevel,
+//            isBeneficial: self.isBeneficial,
+//            tags: self.beneficialTags
+//        )
+//
         UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
-        //
-        //        logRepo.createLogWithImage(
-        //            imageToSave,
-        //            isHappy: true,
-        //            happyLevel: self.happyLevel,
-        //            isBeneficial: self.isBeneficial,
-        //            tags: self.beneficialTags
-        //        )
-        //
-        //        UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
+        
+        return newLog
     }
     
     // MARK: ini buat di app store, jadi saya simpan dulu

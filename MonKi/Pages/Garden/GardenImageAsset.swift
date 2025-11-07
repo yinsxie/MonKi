@@ -8,6 +8,8 @@
 enum GardenImageAsset {
     case gardenBackground
     case gardenEmptyField
+    case emptyFieldBase
+    case emptyFieldOverlay
     
     var imageName: String {
         switch self {
@@ -15,6 +17,10 @@ enum GardenImageAsset {
             return "GardenBackground"
         case .gardenEmptyField:
             return "GardenEmptyField"
+        case .emptyFieldBase:
+            return "EmptyFieldBase"
+        case .emptyFieldOverlay:
+            return "EmptyFieldOverlay"
         }
     }
 }

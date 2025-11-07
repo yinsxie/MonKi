@@ -9,7 +9,7 @@ import CoreData
 import UIKit
 
 protocol LogRepositoryProtocol {
-    func createLogOnly(_ uiImage: UIImage, happyLevel: Int, tags: [String])
+    func createLogOnly(_ uiImage: UIImage, happyLevel: Int, tags: [String]) -> MsLog?
     
     func logContinued(forLog log: MsLog, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict)
     
@@ -24,7 +24,7 @@ protocol LogRepositoryProtocol {
     
     func fetchGardenLogs() -> [MsLog]
     
-    func fetchApprovedLog() -> [MsLog]
+    func fetchDoneLog() -> [MsLog]
 }
 
 final class LogRepository: LogRepositoryProtocol {
@@ -52,13 +52,13 @@ final class LogRepository: LogRepositoryProtocol {
         deleteLog(log: log)
     }
     
-    func createLogOnly(_ uiImage: UIImage, happyLevel: Int, tags: [String]) {
+    func createLogOnly(_ uiImage: UIImage, happyLevel: Int, tags: [String]) -> MsLog? {
         guard let imagePath = ImageStorage.saveImage(uiImage) else {
             print("Failed to save image")
-            return
+            return nil
         }
         
-        createLog(imagePath: imagePath, withState: .logOnly, happyLevel: happyLevel, tags: tags, withVerdict: nil)
+        return createLog(imagePath: imagePath, withState: .logOnly, happyLevel: happyLevel, tags: tags, withVerdict: nil)
     }
     
     func logContinued(forLog log: MsLog, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict) {
@@ -90,7 +90,7 @@ final class LogRepository: LogRepositoryProtocol {
             state = .logDeclined
         }
         
-        createLog(imagePath: imagePath, withState: state, happyLevel: happyLevel, tags: tags, withVerdict: verdict)
+        _ = createLog(imagePath: imagePath, withState: state, happyLevel: happyLevel, tags: tags, withVerdict: verdict)
     }
    
     func fetchGardenLogs() -> [MsLog] {
@@ -98,7 +98,7 @@ final class LogRepository: LogRepositoryProtocol {
         return logs.filter { $0.state != LogState.logDone.stringValue }
     }
     
-    func fetchApprovedLog() -> [MsLog] {
+    func fetchDoneLog() -> [MsLog] {
         let logs = fetchLogs()
         return logs.filter { $0.state == LogState.logDone.stringValue }
     }
@@ -106,7 +106,7 @@ final class LogRepository: LogRepositoryProtocol {
 
 private extension LogRepository {
     
-    func createLog(imagePath: String, withState state: LogState, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict?) {
+    func createLog(imagePath: String, withState state: LogState, happyLevel: Int, tags: [String], withVerdict verdict: ParentLogVerdict?) -> MsLog? {
         let log = MsLog(context: context)
         
         log.id = UUID()
@@ -123,8 +123,10 @@ private extension LogRepository {
         
         do {
             try context.save()
+            return log
         } catch {
             print("Failed to save log: \(error.localizedDescription)")
+            return nil
         }
     }
     

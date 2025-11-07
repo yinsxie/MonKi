@@ -14,6 +14,12 @@ struct GardenHomeView: View {
     @StateObject private var viewModel = GardenViewModel()
     @StateObject var childlogViewModel = ChildLogViewModel()
     
+    @FetchRequest(
+        entity: MsLog.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \MsLog.createdAt, ascending: true)],
+        predicate: NSPredicate(format: "state != %@", LogState.logDone.stringValue)
+    ) var gardenLogs: FetchedResults<MsLog>
+    
     var body: some View {
         NavigationStack(path: $navigationManager.navigationPath) {
             ZStack {
@@ -34,7 +40,7 @@ struct GardenHomeView: View {
                     
                     Spacer()
                     //MARK: Uncomment to enable left and right
-                    footerButtonView
+                    footerButtonView(totalLogs: gardenLogs.count)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 57)
@@ -43,9 +49,10 @@ struct GardenHomeView: View {
                 
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .onAppear {
-                viewModel.fetchLogData()
-            }
+            // not needed with @FetchRequest
+            //            .onAppear {
+            //                viewModel.fetchLogData()
+            //            }
             .navigationDestination(for: MainRoute.self) { route in
                 switch route {
                 case .log:
@@ -76,9 +83,10 @@ struct GardenHomeView: View {
                         switch destination {
                         case .parentSettings:
                             navigationManager.goTo(.parentValue)
-//                        case .reviewLogOnFirstLog:
-//                        case .reviewLogFromGarden:
-//                        case .checklistUpdate:
+                            //                        case .reviewLogOnFirstLog:
+                        case .reviewLogFromGarden(let log):
+                            navigationManager.goTo(.relog(log: log))
+                            //                        case .checklistUpdate:
                         }
                     }
                 )
@@ -88,37 +96,45 @@ struct GardenHomeView: View {
     
     @ViewBuilder
     var fieldView: some View {
-        if viewModel.isLoading {
-            ProgressView()
-        } else {
-            // Filter out archived logs before both rendering and counting
-            let activeLogs = viewModel.logs.filter {
-                if let state = $0.state {
-//                    return LogState(state: state) != .archived
-                }
-                return false
-            }
+        // no need manual loading with @FetchRequest
+        //        if viewModel.isLoading {
+        //            ProgressView()
+        //        } else {
+        
+        let pagedLogs = viewModel.getPagedLogs(from: gardenLogs)
+        
+        LazyVGrid(columns: [GridItem(.fixed(110), spacing: 13), GridItem(.fixed(110))], spacing: 60) {
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
-                
-                ForEach(activeLogs, id: \.self) { log in
+            // hardcode version (before pagination)
+            //                ForEach(0..<4, id: \.self) { (index: Int) in
+            //
+            //                    if index < viewModel.logs.count {
+            //                        let log = viewModel.logs[index]
+            //                        let fieldState = FieldState(state: log.state ?? "x")
+            //
+            //                        fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
+            //                    } else {
+            //                        fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
+            //                    }
+            //                }
+            
+            ForEach(0..<viewModel.pageSize, id: \.self) { (index: Int) in
+                if index < pagedLogs.count {
+                    let log = pagedLogs[index]
                     let fieldState = FieldState(state: log.state ?? "x")
-                    fieldCardViewBuilder(for: log, type: fieldState)
-                }
-                
-                // Now count fillers based on filtered logs
-                if activeLogs.count < 4 {
-                    ForEach(0..<(4 - activeLogs.count), id: \.self) { _ in
-                        fieldCardViewBuilder(for: nil, type: .empty)
-                    }
+                    
+                    fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
+                } else {
+                    fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
                 }
             }
-            .offset(y: 40)
         }
+        .offset(y: 40)
+        //        }
     }
     
     @ViewBuilder
-    func fieldCardViewBuilder(for log: MsLog?, type: FieldState) -> some View {
+    func fieldCardViewBuilder(for log: MsLog?, type: FieldState, positionIndex: Int) -> some View {
         let image: UIImage? = {
             if let imagePath = log?.imagePath {
                 return ImageStorage.loadImage(from: imagePath)
@@ -127,10 +143,18 @@ struct GardenHomeView: View {
             }
         }()
         
-        FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
+        let colorForEmptyState: Color? = {
+            if type == .empty {
+                return getEmptyColor(for: positionIndex)
+            }
+            return nil
+        }()
+        
+        FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode, emptyStateColor: colorForEmptyState) {
             viewModel.onFieldTapped(
                 forLog: log,
                 forFieldType: type,
+                gateManager: gateManager,
                 context: navigationManager
             )
         } onCTAButtonTapped: {
@@ -138,6 +162,21 @@ struct GardenHomeView: View {
             viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, logImage: image)
         }
         
+    }
+    
+    private func getEmptyColor(for position: Int) -> Color {
+        switch position {
+        case 0:
+            return Color(hex: "#AD7151")
+        case 1:
+            return Color(hex: "#8D5739")
+        case 2:
+            return Color(hex: "#7C4C32")
+        case 3:
+            return Color(hex: "#965C40")
+        default:
+            return Color(hex: "#AD7151")
+        }
     }
     
     @ViewBuilder
@@ -151,37 +190,72 @@ struct GardenHomeView: View {
         }
     }
     
-    var footerButtonView: some View {
+    func footerButtonView(totalLogs: Int) -> some View {
         HStack {
-            CustomButton(
-                backgroundColor: ColorPalette.yellow600,
-                foregroundColor: ColorPalette.yellow400,
-                textColor: ColorPalette.yellow50,
-                font: .system(size: 20, weight: .black, design: .rounded),
-                image: "arrow.left",
-                action: {
-                },
-                cornerRadius: 24,
-                width: 64,
-                type: .normal
-            )
+            leftButton(totalLogs: totalLogs)
             
             Spacer()
             
-            CustomButton(
-                backgroundColor: ColorPalette.yellow600,
-                foregroundColor: ColorPalette.yellow400,
-                textColor: ColorPalette.yellow50,
-                font: .system(size: 20, weight: .black, design: .rounded),
-                image: "arrow.right",
-                action: {
-                },
-                cornerRadius: 24,
-                width: 64,
-                type: .normal
+            (
+                Text("\(viewModel.currIndex + 1)")
+                    .fontWeight(.bold)
+                +
+                Text(" dari \(viewModel.maxPage(totalLogs: totalLogs))")
             )
+            .font(.system(size: 24, weight: .regular, design: .rounded))
+            .foregroundStyle(.white)
+            .opacity(viewModel.maxPage(totalLogs: totalLogs) == 1 ? 0 : 1)
+            
+            Spacer()
+            
+            rightButton(totalLogs: totalLogs)
             
         }
+    }
+    
+    @ViewBuilder
+    func leftButton(totalLogs: Int) -> some View {
+        let isDisabled = viewModel.currIndex == 0
+        
+        CustomButton(
+            backgroundColor: ColorPalette.yellow600,
+            foregroundColor: ColorPalette.yellow400,
+            textColor: ColorPalette.yellow50,
+            font: .system(size: 20, weight: .black, design: .rounded),
+            image: "arrow.left",
+            action: {
+                withAnimation {
+                    viewModel.decrementPage()
+                }
+            },
+            cornerRadius: 24,
+            width: 64,
+            type: .normal
+        )
+        .opacity(isDisabled ? 0 : 1)
+    }
+    
+    @ViewBuilder
+    func rightButton(totalLogs: Int) -> some View {
+        let isDisabled = viewModel.currIndex == viewModel.maxPage(totalLogs: totalLogs) - 1
+        
+        CustomButton(
+            backgroundColor: ColorPalette.yellow600,
+            foregroundColor: ColorPalette.yellow400,
+            textColor: ColorPalette.yellow50,
+            font: .system(size: 20, weight: .black, design: .rounded),
+            image: "arrow.right",
+            action: {
+                withAnimation {
+                    viewModel.incrementPage(totalLogs: totalLogs)
+                }
+            },
+            cornerRadius: 24,
+            width: 64,
+            type: .normal
+        )
+        .opacity(isDisabled ? 0 : 1)
+        
     }
     
     var collectibleButton: some View {
