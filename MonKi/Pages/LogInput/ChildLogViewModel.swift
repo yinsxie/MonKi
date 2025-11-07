@@ -341,8 +341,8 @@ final class ChildLogViewModel: ObservableObject {
             hasSlide = false
             selectedBeneficialTags.removeAll()
         } else if currentInputPage == .mainInput {
-            finalProcessedImage = nil
-            if inputSelectedMode == "Gallery" { backgroundRemover.partialReset() }
+            //            finalProcessedImage = nil
+            if inputSelectedMode == "Gallery" {  }
         } else if currentInputPage == .selectMode { // Kembali ke .selectMode (indeks 0)
             // (Reset state jika ada)
         }

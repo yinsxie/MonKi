@@ -47,5 +47,8 @@ struct ReLogHowHappyView: View {
                 AudioManager.shared.play("HowHappy")
             }
         }
+        .onDisappear {
+            AudioManager.shared.stop()
+        }
     }
 }

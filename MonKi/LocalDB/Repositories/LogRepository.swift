@@ -8,16 +8,6 @@
 import CoreData
 import UIKit
 
-// logWaitingListToDo
-// id
-// logId
-// title
-// isChecked
-// createdAt
-// updatedAt
-
-// predicate, where logid = logid
-
 protocol LogRepositoryProtocol {
     func createLogOnly(_ uiImage: UIImage, happyLevel: Int, tags: [String])
     
@@ -32,7 +22,9 @@ protocol LogRepositoryProtocol {
     func logDeletedAfterDeclined(withId id: UUID)
     func logDeletedAfterDeclined(withLog log: MsLog)
     
-    func fetchLogs() -> [MsLog]
+    func fetchGardenLogs() -> [MsLog]
+    
+    func fetchApprovedLog() -> [MsLog]
 }
 
 final class LogRepository: LogRepositoryProtocol {
@@ -100,15 +92,15 @@ final class LogRepository: LogRepositoryProtocol {
         
         createLog(imagePath: imagePath, withState: state, happyLevel: happyLevel, tags: tags, withVerdict: verdict)
     }
+   
+    func fetchGardenLogs() -> [MsLog] {
+        let logs = fetchLogs()
+        return logs.filter { $0.state != LogState.logDone.stringValue }
+    }
     
-    func fetchLogs() -> [MsLog] {
-        let fetchRequest: NSFetchRequest<MsLog> = MsLog.fetchRequest()
-        
-        do {
-            return try context.fetch(fetchRequest)
-        } catch {
-            return []
-        }
+    func fetchApprovedLog() -> [MsLog] {
+        let logs = fetchLogs()
+        return logs.filter { $0.state == LogState.logDone.stringValue }
     }
 }
 
@@ -133,6 +125,16 @@ private extension LogRepository {
             try context.save()
         } catch {
             print("Failed to save log: \(error.localizedDescription)")
+        }
+    }
+    
+    func fetchLogs() -> [MsLog] {
+        let fetchRequest: NSFetchRequest<MsLog> = MsLog.fetchRequest()
+        
+        do {
+            return try context.fetch(fetchRequest)
+        } catch {
+            return []
         }
     }
     
