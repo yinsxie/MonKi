@@ -39,7 +39,7 @@ struct GardenHomeView: View {
                 
                 Spacer()
                 //MARK: Uncomment to enable left and right
-                footerButtonView
+                footerButtonView(totalLogs: gardenLogs.count)
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 57)
@@ -49,7 +49,7 @@ struct GardenHomeView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
-            viewModel.fetchLogData()
+//            viewModel.logRepo.fetchGardenLogs()
         }
         
     }

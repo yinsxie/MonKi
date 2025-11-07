@@ -42,9 +42,10 @@ struct NavigationManagerView: View {
                                 switch destination {
                                 case .parentSettings:
                                     navigationManager.goTo(.main(.parentValue))
-                                    //                        case .reviewLogOnFirstLog:
-                                    //                        case .reviewLogFromGarden:
-                                    //                        case .checklistUpdate:
+                                    //                                                            case .reviewLogOnFirstLog:
+                                case .reviewLogFromGarden(let log):
+                                    navigationManager.goTo(.main(.relog(log: log)))
+                                    //                                                            case .checklistUpdate:
                                 }
                             }
                         )
