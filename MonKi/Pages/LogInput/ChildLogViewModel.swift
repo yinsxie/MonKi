@@ -354,10 +354,12 @@ final class ChildLogViewModel: ObservableObject {
     
     private func saveLog() {
         
-        //        guard let imageToSave = finalProcessedImage else {
-        //            print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
-        //            return
-        //        }
+        guard let imageToSave = finalProcessedImage else {
+            print("Error: 'finalProcessedImage' nil saat mencoba menyimpan.")
+            return
+        }
+        logRepo.createLogOnly(imageToSave, happyLevel: self.happyLevel, tags: self.beneficialTags)
+        UserDefaultsManager.shared.incrementCurrentFilledField(by: 1)
         //
         //        logRepo.createLogWithImage(
         //            imageToSave,
