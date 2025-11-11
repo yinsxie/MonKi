@@ -27,16 +27,10 @@ final class NavigationManager: ObservableObject {
     /// Only used at app launch to set initial root without animation, don't use this elsewhere
     @ViewBuilder
     func buildRoot(_ route: RootRoute) -> some View {
-        // 3 cases, Splash, Onboarding, MainApp -> Garden
-        if route == .main(.garden) {
-            GardenHomeView()
-        } else if route == .onboarding(.landing) {
-            ParentalGateSettingView(viewModel: ParentalGateSettingViewModel(onFinished: {
-                self.changeRootAnimate(root: .main(.garden))
-            }))
-            // Ke onBoardnya
-        } else if route == .splashScreen {
+        if route == .splashScreen {
             SplashScreenView()
+        } else if route == .main(.placeHolder) {
+            Text("Main")
         }
     }
     

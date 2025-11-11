@@ -9,15 +9,15 @@ import SwiftUI
 
 /// Ad this for garden
 enum OnboardingRoute: SubRouteProtocol {
-    case landing
+    case placeHolder
 }
 
 extension OnboardingRoute {
     @ViewBuilder
     func delegateView() -> some View {
         switch self {
-        case .landing:
-            ParentalGateSettingView(viewModel: ParentalGateSettingViewModel(onFinished: {}))
+        case .placeHolder:
+            EmptyView()
         }
     }
 }

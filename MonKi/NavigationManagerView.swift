@@ -9,11 +9,7 @@ import SwiftUI
 
 struct NavigationManagerView: View {
     
-    @State private var isSplashShown: Bool = true
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject private var gateManager: ParentalGateManager
-    @State private var isNewUser: Bool = true
-    @State private var isLoadingAuth: Bool = true
     
     var body: some View {
         
@@ -33,49 +29,20 @@ struct NavigationManagerView: View {
                             .navigationBarBackButtonHidden(true)
                     }
                 })
-                .fullScreenCover(item: $gateManager.gateDestination) { destination in
-                    ParentalGateView(
-                        viewModel: ParentalGateViewModel(
-                            navigationManager: navigationManager,
-                            onSuccess: {
-                                gateManager.gateDestination = nil
-                                switch destination {
-                                case .parentSettings:
-                                    navigationManager.goTo(.main(.parentValue))
-                                    //                                                            case .reviewLogOnFirstLog:
-                                case .reviewLogFromGarden(let log):
-                                    navigationManager.goTo(.main(.relog(log: log)))
-                                    //                                                            case .checklistUpdate:
-                                }
-                            }
-                        )
-                    )
-                }
         }
         .onAppear {
-            //MARK: DEV purposes only
             setupAppFlow()
-            handleAfterSplashScreen()
+            endSplashView()
         }
     }
     
-    func handleAfterSplashScreen() {
+    private func endSplashView() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation {
-                if isNewUser {
-                    navigationManager.changeRootAnimate(root: .onboarding(.landing))
-                } else {
-                    navigationManager.changeRootAnimate(root: .main(.garden))
-                }
-            }
+            navigationManager.changeRootAnimate(root: .main(.placeHolder))
         }
     }
     
     private func setupAppFlow() {
-        self.isNewUser = UserDefaultsManager.shared.getIsNewUser() ?? true
-        
-        //        self.isLoadingAuth = false
-        UserDefaultsManager.shared.initDevUserDefaults()
     }
 }
 
