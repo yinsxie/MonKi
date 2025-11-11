@@ -19,10 +19,12 @@ struct CollectiblesHomeView: View {
     let background2: String = "blueDiagonalRectangle"
     let background3: String = "CanvasBackgroundButton"
     let background4: String = "CollectiblesPaperNote"
-    @StateObject var viewModel: CollectiblesHomeViewModel = CollectiblesHomeViewModel()
+    @StateObject private var viewModel: CollectiblesHomeViewModel
     
-    var onPreviousButtonTap: (() -> Void)
-    var onNextButtonTap: (() -> Void)
+    let onPreviousButtonTap: () -> Void
+    let onNextButtonTap: () -> Void
+    
+    let height: CGFloat = 100.0
     
     init() {
         let viewModel = CollectiblesHomeViewModel()
@@ -69,7 +71,7 @@ struct CollectiblesHomeView: View {
             
             archivedListView
                 .frame(width: 300, height: 500)
-//                .background(Color.red)
+                .offset(y: 20)
         }
     }
     
@@ -79,12 +81,30 @@ struct CollectiblesHomeView: View {
             ForEach(viewModel.pagedArchivedLogs, id: \.objectID) { log in
                 archivedLogCard(log: log)
             }
+            
+            if viewModel.pagedArchivedLogs.count < 4 {
+                ForEach(0..<(4 - viewModel.pagedArchivedLogs.count), id: \.self) { _ in
+                    emptyLogCard()
+                }
+            }
         }
     }
     
     @ViewBuilder
+    func emptyLogCard() -> some View {
+        VStack(spacing: 5) {
+            ChildLogStatusView(isEmpty: true)
+            Text("?")
+                .font(.system(size: 96, weight: .bold, design: .rounded))
+                .foregroundStyle(ColorPalette.neutral300)
+                .frame(height: height)
+        }
+        .frame(minHeight: 208, maxHeight: 208)
+    }
+    
+    @ViewBuilder
     func archivedLogCard(log: MsLog) -> some View {
-        VStack {
+        VStack(spacing: 5) {
             if let tags = log.beneficialTags {
                 ChildLogStatusView(happyLevel: HappyLevelEnum(level: Int(log.happyLevel)), firstTagTitle: IOHelper.expandTags(tags)[safe: 0], secondTagTitle: IOHelper.expandTags(tags)[safe: 1])
             }
@@ -92,7 +112,7 @@ struct CollectiblesHomeView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 60)
+                    .frame(height: height)
             }
         }
         .frame(minHeight: 208, maxHeight: 208)
@@ -104,11 +124,14 @@ struct CollectiblesHomeView: View {
             
             Spacer()
             
-            ForEach(0..<viewModel.maxPage) { index in
-                Circle()
-                    .frame(width: 8, height: 8)
-                    .foregroundStyle(viewModel.currIndex == index ? .black : .black.opacity(0.3))
+            HStack {
+                Text("\(viewModel.currIndex+1)")
+                    .font(.title2Emphasized)
+
+                Text("dari \(viewModel.maxPage)")
+                    .font(.title2Regular)
             }
+            .foregroundStyle(ColorPalette.neutral50)
             
             Spacer()
             

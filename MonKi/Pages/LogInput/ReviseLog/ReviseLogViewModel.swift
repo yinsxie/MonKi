@@ -39,7 +39,7 @@ final class ReLogViewModel: ObservableObject {
             }
         }
     
-    // MARK: - Tag Data 
+    // MARK: - Tag Data
     @Published var beneficialTagsString: String = ""
 
     var beneficialTagLabels: [String] {
@@ -145,18 +145,22 @@ final class ReLogViewModel: ObservableObject {
         // 3. Determine 'isBeneficial'
         let beneficial = !selectedLabels.isEmpty
         
+        
+        // TODO: kerja page verdict dulu boss
+//        logRepository.logContinued(forLog: logId, happyLevel: happyLvl, tags: selectedLabels, withVerdict: <#T##ParentLogVerdict#>)
+        
         // --- Call Repository ---
         // We call the repository function, we don't edit the object directly.
-        logRepository.childRelogged(
-            withId: logId,
-            isHappy: happy,
-            // MARK: CHANGE THIS
-            happyLevel: happyLvl,
-            isBeneficial: beneficial,
-            tags: selectedLabels
-        )
-        
-        print("ReLog: Save complete for log \(logId).")
+//        logRepository.childRelogged(
+//            withId: logId,
+//            isHappy: happy,
+//            // MARK: CHANGE THIS
+//            happyLevel: happyLvl,
+//            isBeneficial: beneficial,
+//            tags: selectedLabels
+//        )
+//
+//        print("ReLog: Save complete for log \(logId).")
     }
     
     private func fetchBeneficialTags() {

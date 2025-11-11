@@ -28,15 +28,12 @@ final class CollectiblesHomeViewModel: ObservableObject {
     }
     
     func getArchivedLogs() {
-        listOfArhcivedLogs = logRepo.fetchLogs().filter {
-            ChildrenLogState(state: $0.state ?? "") == .archived
-        }
+        listOfArhcivedLogs = logRepo.fetchDoneLog()
         
         getPagedArchivedLogs(for: 0)
         
         if listOfArhcivedLogs.count > 0 && listOfArhcivedLogs.count % 4 == 0 {
             maxPage = Int(listOfArhcivedLogs.count/4)
-            
         } else {
             maxPage = Int(listOfArhcivedLogs.count/4) + 1
         }

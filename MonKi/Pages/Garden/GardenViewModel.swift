@@ -10,11 +10,16 @@ import SwiftUI
 @MainActor
 final class GardenViewModel: ObservableObject {
     
-    @Published var isLoading: Bool = true
-    @Published var logs: [MsLog] = []
+    // no need manual loading with @FetchRequest
+    //    @Published var isLoading: Bool = true
+    //    @Published var logs: [MsLog] = []
+    
     @Published var imageEventBuffer: UIImage?
     @Published var alertConfirmationType: GardenShovelModality?
     @Published var isShovelMode: Bool = false
+    
+    @Published var currIndex: Int = 0
+    let pageSize: Int = 4
     
     var logRepo: LogRepositoryProtocol
     
@@ -26,7 +31,7 @@ final class GardenViewModel: ObservableObject {
         context.popLast()
     }
     
-    func navigateTo(route: MainRoute, context: NavigationManager) {
+    func navigateTo(route: RootRoute, context: NavigationManager) {
         context.goTo(route)
     }
     
@@ -34,17 +39,19 @@ final class GardenViewModel: ObservableObject {
         context.popLast()
     }
     
-    func onFieldTapped(forFieldType type: FieldState, context: NavigationManager) {
+    func onFieldTapped(forLog log: MsLog?, forFieldType type: FieldState, gateManager: ParentalGateManager, context: NavigationManager) {
         switch type {
         case .empty:
-            context.goTo(.childLog(.logInput))
+            context.goTo(.main(.log))
+        case .created:
+            guard let logToEdit = log else { return }
+            gateManager.gateDestination = .reviewLogFromGarden(log: logToEdit)
         default:
             return
         }
-        
     }
     
-    func handleCTAButtonTapped(forLog log: MsLog?, withType type: FieldState, context: NavigationManager, bufferData: GardenFullDataBuffer? = nil, logImage: UIImage? = nil) {
+    func handleCTAButtonTapped(forLog log: MsLog?, withType type: FieldState, context: NavigationManager, logImage: UIImage? = nil) {
         if let log = log {
             switch type {
             case .approved:
@@ -53,11 +60,6 @@ final class GardenViewModel: ObservableObject {
                 onDoneFieldTapped(log, context: context)
             case .declined:
                 onDeclinedFieldTapped(log, context: context)
-            case .created:
-                onShovelFieldTapped(log, buffer: bufferData, logImage: logImage)
-                DispatchQueue.main.async {
-                    self.fetchLogData()
-                }
             default:
                 return
             }
@@ -65,22 +67,61 @@ final class GardenViewModel: ObservableObject {
     }
     
     func pushReplaceToCollectibleView(context: NavigationManager) {
-        context.replaceTopAnimate(with: .childGarden(.collectible))
     }
     
-    func fetchLogData() {
-        logs = []
-        isLoading = true
-        logs = logRepo.fetchLogs()
-        isLoading = false
-    }
+    // no need manual loading with @FetchRequest
+    //    func fetchLogData() {
+    //        logs = []
+    //        isLoading = true
+    //        logs = logRepo.fetchGardenLogs()
+    //        isLoading = false
+    //    }
     
     func enableShovelModeAlert(toType type: GardenShovelModality?) {
         alertConfirmationType = type
     }
+    
+    // Pagination Logic
+    
+    func maxPage(totalLogs: Int) -> Int {
+        return (totalLogs / pageSize) + 1
+    }
+    
+    /// Slices the full FetchedResults array into a small array for the current page
+    func getPagedLogs(from allLogs: FetchedResults<MsLog>) -> [MsLog] {
+        // Check if the index is invalid (e.g., from logs being deleted)
+        let maxPageIndex = self.maxPage(totalLogs: allLogs.count) - 1
+        if currIndex > maxPageIndex {
+            // We're on a page that shouldn't exist. Reset to the last valid page.
+            DispatchQueue.main.async {
+                self.currIndex = max(0, maxPageIndex)
+            }
+            return [] // Return empty for this render pass
+        }
         
-    func validateShovelMode(bufferData: GardenFullDataBuffer?) {
-        isShovelMode = bufferData != nil
+        // At this point, the page index is valid (e.g., 0 or 1 for 4 logs)
+        let start = currIndex * pageSize
+        
+        // Check if this valid page is simply the "empty" page
+        if start >= allLogs.count {
+            return []
+        }
+        
+        // If we're here, it's a normal page with logs on it.
+        let end = min(start + pageSize, allLogs.count)
+        return Array(allLogs[start..<end])
+    }
+    
+    func incrementPage(totalLogs: Int) {
+        if currIndex < maxPage(totalLogs: totalLogs) - 1 {
+            currIndex += 1
+        }
+    }
+    
+    func decrementPage() {
+        if currIndex > 0 {
+            currIndex -= 1
+        }
     }
 }
 
@@ -93,52 +134,33 @@ private extension GardenViewModel {
             completion(false)
         }
     }
-
+    
     func onApproveFieldTapped(_ log: MsLog, context: NavigationManager) {
         bufferImageFromLogForEvent(log) { success in
             guard success else { return }
             
-            context.goTo(.childGarden(.watering))
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 if let logId = log.id {
-                    self.logRepo.logDone(withId: logId)
+                    //                    self.logRepo.logDone(withId: logId)
                 }
             }
         }
     }
-
+    
     func onDoneFieldTapped(_ log: MsLog, context: NavigationManager) {
         bufferImageFromLogForEvent(log) { success in
             guard success else { return }
             
-            context.goTo(.childGarden(.harvesting))
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 if let logId = log.id {
                     UserDefaultsManager.shared.decrementCurrentFilledField(by: 1)
-                    self.logRepo.logArchieved(withId: logId)
+                    //                    self.logRepo.logArchieved(withId: logId)
                 }
             }
         }
     }
     
     func onDeclinedFieldTapped(_ log: MsLog, context: NavigationManager) {
-        context.goTo(.reLog(log: log))
     }
     
-    func onShovelFieldTapped(_ log: MsLog, buffer: GardenFullDataBuffer? = nil, logImage: UIImage? = nil) {
-        if let buffer = buffer, let logImage = logImage {
-            let commitType = GardenShovelModality.commit(image: logImage) {
-                self.logRepo.logReplaced(replacedLog: log, newImage: buffer.image, isHappy: buffer.isHappy,happyLevel: buffer.happyLevel ,isBeneficial: buffer.isHappy, tags: buffer.tags)
-                
-                self.enableShovelModeAlert(toType: nil)
-                DispatchQueue.main.async {
-                    withAnimation {
-                        self.isShovelMode = false
-                        self.fetchLogData()
-                    }
-                }
-            }
-            enableShovelModeAlert(toType: commitType)
-        }
-    }
 }

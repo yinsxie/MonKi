@@ -10,12 +10,15 @@ import SwiftUI
 struct GardenHomeView: View {
     
     @EnvironmentObject var navigationManager: NavigationManager
-    @EnvironmentObject var viewModel: GardenViewModel
-    var bufferDataFromLogFull: GardenFullDataBuffer?
+    @EnvironmentObject var gateManager: ParentalGateManager
+    @StateObject private var viewModel = GardenViewModel()
+    @StateObject var childlogViewModel = ChildLogViewModel()
     
-    init(bufferDataFromLogFull: GardenFullDataBuffer?) {
-        self.bufferDataFromLogFull = bufferDataFromLogFull
-    }
+    @FetchRequest(
+        entity: MsLog.entity(),
+        sortDescriptors: [NSSortDescriptor(keyPath: \MsLog.createdAt, ascending: true)],
+        predicate: NSPredicate(format: "state != %@", LogState.logDone.stringValue)
+    ) var gardenLogs: FetchedResults<MsLog>
     
     var body: some View {
         ZStack {
@@ -28,67 +31,70 @@ struct GardenHomeView: View {
             
             VStack {
                 HStack {
-                    if !viewModel.isShovelMode {
-                        homeButton
-                        Spacer()
-                        collectibleButton
-                    } else {
-                        cancelButton
-                        Spacer()
-                    }
+                    parentButton
+                    Spacer()
+                    collectibleButton
                 }
                 .padding(.top, 70)
                 
                 Spacer()
                 //MARK: Uncomment to enable left and right
-//                footerButtonView
+                footerButtonView(totalLogs: gardenLogs.count)
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 57)
             
             popUpView
-        
+            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
-            viewModel.validateShovelMode(bufferData: bufferDataFromLogFull)
-            viewModel.fetchLogData()
+//            viewModel.logRepo.fetchGardenLogs()
         }
+        
     }
     
     @ViewBuilder
     var fieldView: some View {
-        if viewModel.isLoading {
-            ProgressView()
-        } else {
-            // Filter out archived logs before both rendering and counting
-            let activeLogs = viewModel.logs.filter {
-                if let state = $0.state {
-                    return ChildrenLogState(state: state) != .archived
-                }
-                return false
-            }
+        // no need manual loading with @FetchRequest
+        //        if viewModel.isLoading {
+        //            ProgressView()
+        //        } else {
+        
+        let pagedLogs = viewModel.getPagedLogs(from: gardenLogs)
+        
+        LazyVGrid(columns: [GridItem(.fixed(110), spacing: 13), GridItem(.fixed(110))], spacing: 60) {
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
-                
-                ForEach(activeLogs, id: \.self) { log in
-                    let fieldState = FieldState(state: log.state ?? "")
-                    fieldCardViewBuilder(for: log, type: fieldState)
-                }
-                
-                // Now count fillers based on filtered logs
-                if activeLogs.count < 4 {
-                    ForEach(0..<(4 - activeLogs.count), id: \.self) { _ in
-                        fieldCardViewBuilder(for: nil, type: .empty)
-                    }
+            // hardcode version (before pagination)
+            //                ForEach(0..<4, id: \.self) { (index: Int) in
+            //
+            //                    if index < viewModel.logs.count {
+            //                        let log = viewModel.logs[index]
+            //                        let fieldState = FieldState(state: log.state ?? "x")
+            //
+            //                        fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
+            //                    } else {
+            //                        fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
+            //                    }
+            //                }
+            
+            ForEach(0..<viewModel.pageSize, id: \.self) { (index: Int) in
+                if index < pagedLogs.count {
+                    let log = pagedLogs[index]
+                    let fieldState = FieldState(state: log.state ?? "x")
+                    
+                    fieldCardViewBuilder(for: log, type: fieldState, positionIndex: index)
+                } else {
+                    fieldCardViewBuilder(for: nil, type: .empty, positionIndex: index)
                 }
             }
-            .offset(y: 40)
         }
+        .offset(y: 40)
+        //        }
     }
     
     @ViewBuilder
-    func fieldCardViewBuilder(for log: MsLog?, type: FieldState) -> some View {
+    func fieldCardViewBuilder(for log: MsLog?, type: FieldState, positionIndex: Int) -> some View {
         let image: UIImage? = {
             if let imagePath = log?.imagePath {
                 return ImageStorage.loadImage(from: imagePath)
@@ -97,11 +103,39 @@ struct GardenHomeView: View {
             }
         }()
         
-        FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode) {
-            viewModel.navigateTo(route: .childLog(.logInput), context: navigationManager)
+        let colorForEmptyState: Color? = {
+            if type == .empty {
+                return getEmptyColor(for: positionIndex)
+            }
+            return nil
+        }()
+        
+        FieldCardView(type: type, logImage: image, isShovelMode: viewModel.isShovelMode, emptyStateColor: colorForEmptyState) {
+            viewModel.onFieldTapped(
+                forLog: log,
+                forFieldType: type,
+                gateManager: gateManager,
+                context: navigationManager
+            )
         } onCTAButtonTapped: {
-            print("CTA button tapped") 
-            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, bufferData: bufferDataFromLogFull, logImage: image)
+            print("CTA button tapped")
+            viewModel.handleCTAButtonTapped(forLog: log, withType: type, context: navigationManager, logImage: image)
+        }
+        
+    }
+    
+    private func getEmptyColor(for position: Int) -> Color {
+        switch position {
+        case 0:
+            return Color(hex: "#AD7151")
+        case 1:
+            return Color(hex: "#8D5739")
+        case 2:
+            return Color(hex: "#7C4C32")
+        case 3:
+            return Color(hex: "#965C40")
+        default:
+            return Color(hex: "#AD7151")
         }
     }
     
@@ -116,37 +150,72 @@ struct GardenHomeView: View {
         }
     }
     
-    var footerButtonView: some View {
+    func footerButtonView(totalLogs: Int) -> some View {
         HStack {
-            CustomButton(
-                backgroundColor: ColorPalette.yellow600,
-                foregroundColor: ColorPalette.yellow400,
-                textColor: ColorPalette.yellow50,
-                font: .system(size: 20, weight: .black, design: .rounded),
-                image: "arrow.left",
-                action: {
-                },
-                cornerRadius: 24,
-                width: 64,
-                type: .normal
-            )
+            leftButton(totalLogs: totalLogs)
             
             Spacer()
             
-            CustomButton(
-                backgroundColor: ColorPalette.yellow600,
-                foregroundColor: ColorPalette.yellow400,
-                textColor: ColorPalette.yellow50,
-                font: .system(size: 20, weight: .black, design: .rounded),
-                image: "arrow.right",
-                action: {
-                },
-                cornerRadius: 24,
-                width: 64,
-                type: .normal
+            (
+                Text("\(viewModel.currIndex + 1)")
+                    .fontWeight(.bold)
+                +
+                Text(" dari \(viewModel.maxPage(totalLogs: totalLogs))")
             )
-
+            .font(.system(size: 24, weight: .regular, design: .rounded))
+            .foregroundStyle(.white)
+            .opacity(viewModel.maxPage(totalLogs: totalLogs) == 1 ? 0 : 1)
+            
+            Spacer()
+            
+            rightButton(totalLogs: totalLogs)
+            
         }
+    }
+    
+    @ViewBuilder
+    func leftButton(totalLogs: Int) -> some View {
+        let isDisabled = viewModel.currIndex == 0
+        
+        CustomButton(
+            backgroundColor: ColorPalette.yellow600,
+            foregroundColor: ColorPalette.yellow400,
+            textColor: ColorPalette.yellow50,
+            font: .system(size: 20, weight: .black, design: .rounded),
+            image: "arrow.left",
+            action: {
+                withAnimation {
+                    viewModel.decrementPage()
+                }
+            },
+            cornerRadius: 24,
+            width: 64,
+            type: .normal
+        )
+        .opacity(isDisabled ? 0 : 1)
+    }
+    
+    @ViewBuilder
+    func rightButton(totalLogs: Int) -> some View {
+        let isDisabled = viewModel.currIndex == viewModel.maxPage(totalLogs: totalLogs) - 1
+        
+        CustomButton(
+            backgroundColor: ColorPalette.yellow600,
+            foregroundColor: ColorPalette.yellow400,
+            textColor: ColorPalette.yellow50,
+            font: .system(size: 20, weight: .black, design: .rounded),
+            image: "arrow.right",
+            action: {
+                withAnimation {
+                    viewModel.incrementPage(totalLogs: totalLogs)
+                }
+            },
+            cornerRadius: 24,
+            width: 64,
+            type: .normal
+        )
+        .opacity(isDisabled ? 0 : 1)
+        
     }
     
     var collectibleButton: some View {
@@ -157,7 +226,8 @@ struct GardenHomeView: View {
             font: .system(size: 20, weight: .black, design: .rounded),
             image: "book.pages.fill",
             action: {
-                viewModel.navigateTo(route: .childGarden(.collectible), context: navigationManager)
+                navigationManager.goTo(.main(.collectible))
+                print("Pindah ke collectible")
             },
             cornerRadius: 24,
             width: 64,
@@ -165,15 +235,15 @@ struct GardenHomeView: View {
         )
     }
     
-    var homeButton: some View {
+    var parentButton: some View {
         CustomButton(
             backgroundColor: ColorPalette.yellow600,
             foregroundColor: ColorPalette.yellow400,
             textColor: ColorPalette.yellow50,
-            image: "kidsButton",
+            image: "parentButton",
             imageHeight: 60,
             action: {
-                viewModel.navigateToHome(context: navigationManager)
+                gateManager.gateDestination = .parentSettings
             },
             cornerRadius: 24,
             width: 64,
@@ -181,34 +251,10 @@ struct GardenHomeView: View {
         )
     }
     
-    var cancelButton: some View {
-        CustomButton(
-            backgroundColor: ColorPalette.yellow600,
-            foregroundColor: ColorPalette.yellow400,
-            textColor: ColorPalette.yellow50,
-            font: .system(size: 20, weight: .black, design: .rounded),
-            image: "xmark",
-            action: {
-                // Show confirmation popup to exit shovel mode
-                // Prefer the buffered image; if missing, fall back to a placeholder asset
-                let fallback = UIImage(named: "icecream_placeholder")
-                let imageToUse = bufferDataFromLogFull?.image ?? fallback
-                guard let imageToUse else { return }
-                let alertType: GardenShovelModality = .exit(image: imageToUse) {
-                    withAnimation { viewModel.isShovelMode = false }
-                    // Dismiss the popup after confirming
-                    viewModel.enableShovelModeAlert(toType: nil)
-                }
-                viewModel.enableShovelModeAlert(toType: alertType)
-            },
-            cornerRadius: 24,
-            width: 64,
-            type: .normal
-        )
-    }
 }
 
 #Preview {
-    HomeView()
+    GardenHomeView()
         .environmentObject(NavigationManager())
+        .environmentObject(ParentalGateManager())
 }

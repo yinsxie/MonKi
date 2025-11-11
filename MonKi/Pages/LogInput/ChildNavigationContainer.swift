@@ -11,6 +11,7 @@ import CoreData
 
 struct ChildLogNavigationContainer: View {
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var parentGate: ParentalGateManager
     @StateObject private var viewModel: ChildLogViewModel
 
     init() {
@@ -28,7 +29,7 @@ struct ChildLogNavigationContainer: View {
                     navigationManager.popLast()
                 },
                 customNextAction: { defaultCloseAction in
-                    viewModel.handleNextAction(context: navigationManager, defaultAction: defaultCloseAction)
+                    viewModel.handleNextAction(context: navigationManager, gateManager: parentGate, defaultAction: defaultCloseAction)
                 },
                 customBackAction: {
                     viewModel.handleBackAction()
@@ -81,31 +82,34 @@ struct ChildLogNavigationContainer: View {
                         viewModel.selectedItem = nil
                         viewModel.previewImage = nil
                         viewModel.finalProcessedImage = UIImage()
-                        viewModel.backgroundRemover.partialReset()
                         viewModel.imageLoadError = nil
                     }
                  )
             }
             
-            if viewModel.isShowGardenFullAlert {
-                popUpView
+//            if viewModel.isShowGardenFullAlert {
+//                popUpView
+//            }
+            if let popupType = viewModel.activePopup {
+                PopUpView(type: popupType) {
+                    withAnimation {
+                        viewModel.dismissActivePopup()
+                    }
+                }
             }
         }
         
         // TODO: Add alert for Canvas processing errors if needed
     }
     
-    var popUpView: some View {
-        PopUpView(type: LogInputModality.gardenFull(onPrimaryTap: {
-            withAnimation {
-                viewModel.setAlertonGardenFull(to: false)
-                navigationManager.popToRoot()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    navigationManager.goTo(.childGarden(.home(logToBePlanted: viewModel.bufferedLogData)))
-                }
-            }
-        })) {
-            viewModel.setAlertonGardenFull(to: false)
-        }
-    }
+//    var popUpView: some View {
+//        PopUpView(type: LogInputModality.gardenFull(onPrimaryTap: {
+//            withAnimation {
+//                viewModel.setAlertonGardenFull(to: false)
+//                navigationManager.popToRoot()
+//            }
+//        })) {
+//            viewModel.setAlertonGardenFull(to: false)
+//        }
+//    }
 }

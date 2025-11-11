@@ -12,8 +12,9 @@ struct FieldCardView: View {
     var type: FieldState
     var logImage: UIImage?
     var isShovelMode: Bool?
+    var emptyStateColor: Color?
     
-    var onEmptyFieldTapped: (() -> Void)?
+    var onFieldTapped: (() -> Void)?
     var onCTAButtonTapped: (() -> Void)?
     
     let emptyFieldSize: CGFloat = 141.0
@@ -25,7 +26,7 @@ struct FieldCardView: View {
         switch type {
         case .empty:
             return widthAndPotField
-        case .created, .declined, .approved:
+        case .created, .declined, .approved, .waiting:
             return 158.59
         case .done:
             return 181.71
@@ -38,13 +39,15 @@ struct FieldCardView: View {
         type: FieldState,
         logImage: UIImage? = UIImage(named: ColoredPencilAsset.canvasViewBlackPencil.imageName),
         isShovelMode: Bool? = false,
-        onEmptyFieldTapped: (() -> Void)? = nil,
+        emptyStateColor: Color? = nil,
+        onFieldTapped: (() -> Void)? = nil,
         onCTAButtonTapped: (() -> Void)? = nil
     ) {
         self.type = type
         self.logImage = logImage
         self.isShovelMode = isShovelMode
-        self.onEmptyFieldTapped = onEmptyFieldTapped
+        self.emptyStateColor = emptyStateColor
+        self.onFieldTapped = onFieldTapped
         self.onCTAButtonTapped = onCTAButtonTapped
         
         switch type {
@@ -101,25 +104,46 @@ struct FieldCardView: View {
             }
         }
         .background(
+            emptyStateBackgroundView
+        )
+        .frame(width: widthAndPotField, height: heightField)
+        .onTapGesture {
+            //MARK: ini sementara aja since garden akan berubah
+                onFieldTapped?()
+        }
+    }
+    
+    @ViewBuilder
+        private var emptyStateBackgroundView: some View {
+        if type == .empty {
+            ZStack {
+                Image(GardenImageAsset.emptyFieldBase.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: emptyFieldSize, height: emptyFieldSize)
+                    .foregroundStyle(emptyStateColor ?? Color(hex: "#AD7151")
+)
+                
+                Image(GardenImageAsset.emptyFieldOverlay.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: emptyFieldSize, height: emptyFieldSize)
+            }
+            
+        } else {
             Image(GardenImageAsset.gardenEmptyField.imageName)
                 .resizable()
                 .frame(width: emptyFieldSize, height: emptyFieldSize)
-                .onTapGesture {
-                    if type == .empty {
-                        onEmptyFieldTapped?()
-                    }
-                }
-        )
-        .frame(width: widthAndPotField, height: heightField)
+        }
     }
 }
 
 #Preview {
     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 70) {
         FieldCardView(type: .empty)
-        FieldCardView(type: .approved)
         FieldCardView(type: .created)
-        FieldCardView(type: .done)
+        FieldCardView(type: .waiting)
+        FieldCardView(type: .approved)
         
     }
     .padding(.top, 50)
